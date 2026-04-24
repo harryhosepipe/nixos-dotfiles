@@ -152,6 +152,28 @@ widget_defaults = dict(
 extension_defaults = widget_defaults.copy()
 
 sep = widget.Sep(linewidth=1, padding=8, foreground=colors[9])
+battery_paths = [entry for entry in os.listdir("/sys/class/power_supply") if entry.startswith("BAT")] if os.path.isdir("/sys/class/power_supply") else []
+battery_widgets = []
+
+if battery_paths:
+    battery_widgets = [
+        sep,
+        widget.Battery(
+            foreground=colors[6],           # pick a palette slot you like
+            padding=8,
+            update_interval=5,
+            format='{percent:2.0%} {char} {hour:d}:{min:02d}',  # e.g. "73% ⚡ 1:45"
+            fmt='Bat: {}',
+            charge_char='',               # shown while charging
+            discharge_char='',            # Nerd icon; use '-' if you prefer plain ascii
+            full_char='✔',                 # when at/near 100%
+            unknown_char='?',
+            empty_char='!',
+            mouse_callbacks={
+                'Button1': lambda: qtile.cmd_spawn(myTerm + ' -e upower -i $(upower -e | grep BAT)'),
+            },
+        ),
+    ]
 
 screens = [
     Screen(
@@ -240,22 +262,7 @@ screens = [
                     fmt = 'Disk: {}',
                     visible_on_warn = False,
                 ),
-                sep,
-                widget.Battery(
-                    foreground=colors[6],           # pick a palette slot you like
-                    padding=8,
-                    update_interval=5,
-                    format='{percent:2.0%} {char} {hour:d}:{min:02d}',  # e.g. "73% ⚡ 1:45"
-                    fmt='Bat: {}',
-                    charge_char='',               # shown while charging
-                    discharge_char='',            # Nerd icon; use '-' if you prefer plain ascii
-                    full_char='✔',                 # when at/near 100%
-                    unknown_char='?',
-                    empty_char='!', 
-                    mouse_callbacks={
-                        'Button1': lambda: qtile.cmd_spawn(myTerm + ' -e upower -i $(upower -e | grep BAT)'),
-                    },
-                ),
+                *battery_widgets,
                 sep,
                 widget.Volume(
                     foreground = colors[7],

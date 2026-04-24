@@ -1,5 +1,14 @@
 { config, lib, pkgs, ... }:
 
+let
+  shellSettings = import ./shells/settings.nix;
+  shellPackages = {
+    bash = pkgs.bashInteractive;
+    zsh = pkgs.zsh;
+    fish = pkgs.fish;
+  };
+in
+
 {
   imports =
     [
@@ -33,10 +42,14 @@
   users.users.pablo = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
+    shell = shellPackages.${shellSettings.defaultShell};
     packages = with pkgs; [
       tree
     ];
   };
+
+  programs.zsh.enable = true;
+  programs.fish.enable = true;
 
   programs.firefox.enable = true;
 
@@ -45,6 +58,12 @@
     wget
     alacritty
     git
+  ];
+
+  environment.shells = with pkgs; [
+    bashInteractive
+    zsh
+    fish
   ];
 
   fonts.packages = with pkgs; [

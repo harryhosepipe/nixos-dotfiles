@@ -1,0 +1,8 @@
+[projects."/home/pablo"]
+trust_level = "trusted"
+
+[projects."/home/pablo/dotfiles"]
+trust_level = "trusted"
+
+[plugins."github@openai-curated"]
+enabled = true
