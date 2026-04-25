@@ -2,9 +2,12 @@
 
 let
   dotfiles = "${config.home.homeDirectory}/dotfiles/config";
+  shellSettings = import ./shells/settings.nix;
+  fzfShare = "${pkgs.fzf}/share/fzf";
   createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
 
   configDirs = {
+    bash = "bash";
     qtile = "qtile";
     nvim = "nvim";
     zsh = "zsh";
@@ -21,8 +24,10 @@ in
   home.username = "pablo";
   home.homeDirectory = "/home/pablo";
   home.stateVersion = "25.05";
+  home.sessionPath = shellSettings.sessionPath;
   home.sessionVariables = {
     CODEX_HOME = "${config.xdg.configHome}/codex";
+    FZF_SHARE = fzfShare;
     _ZO_ECHO = "1";
     _ZO_EXCLUDE_DIRS = "${config.home.homeDirectory}/.cache:${config.home.homeDirectory}/.local/share/Trash:${config.home.homeDirectory}/dotfiles/config/codex";
   };

@@ -61,6 +61,7 @@ That means future changes should move the repo toward:
 - Keep file and folder names boring and obvious.
 - When adding a new folder, explain in simple words why it exists.
 - Leave short comments only when they help a learner understand the shape.
+- When editing Nix files or shell config files, add useful plain-language comments where they help explain startup order, shared values, or why something must be loaded in a certain place.
 
 ## Preferred Direction For Refactors
 
