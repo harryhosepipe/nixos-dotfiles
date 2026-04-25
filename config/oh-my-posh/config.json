@@ -16,7 +16,6 @@
     {
       "type": "prompt",
       "alignment": "left",
-      "newline": true,
       "segments": [
         {
           "template": "{{ if .WSL }}WSL at{{ end }} {{.Icon}} ",
@@ -139,15 +138,10 @@
           "style": "powerline"
         },
         {
-          "template": " {{ if gt .Code 0 }}\u2717{{ else }}\u2713{{ end }} ",
+          "template": "\n{{ if gt .Code 0 }}<#cc241d><</><#cc241d>/</><#cc241d>></>{{ else }}<#98971a><</><#98971a>/</><#98971a>></>{{ end }}",
           "foreground": "#98971a",
-          "foreground_templates": [
-            "{{ if gt .Code 0 }}#cc241d{{ end }}"
-          ],
-          "properties": {
-            "always_enabled": true
-          },
-          "type": "status",
+          "force": true,
+          "type": "text",
           "style": "plain"
         }
       ]

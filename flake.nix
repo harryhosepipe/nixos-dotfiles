@@ -1,5 +1,5 @@
 {
-  description = "NixOS from Scratch";
+  description = "Learning-first NixOS setup";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.11";
@@ -9,21 +9,28 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
-    nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            users.pablo = import ./home.nix;
-            backupFileExtension = "backup";
-          };
-        }
-      ];
+  outputs = { nixpkgs, home-manager, ... }:
+    let
+      # This file stays small on purpose.
+      # The host list lives in hosts.nix and each machine has its own folder.
+      hosts = import ./hosts.nix;
+      mainHost = hosts.nixos-btw;
+    in
+    {
+      nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
+        system = mainHost.system;
+        modules = [
+          ./hosts/nixos-btw/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.${mainHost.user} = import ./hosts/nixos-btw/home.nix;
+              backupFileExtension = "backup";
+            };
+          }
+        ];
+      };
     };
-  };
 }
