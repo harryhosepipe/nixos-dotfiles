@@ -1,0 +1,4 @@
+# Keep only the real Codex settings file in Git.
+*
+!.gitignore
+!config.toml

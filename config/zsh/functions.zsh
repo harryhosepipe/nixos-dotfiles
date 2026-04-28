@@ -27,3 +27,12 @@ fh() {
   selected="$(history | sed 's/^[[:space:]]*[0-9]\+[[:space:]]*//' | awk 'NF && !seen[$0]++' | fzf --prompt='history> ')"
   [ -n "$selected" ] && eval "$selected"
 }
+
+fzf_complete_and_accept() {
+  local before="$BUFFER"
+  zle fzf-completion
+
+  if [[ "$BUFFER" != "$before" && -n "$BUFFER" ]]; then
+    zle accept-line
+  fi
+}

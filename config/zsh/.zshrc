@@ -20,6 +20,8 @@ fi
 # Load the shared functions and aliases from the repo.
 source ~/.config/zsh/functions.zsh
 source ~/.config/zsh/aliases.zsh
+zle -N fzf_complete_and_accept
+bindkey '^[l' fzf_complete_and_accept
 
 #History
 HISTSIZE=5000

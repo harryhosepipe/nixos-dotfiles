@@ -1,6 +1,5 @@
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
-service_tier = "fast"
 [projects."/home/pablo"]
 trust_level = "trusted"
 
@@ -9,3 +8,6 @@ trust_level = "trusted"
 
 [plugins."github@openai-curated"]
 enabled = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 3

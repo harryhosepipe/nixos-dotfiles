@@ -82,6 +82,10 @@ A simple structure that can grow is better than a “perfect” structure that i
 - Do not move generated or personal app state into the learning structure on purpose.
 - Treat `hardware-configuration.nix` as machine-tied unless the user asks otherwise.
 - Keep rebuild commands and common entry points easy to spot.
+- Do not run `nixos-rebuild` or `home-manager switch` just to test a change.
+- Do not run `nix build` just to test a change.
+- Prefer `nix eval` or other read-only checks first.
+- Only do a real build, rebuild, or switch when the user explicitly asks for it.
 
 ## Definition Of Success
 

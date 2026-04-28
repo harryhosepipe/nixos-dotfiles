@@ -2,31 +2,42 @@
   description = "Learning-first NixOS setup";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-25.11";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = inputs@{
+    nixpkgs,
+    home-manager,
+    ...
+  }:
     let
       # This file stays small on purpose.
       # The host list lives in hosts.nix and each machine has its own folder.
       hosts = import ./hosts.nix;
-      mainHost = hosts.nixos-btw;
+      mainHost = hosts.desktop;
     in
     {
-      nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
         system = mainHost.system;
+        specialArgs = {
+          host = mainHost;
+        };
         modules = [
-          ./hosts/nixos-btw/configuration.nix
+          (mainHost.path + "/configuration.nix")
           home-manager.nixosModules.home-manager
           {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              users.${mainHost.user} = import ./hosts/nixos-btw/home.nix;
+              extraSpecialArgs = {
+                inherit inputs;
+              };
+              users.${mainHost.user} = import (mainHost.path + "/home.nix");
               backupFileExtension = "backup";
             };
           }

@@ -1,23 +1,16 @@
 vim.filetype.add({ extension = { goon = "goon" } })
 
--- Register custom goon parser with treesitter (old API)
-local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-parser_config.goon = {
-    install_info = {
-        url = "/home/tony/repos/tree-sitter-goon",
-        files = { "src/parser.c" },
-    },
-    filetype = "goon",
-}
+local safe = require("config.safe")
+local treesitter = safe.require("nvim-treesitter")
+local textobjects = safe.require("nvim-treesitter-textobjects")
+local treesitter_context = safe.require("treesitter-context")
 
--- Configure nvim-treesitter with ensure_installed
-require("nvim-treesitter.configs").setup({
-    ensure_installed = {
-        "json", "python", "ron", "javascript", "haskell", "d", "query",
-        "typescript", "tsx", "rust", "zig", "php", "yaml", "html", "css",
-        "markdown", "markdown_inline", "bash", "lua", "vim", "vimdoc", "c",
-        "dockerfile", "gitignore", "astro", "go", "templ"
-    },
+if not treesitter then
+    return
+end
+
+-- nixCats installs the parser set up front, so this file only turns features on.
+treesitter.setup({
     highlight = {
         enable = true,
     },
@@ -26,17 +19,27 @@ require("nvim-treesitter.configs").setup({
     },
 })
 
-require("nvim-treesitter-textobjects").setup({
-    select = {
-        lookahead = true,
-    },
-})
+if textobjects then
+    textobjects.setup({
+        select = {
+            lookahead = true,
+        },
+    })
+end
 
 vim.keymap.set({ "x", "o" }, "af", function()
-    require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects")
+    local select = safe.require("nvim-treesitter-textobjects.select")
+    if select then
+        select.select_textobject("@function.outer", "textobjects")
+    end
 end)
 vim.keymap.set({ "x", "o" }, "if", function()
-    require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects")
+    local select = safe.require("nvim-treesitter-textobjects.select")
+    if select then
+        select.select_textobject("@function.inner", "textobjects")
+    end
 end)
 
-require("treesitter-context").setup({})
+if treesitter_context then
+    treesitter_context.setup({})
+end

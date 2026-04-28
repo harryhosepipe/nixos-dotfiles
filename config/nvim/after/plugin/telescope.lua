@@ -1,5 +1,14 @@
-local actions = require("telescope.actions")
-require("telescope").setup({
+local safe = require("config.safe")
+
+local telescope = safe.require("telescope")
+local actions = safe.require("telescope.actions", "telescope.nvim")
+local builtin = safe.require("telescope.builtin", "telescope.nvim")
+
+if not (telescope and actions and builtin) then
+    return
+end
+
+telescope.setup({
     defaults = {
         mappings = {
             i = {
@@ -10,8 +19,6 @@ require("telescope").setup({
         },
     },
 })
-
-local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>ff", builtin.find_files)
 vim.keymap.set("n", "<leader>fo", builtin.oldfiles)
 vim.keymap.set("n", "<leader>fq", builtin.quickfix)

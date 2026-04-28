@@ -1,7 +1,17 @@
-local cmp = require("cmp")
-require("cmp_nvim_lsp").setup()
-cmp.register_source("path", require("cmp_path").new())
-cmp.register_source("buffer", require("cmp_buffer"))
+local safe = require("config.safe")
+
+local cmp = safe.require("cmp", "nvim-cmp")
+local cmp_nvim_lsp = safe.require("cmp_nvim_lsp")
+local cmp_path = safe.require("cmp_path")
+local cmp_buffer = safe.require("cmp_buffer")
+
+if not (cmp and cmp_nvim_lsp and cmp_path and cmp_buffer) then
+    return
+end
+
+cmp_nvim_lsp.setup()
+cmp.register_source("path", cmp_path.new())
+cmp.register_source("buffer", cmp_buffer)
 
 cmp.setup({
     preselect = cmp.PreselectMode.Item,
