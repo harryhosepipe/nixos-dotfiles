@@ -54,6 +54,15 @@ in
 
   services.ssh-agent.enable = true;
 
+  programs.gh = {
+    enable = true;
+    settings = {
+      # Tell gh to create GitHub remotes with SSH so Git uses the SSH key
+      # already selected in the ssh config above.
+      git_protocol = "ssh";
+    };
+  };
+
   home.file.".bashrc".source = createSymlink "${dotfiles}/bash/.bashrc";
   home.file.".bash_profile".source = createSymlink "${dotfiles}/bash/.bash_profile";
   home.file.".profile".source = createSymlink "${dotfiles}/profile/.profile";
@@ -71,7 +80,6 @@ in
     doppler
     bat
     btop
-    gh
     oh-my-posh
     fzf
     zoxide
