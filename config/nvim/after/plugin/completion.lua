@@ -26,6 +26,12 @@ cmp.setup({
         ["<C-Space>"] = cmp.mapping.complete(),
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+        ["<C-j>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then cmp.select_next_item({ behavior = cmp.SelectBehavior.Select }) else fallback() end
+        end, { "i", "s" }),
+        ["<C-k>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select }) else fallback() end
+        end, { "i", "s" }),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-u>"] = cmp.mapping.scroll_docs(-4),
         ["<Tab>"] = cmp.mapping(function(fallback)

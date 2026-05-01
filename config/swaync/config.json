@@ -1,0 +1,26 @@
+{
+  "hide-on-action": true,
+  "script-fail-notify": false,
+  "scripts": {
+    "focus-signal-by-name": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" signal'",
+      "app-name": "Signal",
+      "run-on": "action"
+    },
+    "focus-signal-by-desktop-entry": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" signal'",
+      "desktop-entry": "signal",
+      "run-on": "action"
+    },
+    "focus-whatsapp-by-name": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" whatsapp'",
+      "app-name": "WhatsApp|Whatsapp|WhatsApp Electron",
+      "run-on": "action"
+    },
+    "focus-whatsapp-by-desktop-entry": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" whatsapp'",
+      "desktop-entry": "com.github.dagmoller.whatsapp-electron",
+      "run-on": "action"
+    }
+  }
+}

@@ -1,9 +1,11 @@
-{ config, inputs, pkgs, ... }:
-
-let
-  utils = inputs.nixCats.utils;
-in
 {
+  config,
+  inputs,
+  pkgs,
+  ...
+}: let
+  utils = inputs.nixCats.utils;
+in {
   imports = [
     inputs.nixCats.homeModule
   ];
@@ -17,43 +19,42 @@ in
     ];
 
     # Keep one clear Neovim package for this home setup.
-    packageNames = [ "mainNvim" ];
+    packageNames = ["mainNvim"];
 
     # The Lua config lives in the repo like a normal Neovim folder.
     luaPath = ../../config/nvim;
 
-    categoryDefinitions.replace =
-      { pkgs, ... }:
-      {
-        lspsAndRuntimeDeps.general = with pkgs; [
-          fd
-          ripgrep
-          wl-clipboard
-          git
-          nil
-          alejandra
-          lua-language-server
-          vscode-langservers-extracted
-          typescript-language-server
-          typescript
-          zls
-          rust-analyzer
-          clang-tools
-          c3-lsp
-          serve-d
-          haskell-language-server
-          fourmolu
-          gopls
-          templ
-          phpactor
-          php84Packages.php-cs-fixer
-        ];
+    categoryDefinitions.replace = {pkgs, ...}: {
+      lspsAndRuntimeDeps.general = with pkgs; [
+        fd
+        ripgrep
+        wl-clipboard
+        git
+        nil
+        alejandra
+        lua-language-server
+        vscode-langservers-extracted
+        typescript-language-server
+        typescript
+        zls
+        rust-analyzer
+        clang-tools
+        c3-lsp
+        serve-d
+        haskell-language-server
+        fourmolu
+        gopls
+        templ
+        phpactor
+        php84Packages.php-cs-fixer
+      ];
 
-        startupPlugins.general = with pkgs.vimPlugins; [
-          plenary-nvim
-          nvim-treesitter
-          (nvim-treesitter.withPlugins (
-            grammars: with grammars; [
+      startupPlugins.general = with pkgs.vimPlugins; [
+        plenary-nvim
+        nvim-treesitter
+        (nvim-treesitter.withPlugins (
+          grammars:
+            with grammars; [
               bash
               c
               c3
@@ -83,30 +84,31 @@ in
               yaml
               zig
             ]
-          ))
-          nvim-treesitter-textobjects
-          nvim-treesitter-context
-          nvim-cmp
-          cmp-nvim-lsp
-          cmp-path
-          cmp-buffer
-          telescope-nvim
-          harpoon2
-          nui-nvim
-          neo-tree-nvim
-          tokyonight-nvim
-          which-key-nvim
-          lualine-nvim
-          nvim-highlight-colors
-          orgmode
-          vim-fugitive
-          undotree
-          vim-oscyank
-        ];
-      };
+        ))
+        nvim-treesitter-textobjects
+        nvim-treesitter-context
+        nvim-cmp
+        cmp-nvim-lsp
+        cmp-path
+        cmp-buffer
+        telescope-nvim
+        harpoon2
+        nui-nvim
+        neo-tree-nvim
+        tokyonight-nvim
+        which-key-nvim
+        lualine-nvim
+        nvim-highlight-colors
+        orgmode
+        vim-fugitive
+        undotree
+        vim-oscyank
+        flash-nvim
+      ];
+    };
 
     packageDefinitions.replace = {
-      mainNvim = { ... }: {
+      mainNvim = {...}: {
         settings = {
           # Read the live ~/.config/nvim folder so Lua edits show up right away.
           wrapRc = false;

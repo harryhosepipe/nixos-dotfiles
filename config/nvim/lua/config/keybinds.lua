@@ -24,6 +24,7 @@ vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
 -- sometimes in insert mode, control-c doesn't exactly work like escape
 vim.keymap.set("i", "<C-c>", "<Esc>")
+vim.keymap.set("i", "jj", "<Esc>", { desc = "Leave insert mode" })
 
 -- What the heck is Ex mode?
 vim.keymap.set("n", "Q", "<nop>")

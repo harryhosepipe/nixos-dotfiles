@@ -21,20 +21,35 @@ fi
 source ~/.config/zsh/functions.zsh
 source ~/.config/zsh/aliases.zsh
 zle -N fzf_complete_and_accept
+# Use Ctrl+F to accept the gray inline suggestion from zsh-autosuggestions.
+# Tab still opens completion menus and fzf-based completion.
+bindkey '^F' autosuggest-accept
 bindkey '^[l' fzf_complete_and_accept
 
 #History
+# Keep shell history in the XDG state folder so config and saved state stay separate.
+HISTDIR="${XDG_STATE_HOME:-$HOME/.local/state}/zsh"
+mkdir -p "$HISTDIR"
+
 HISTSIZE=5000
-HISTFILE=~/.zsh_history
+HISTFILE="$HISTDIR/history"
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
+
+# Move the old history file once so new shells stop writing to two places.
+if [ ! -f "$HISTFILE" ] && [ -f "$HOME/.zsh_history" ]; then
+  mv "$HOME/.zsh_history" "$HISTFILE"
+fi
+
 setopt appendhistory
-setopt sharehistory
+setopt hist_fcntl_lock
+setopt hist_save_by_copy
 setopt hist_ignore_space
 setopt hist_ignore_all_dups
 setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
+setopt hist_reduce_blanks
 
 #Completion Styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A=Za-z}'

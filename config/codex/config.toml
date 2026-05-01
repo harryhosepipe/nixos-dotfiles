@@ -1,4 +1,4 @@
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "medium"
 [projects."/home/pablo"]
 trust_level = "trusted"
@@ -6,8 +6,24 @@ trust_level = "trusted"
 [projects."/home/pablo/dotfiles"]
 trust_level = "trusted"
 
+[projects."/home/pablo/nix-dot"]
+trust_level = "trusted"
+
+[projects."/home/pablo/vmsetup"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/Factory-team-2.0"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
+
+[mcp_servers.gitnexus]
+command = "npx"
+args = ["-y", "gitnexus@1.6.3", "mcp"]
+
+[mcp_servers.context-mode]
+command = "context-mode"
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
