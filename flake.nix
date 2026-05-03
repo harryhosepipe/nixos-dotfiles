@@ -4,14 +4,6 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
-    nvim-colorpicker = {
-      url = "github:mikevskater/nvim-colorpicker";
-      flake = false;
-    };
-    nvim-float = {
-      url = "github:mikevskater/nvim-float";
-      flake = false;
-    };
     codex-cli-nix = {
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -45,31 +37,32 @@
     hosts = import ./hosts.nix {
       inherit userSettings system;
     };
-    mainHost = hosts.desktop;
-  in {
-    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-      system = mainHost.system;
-      specialArgs = {
-        host = mainHost;
-        inherit userSettings;
-        inherit system;
-      };
-      modules = [
-        (mainHost.path + "/configuration.nix")
-        home-manager.nixosModules.home-manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            extraSpecialArgs = {
-              inherit inputs;
-              inherit userSettings;
+    mkNixosConfiguration = host:
+      nixpkgs.lib.nixosSystem {
+        system = host.system;
+        specialArgs = {
+          inherit host;
+          inherit userSettings;
+          inherit system;
+        };
+        modules = [
+          (host.path + "/configuration.nix")
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = {
+                inherit inputs;
+                inherit userSettings;
+              };
+              users.${host.user} = import (host.path + "/home.nix");
+              backupFileExtension = "backup";
             };
-            users.${mainHost.user} = import (mainHost.path + "/home.nix");
-            backupFileExtension = "backup";
-          };
-        }
-      ];
-    };
+          }
+        ];
+      };
+  in {
+    nixosConfigurations = nixpkgs.lib.mapAttrs (_: mkNixosConfiguration) hosts;
   };
 }

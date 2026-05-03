@@ -48,6 +48,9 @@ args = ["-y", "gitnexus@1.6.3", "mcp"]
 [mcp_servers.context-mode]
 command = "context-mode"
 
+[mcp_servers.context-mode.tools.ctx_search]
+approval_mode = "approve"
+
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 

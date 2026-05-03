@@ -1,9 +1,7 @@
 {
   userSettings,
   system,
-}:
-
-{
+}: {
   # This file is the short host list for the repo.
   # Each machine says which user it belongs to, what its real hostname is,
   # and where its own host files live.

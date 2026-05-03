@@ -5,15 +5,15 @@
   userSettings,
   ...
 }: let
-  shellSettings = import ../shells/settings.nix;
+  shellSettings = import ../../../shells/settings.nix;
   shellPackages = {
     bash = pkgs.bashInteractive;
     zsh = pkgs.zsh;
     fish = pkgs.fish;
   };
 in {
-  # This file is the shared system base.
-  # Put settings here when they should be true for every machine.
+  # Shared NixOS base for every declared machine.
+  # Keep host hardware, GPU quirks, and one-off services in the host folder.
 
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [

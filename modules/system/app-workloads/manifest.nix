@@ -7,8 +7,9 @@
   envFile = "${dataDir}/manifest.env";
   networkName = "manifest";
 in {
-  virtualisation.docker.enable = true;
-  virtualisation.oci-containers.backend = "docker";
+  imports = [
+    ../docker/runtime.nix
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${dataDir} 0700 root root -"
