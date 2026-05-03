@@ -5,6 +5,7 @@
     ../common.nix
     ./hardware-configuration.nix
     ./nvidia.nix
+    ../../modules/system/docker/manifest.nix
     ../../modules/system/gui/hyprland-greetd.nix
     ../../modules/system/vfio/single-gpu-passthrough.nix
   ];

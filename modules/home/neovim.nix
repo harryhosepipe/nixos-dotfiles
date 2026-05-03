@@ -5,18 +5,6 @@
   ...
 }: let
   utils = inputs.nixCats.utils;
-  buildVimPlugin = pkgs.vimUtils.buildVimPlugin;
-  nvimFloat = buildVimPlugin {
-    pname = "nvim-float";
-    version = "unstable";
-    src = inputs."nvim-float";
-  };
-  nvimColorpicker = buildVimPlugin {
-    pname = "nvim-colorpicker";
-    version = "unstable";
-    src = inputs.nvim-colorpicker;
-    dependencies = [nvimFloat];
-  };
 in {
   imports = [
     inputs.nixCats.homeModule
@@ -48,6 +36,16 @@ in {
         vscode-langservers-extracted
         typescript-language-server
         typescript
+        svelte-language-server
+        astro-language-server
+        bash-language-server
+        pyright
+        emmet-language-server
+        eslint_d
+        ruff
+        stylelint
+        htmlhint
+        haskellPackages.ShellCheck
         zls
         rust-analyzer
         clang-tools
@@ -80,6 +78,7 @@ in {
               javascript
               json
               lua
+              astro
               markdown
               markdown_inline
               nix
@@ -87,6 +86,7 @@ in {
               python
               query
               rust
+              svelte
               templ
               toml
               tsx
@@ -103,11 +103,10 @@ in {
         cmp-nvim-lsp
         cmp-path
         cmp-buffer
+        lazydev-nvim
         telescope-nvim
         harpoon2
         nui-nvim
-        nvimFloat
-        nvimColorpicker
         neo-tree-nvim
         tokyonight-nvim
         which-key-nvim
@@ -118,6 +117,14 @@ in {
         undotree
         vim-oscyank
         flash-nvim
+        mini-pairs
+        ts-comments-nvim
+        gitsigns-nvim
+        trouble-nvim
+        nvim-lint
+        nvim-ts-autotag
+        bufferline-nvim
+        snacks-nvim
       ];
     };
 

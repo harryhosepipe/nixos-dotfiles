@@ -1,11 +1,19 @@
 vim.filetype.add({
     extension = {
+        astro = "astro",
         h = "c",
         c3 = "c3",
         d = "d",
+        svelte = "svelte",
         templ = "templ",
     },
 })
+
+local safe = require("config.safe")
+local lazydev = safe.require("lazydev", "lazydev.nvim")
+if lazydev then
+    lazydev.setup()
+end
 
 vim.lsp.config("*", {
     root_markers = { ".git" },
@@ -42,7 +50,7 @@ function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
     return orig_open_floating_preview(contents, syntax, opts, ...)
 end
 
-local cmp_nvim_lsp = require("config.safe").require("cmp_nvim_lsp")
+local cmp_nvim_lsp = safe.require("cmp_nvim_lsp")
 local capabilities = cmp_nvim_lsp
     and cmp_nvim_lsp.default_capabilities()
     or vim.lsp.protocol.make_client_capabilities()
@@ -175,6 +183,12 @@ local servers = {
         },
     },
 
+    html = {
+        cmd = { "vscode-html-language-server", "--stdio" },
+        filetypes = { "html" },
+        root_markers = { "package.json", ".git" },
+    },
+
     jsonls = {
         cmd = { "vscode-json-languageserver", "--stdio" },
         filetypes = { "json", "jsonc" },
@@ -197,6 +211,77 @@ local servers = {
                 completeFunctionCalls = true,
             },
         },
+    },
+
+    eslint = {
+        cmd = { "vscode-eslint-language-server", "--stdio" },
+        filetypes = {
+            "astro",
+            "javascript",
+            "javascriptreact",
+            "svelte",
+            "typescript",
+            "typescriptreact",
+        },
+        root_markers = {
+            "eslint.config.js",
+            "eslint.config.mjs",
+            "eslint.config.cjs",
+            ".eslintrc",
+            ".eslintrc.js",
+            ".eslintrc.cjs",
+            ".eslintrc.json",
+            "package.json",
+        },
+    },
+
+    svelte = {
+        cmd = { "svelteserver", "--stdio" },
+        filetypes = { "svelte" },
+        root_markers = { "svelte.config.js", "svelte.config.mjs", "package.json", ".git" },
+    },
+
+    astro = {
+        cmd = { "astro-ls", "--stdio" },
+        filetypes = { "astro" },
+        root_markers = { "astro.config.mjs", "astro.config.js", "package.json", ".git" },
+        init_options = {
+            typescript = {},
+        },
+    },
+
+    bashls = {
+        cmd = { "bash-language-server", "start" },
+        filetypes = { "bash", "sh" },
+        root_markers = { ".git" },
+    },
+
+    pyright = {
+        cmd = { "pyright-langserver", "--stdio" },
+        filetypes = { "python" },
+        root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
+        settings = {
+            python = {
+                analysis = {
+                    autoSearchPaths = true,
+                    typeCheckingMode = "basic",
+                    useLibraryCodeForTypes = true,
+                },
+            },
+        },
+    },
+
+    emmet_language_server = {
+        cmd = { "emmet-language-server", "--stdio" },
+        filetypes = {
+            "astro",
+            "css",
+            "html",
+            "javascriptreact",
+            "svelte",
+            "typescriptreact",
+        },
+        root_markers = { "package.json", ".git" },
     },
 
     gopls = {

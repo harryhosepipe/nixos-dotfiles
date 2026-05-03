@@ -1,11 +1,29 @@
+GENERAL---
 set up ntfy
 set up dozzle for notifications
 jellyseerr
+
+
+NEOVIM TODOS
+
+installed these plugins in modules/home/neovim.nix:
+    mini.pairs
+    ts-comments.nvim
+    lazydev.nvim
+    gitsigns.nvim
+    trouble.nvim
+    nvim-lint
+    nvim-ts-autotag
+    bufferline.nvim
+    snacks.nvim
+
+DOCKER CONTAINERS
+    https://github.com/mnfst/manifest
+
 
 non priority below
 
 setup a interface for changing audio settings.
 make signal and whatsapp open when hypr starts
 get the hypr settings app:w
-
 

@@ -1,5 +1,25 @@
 model = "gpt-5.5"
 model_reasoning_effort = "medium"
+
+# Manifest custom provider kept disabled for now.
+# Manifest currently works for non-streaming /v1/responses calls, but Codex
+# needs streaming response.completed events and Manifest only returned [DONE].
+#
+# [model_providers.manifest]
+# name = "Manifest"
+# base_url = "http://127.0.0.1:2099/v1"
+# wire_api = "responses"
+# supports_websockets = false
+#
+# [model_providers.manifest.auth]
+# command = "cat"
+# args = ["/home/pablo/.config/codex/manifest-api-key"]
+#
+# [profiles.manifest]
+# model_provider = "manifest"
+# model = "auto"
+# model_reasoning_effort = "medium"
+
 [projects."/home/pablo"]
 trust_level = "trusted"
 
@@ -13,6 +33,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/pablo/projects/Factory-team-2.0"]
+trust_level = "trusted"
+
+[projects."/home/pablo/.config/codex"]
 trust_level = "trusted"
 
 [plugins."github@openai-curated"]
