@@ -2,3 +2,5 @@
 *
 !.gitignore
 !config.toml
+!agents/
+!agents/bob.toml

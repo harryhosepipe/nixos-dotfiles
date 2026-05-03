@@ -4,6 +4,14 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nvim-colorpicker = {
+      url = "github:mikevskater/nvim-colorpicker";
+      flake = false;
+    };
+    nvim-float = {
+      url = "github:mikevskater/nvim-float";
+      flake = false;
+    };
     codex-cli-nix = {
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,52 +26,50 @@
     };
   };
 
-  outputs =
-    inputs @ { nixpkgs
-    , home-manager
-    , ...
-    }:
-    let
-      userSettings = {
-        name = "Pablo";
-        username = "pablo";
-        dotFiles = "nix-dot";
-        email = "pablo@renderbros.com";
-      };
-      system = {
-        hostName = "nixos-pablo";
-      };
-      # This file stays small on purpose.
-      # The host list lives in hosts.nix and each machine has its own folder.
-      hosts = import ./hosts.nix {
-        inherit userSettings system;
-      };
-      mainHost = hosts.desktop;
-    in
-    {
-      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-        system = mainHost.system;
-        specialArgs = {
-          host = mainHost;
-          inherit userSettings;
-          inherit system;
-        };
-        modules = [
-          (mainHost.path + "/configuration.nix")
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = {
-                inherit inputs;
-                inherit userSettings;
-              };
-              users.${mainHost.user} = import (mainHost.path + "/home.nix");
-              backupFileExtension = "backup";
-            };
-          }
-        ];
-      };
+  outputs = inputs @ {
+    nixpkgs,
+    home-manager,
+    ...
+  }: let
+    userSettings = {
+      name = "Pablo";
+      username = "pablo";
+      dotFiles = "nix-dot";
+      email = "pablo@renderbros.com";
     };
+    system = {
+      hostName = "nixos-pablo";
+    };
+    # This file stays small on purpose.
+    # The host list lives in hosts.nix and each machine has its own folder.
+    hosts = import ./hosts.nix {
+      inherit userSettings system;
+    };
+    mainHost = hosts.desktop;
+  in {
+    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
+      system = mainHost.system;
+      specialArgs = {
+        host = mainHost;
+        inherit userSettings;
+        inherit system;
+      };
+      modules = [
+        (mainHost.path + "/configuration.nix")
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs = {
+              inherit inputs;
+              inherit userSettings;
+            };
+            users.${mainHost.user} = import (mainHost.path + "/home.nix");
+            backupFileExtension = "backup";
+          };
+        }
+      ];
+    };
+  };
 }

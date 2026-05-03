@@ -1,1 +1,20 @@
-.gitnexus
+.gitnexus/
+
+# Nix build result links.
+result
+result-*
+
+# Local environment and editor state.
+.direnv/
+.env
+.env.*
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Runtime caches and generated files.
+__pycache__/
+*.pyc
+config/zsh/.zcompdump*
+config/zsh/.zsh_history

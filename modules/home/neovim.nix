@@ -5,6 +5,18 @@
   ...
 }: let
   utils = inputs.nixCats.utils;
+  buildVimPlugin = pkgs.vimUtils.buildVimPlugin;
+  nvimFloat = buildVimPlugin {
+    pname = "nvim-float";
+    version = "unstable";
+    src = inputs."nvim-float";
+  };
+  nvimColorpicker = buildVimPlugin {
+    pname = "nvim-colorpicker";
+    version = "unstable";
+    src = inputs.nvim-colorpicker;
+    dependencies = [nvimFloat];
+  };
 in {
   imports = [
     inputs.nixCats.homeModule
@@ -94,6 +106,8 @@ in {
         telescope-nvim
         harpoon2
         nui-nvim
+        nvimFloat
+        nvimColorpicker
         neo-tree-nvim
         tokyonight-nvim
         which-key-nvim

@@ -62,6 +62,9 @@ in
       "codex/config.toml".source =
         createSymlink "${dotfiles}/codex/config.toml";
 
+      "codex/agents".source =
+        createSymlink "${dotfiles}/codex/agents";
+
       "codex/hooks.json".source =
         createSymlink "${dotfiles}/codex/hooks.json";
     }

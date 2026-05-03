@@ -15,6 +15,13 @@ in {
   # This file is the shared system base.
   # Put settings here when they should be true for every machine.
 
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "nvidia-settings"
+      "nvidia-x11"
+      "nvim-highlight-colors"
+    ];
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
