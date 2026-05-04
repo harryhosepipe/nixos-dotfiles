@@ -102,6 +102,14 @@ local function setup_document_highlight(client, buf)
     })
 end
 
+local function setup_semantic_tokens(client, _buf)
+    if not client:supports_method("textDocument/semanticTokens/full") then
+        return
+    end
+
+    vim.lsp.semantic_tokens.enable(true, { client_id = client.id })
+end
+
 local function setup_format_on_save(client, buf)
     local excluded_filetypes = { php = true, c = true, cpp = true }
     if client:supports_method("textDocument/willSaveWaitUntil") then
@@ -131,6 +139,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         map_lsp_keys(buf)
         setup_document_highlight(client, buf)
+        setup_semantic_tokens(client, buf)
         setup_format_on_save(client, buf)
     end,
 })
@@ -219,7 +228,6 @@ local servers = {
             "astro",
             "javascript",
             "javascriptreact",
-            "svelte",
             "typescript",
             "typescriptreact",
         },
@@ -239,6 +247,9 @@ local servers = {
         cmd = { "svelteserver", "--stdio" },
         filetypes = { "svelte" },
         root_markers = { "svelte.config.js", "svelte.config.mjs", "package.json", ".git" },
+        on_init = function(client)
+            client.server_capabilities.diagnosticProvider = nil
+        end,
     },
 
     astro = {

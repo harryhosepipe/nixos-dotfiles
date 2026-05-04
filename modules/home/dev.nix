@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # This file is for everyday developer tools.
   # Keep project-specific versions in each project when possible.
 
@@ -11,6 +9,8 @@
 
   home.packages = with pkgs; [
     nodejs
+    pnpm
+    bun
     jq
     just
     curl

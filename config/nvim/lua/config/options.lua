@@ -4,16 +4,20 @@ local set = vim.opt
 --line nums
 set.relativenumber = true
 set.number = true
+set.wrap = false
 
 -- indentation and tabs
 set.tabstop = 4
 set.shiftwidth = 4
+set.softtabstop = 4
 set.autoindent = true
 set.expandtab = true
 
 -- search settings
 set.ignorecase = true
 set.smartcase = true
+set.incsearch = true
+set.hlsearch = true
 
 -- appearance
 set.termguicolors = true
@@ -40,16 +44,14 @@ set.splitright = true
 set.iskeyword:append("-")
 
 -- keep cursor at least 8 rows from top/bot
-set.scrolloff = 8
+set.scrolloff = 16
+set.sidescrolloff = 10
 
 -- undo dir settings
 set.swapfile = false
 set.backup = false
-set.undodir = os.getenv("HOME") .. "/.vim/undodir"
+set.undodir = os.getenv("HOME") .. "/.config/nvim/.undodir"
 set.undofile = true
 
--- incremental search
-set.incsearch = true
-
--- faster cursor hold
 set.updatetime = 50
+

@@ -59,6 +59,9 @@ in {
         identityFile = "~/.ssh/ansible_razer";
         identitiesOnly = true;
       };
+      "nixvm" = {
+        hostname = "192.168.122.131";
+      };
     };
   };
 

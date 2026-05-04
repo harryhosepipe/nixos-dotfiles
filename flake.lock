@@ -105,47 +105,13 @@
         "type": "indirect"
       }
     },
-    "nvim-colorpicker": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1773302749,
-        "narHash": "sha256-OfJuhBFel+lEmm11QCXKGayFx47mRJatqMFOEbbqz9o=",
-        "owner": "mikevskater",
-        "repo": "nvim-colorpicker",
-        "rev": "88f6aeac944570ebfb97ac67c9fea27a73ea0429",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mikevskater",
-        "repo": "nvim-colorpicker",
-        "type": "github"
-      }
-    },
-    "nvim-float": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774577541,
-        "narHash": "sha256-5rV35/k9TXiprjpEWH3j+/FKryfwijR4GN1mCQBPVhU=",
-        "owner": "mikevskater",
-        "repo": "nvim-float",
-        "rev": "ae790c0a96fcf0c5267371bff04b2fc4542fd643",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mikevskater",
-        "repo": "nvim-float",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "codex-cli-nix": "codex-cli-nix",
         "home-manager": "home-manager",
         "mattpocock-skills": "mattpocock-skills",
         "nixCats": "nixCats",
-        "nixpkgs": "nixpkgs",
-        "nvim-colorpicker": "nvim-colorpicker",
-        "nvim-float": "nvim-float"
+        "nixpkgs": "nixpkgs"
       }
     },
     "systems": {

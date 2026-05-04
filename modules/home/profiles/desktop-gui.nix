@@ -149,6 +149,7 @@ in {
 
   home.packages = with pkgs; [
     thunar
+    bitwarden-desktop
     signal-desktop
     whatsapp-electron
     pavucontrol
