@@ -4,21 +4,17 @@
   pkgs,
   userSettings,
   ...
-}:
-let
+}: let
   cfg = config.passthrough.singleGpu;
   guestNames =
-    if cfg.vmNames != [ ] then
-      cfg.vmNames
-    else
-      [ cfg.vmName ];
+    if cfg.vmNames != []
+    then cfg.vmNames
+    else [cfg.vmName];
 
-  boolToString =
-    value:
-    if value then
-      "1"
-    else
-      "0";
+  boolToString = value:
+    if value
+    then "1"
+    else "0";
 
   hookScript = pkgs.writeShellScript "libvirt-single-gpu-hook" ''
     #!/bin/bash
@@ -240,8 +236,7 @@ let
         ;;
     esac
   '';
-in
-{
+in {
   options.passthrough.singleGpu = {
     enable = lib.mkEnableOption "single-GPU passthrough host preparation";
 
@@ -253,7 +248,7 @@ in
 
     vmNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
+      default = [];
       description = "Guest names that should trigger the single-GPU libvirt hook.";
     };
 
@@ -313,7 +308,7 @@ in
 
     extraKernelParams = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
+      default = [];
       description = "Extra kernel parameters appended to the VFIO host settings.";
     };
 
@@ -331,7 +326,11 @@ in
 
     boot.kernelParams =
       [
-        (if cfg.cpuVendor == "amd" then "amd_iommu=on" else "intel_iommu=on")
+        (
+          if cfg.cpuVendor == "amd"
+          then "amd_iommu=on"
+          else "intel_iommu=on"
+        )
         "iommu=pt"
       ]
       ++ cfg.extraKernelParams;
@@ -356,7 +355,7 @@ in
       enable = true;
       qemu = {
         swtpm.enable = true;
-        vhostUserPackages = [ pkgs.virtiofsd ];
+        vhostUserPackages = [pkgs.virtiofsd];
       };
       hooks.qemu.single-gpu-passthrough = hookScript;
     };

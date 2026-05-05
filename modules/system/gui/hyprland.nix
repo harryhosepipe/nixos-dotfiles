@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   boot = {
     # Keep the greeter screen calm by hiding routine boot and device chatter.
     # Serious errors can still show up, but warnings like noisy USB messages stay
@@ -28,7 +26,7 @@
       default_session = {
         # Start Hyprland through its helper script so the session gets the
         # environment setup Hyprland expects on NixOS.
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.hyprland}/bin/start-hyprland";
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.hyprland}/bin/start-hyprland";
         user = "greeter";
       };
     };

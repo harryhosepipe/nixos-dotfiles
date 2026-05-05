@@ -12,7 +12,7 @@ Main files:
 - `lua/config/keybinds.lua`: custom keymaps.
 - `after/plugin/`: plugin setup files.
 - `plugin/lsp.lua`: language server setup.
-- `modules/home/neovim.nix`: the NixCats package list.
+- `modules/home/editors/neovim-full.nix`: the NixCats package list.
 
 This setup does not import LazyVim and does not use `lazy.nvim`.
 

@@ -1,6 +1,4 @@
-{ ... }:
-
-{
+{...}: {
   # This recipe is one complete desktop choice.
   # Hosts can swap it later for a different GUI recipe.
   services.xserver = {

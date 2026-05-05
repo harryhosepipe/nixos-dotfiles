@@ -2,9 +2,13 @@
   config,
   inputs,
   pkgs,
+  pkgs-unstable,
+  userSettings,
   ...
 }: let
   utils = inputs.nixCats.utils;
+  dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
+  createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
 in {
   imports = [
     inputs.nixCats.homeModule
@@ -22,7 +26,7 @@ in {
     packageNames = ["mainNvim"];
 
     # The Lua config lives in the repo like a normal Neovim folder.
-    luaPath = ../../config/nvim;
+    luaPath = ../../../config/nvim;
 
     categoryDefinitions.replace = {pkgs, ...}: {
       lspsAndRuntimeDeps.general = with pkgs; [
@@ -56,7 +60,7 @@ in {
         gopls
         templ
         phpactor
-        php84Packages.php-cs-fixer
+        pkgs-unstable.php84Packages.php-cs-fixer
       ];
 
       startupPlugins.general = with pkgs.vimPlugins; [
@@ -67,7 +71,6 @@ in {
             with grammars; [
               bash
               c
-              c3
               css
               d
               dockerfile
@@ -148,4 +151,6 @@ in {
       };
     };
   };
+
+  xdg.configFile."nvim".source = createSymlink "${dotfiles}/nvim";
 }

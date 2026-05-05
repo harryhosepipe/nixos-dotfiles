@@ -1,68 +1,75 @@
 {
-  description = "Learning-first NixOS setup";
+  description = "NixOS desktop, laptop and server config";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
+
     codex-cli-nix = {
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     mattpocock-skills = {
       url = "github:mattpocock/skills";
       flake = false;
     };
+
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = inputs @ {
+    self,
     nixpkgs,
+    nixpkgs-unstable,
     home-manager,
     ...
   }: let
-    userSettings = {
-      name = "Pablo";
-      username = "pablo";
-      dotFiles = "nix-dot";
-      email = "pablo@renderbros.com";
-    };
-    system = {
-      hostName = "nixos-pablo";
-    };
-    # This file stays small on purpose.
-    # The host list lives in hosts.nix and each machine has its own folder.
-    hosts = import ./hosts.nix {
-      inherit userSettings system;
-    };
-    mkNixosConfiguration = host:
+    system = "x86_64-linux";
+
+    mkHost = hostname: let
+      userSettings = import ./hosts/${hostname}/settings.nix;
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
       nixpkgs.lib.nixosSystem {
-        system = host.system;
+        inherit system;
+
         specialArgs = {
-          inherit host;
-          inherit userSettings;
-          inherit system;
+          inherit inputs self userSettings pkgs-unstable;
         };
+
         modules = [
-          (host.path + "/configuration.nix")
+          ./hosts/${hostname}
+
           home-manager.nixosModules.home-manager
           {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = {
-                inherit inputs;
-                inherit userSettings;
-              };
-              users.${host.user} = import (host.path + "/home.nix");
               backupFileExtension = "backup";
+
+              extraSpecialArgs = {
+                inherit inputs self userSettings pkgs-unstable;
+              };
+
+              users.${userSettings.username} = import ./users/${userSettings.username}/home.nix;
             };
           }
         ];
       };
   in {
-    nixosConfigurations = nixpkgs.lib.mapAttrs (_: mkNixosConfiguration) hosts;
+    nixosConfigurations = {
+      desktop = mkHost "desktop";
+      laptop = mkHost "laptop";
+      server = mkHost "server";
+    };
   };
 }

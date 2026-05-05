@@ -1,11 +1,10 @@
-{ config
-, inputs
-, pkgs
-, userSettings
-, ...
-}:
-
-let
+{
+  config,
+  inputs,
+  pkgs,
+  userSettings,
+  ...
+}: let
   dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
   createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
 
@@ -38,14 +37,13 @@ let
 
   mattPocockSkillFiles =
     builtins.listToAttrs
-      (builtins.map
-        (name: {
-          name = "codex/skills/${name}";
-          value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
-        })
-        (builtins.attrNames mattPocockSkills));
-in
-{
+    (builtins.map
+      (name: {
+        name = "codex/skills/${name}";
+        value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
+      })
+      (builtins.attrNames mattPocockSkills));
+in {
   home.packages = [
     codex
   ];
