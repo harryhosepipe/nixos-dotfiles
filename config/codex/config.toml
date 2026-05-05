@@ -1,5 +1,5 @@
 model = "gpt-5.5"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "low"
 
 # Manifest custom provider kept disabled for now.
 # Manifest currently works for non-streaming /v1/responses calls, but Codex
@@ -38,12 +38,15 @@ trust_level = "trusted"
 [projects."/home/pablo/.config/codex"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/junkmail2"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
-[mcp_servers.gitnexus]
-command = "npx"
-args = ["-y", "gitnexus@1.6.3", "mcp"]
+# [mcp_servers.gitnexus]
+# command = "npx"
+# args = ["-y", "gitnexus@1.6.3", "mcp"]
 
 [mcp_servers.context-mode]
 command = "context-mode"

@@ -16,5 +16,6 @@ result-*
 # Runtime caches and generated files.
 __pycache__/
 *.pyc
+node_modules/
 config/zsh/.zcompdump*
 config/zsh/.zsh_history

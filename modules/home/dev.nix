@@ -10,6 +10,7 @@
   };
 
   home.packages = with pkgs; [
+    bun
     nodejs
     jq
     just

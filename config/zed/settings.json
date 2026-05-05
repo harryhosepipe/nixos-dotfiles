@@ -1,0 +1,28 @@
+{
+  "project_panel": {
+    "dock": "left"
+  },
+  "ui_font_family": ".ZedSans",
+  "buffer_font_family": "Inconsolata Nerd Font Mono",
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry"
+    }
+  },
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": false
+  },
+  "session": {
+    "trust_all_worktrees": true
+  },
+  "lsp": {
+    "nixd": {
+      "binary": {
+        "path_lookup": true
+      }
+    }
+  },
+  "vim_mode": true,
+  "theme": "Ayu Mirage"
+}

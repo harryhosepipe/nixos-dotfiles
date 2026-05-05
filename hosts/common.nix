@@ -65,7 +65,7 @@ in {
 
   users.users.${userSettings.username} = {
     isNormalUser = true;
-    extraGroups = ["wheel"];
+    extraGroups = ["wheel" "docker"];
     shell = shellPackages.${shellSettings.defaultShell};
     packages = with pkgs; [
       tree

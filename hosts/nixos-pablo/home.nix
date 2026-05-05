@@ -1,9 +1,9 @@
-{ config
-, pkgs
-, userSettings
-, ...
-}:
-let
+{
+  config,
+  pkgs,
+  userSettings,
+  ...
+}: let
   dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
   shellSettings = import ../../shells/settings.nix;
   fzfShare = "${pkgs.fzf}/share/fzf";
@@ -19,16 +19,18 @@ let
     zsh = "zsh";
     fish = "fish";
     "oh-my-posh" = "oh-my-posh";
+    zed = "zed";
   };
-in
-{
+in {
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/codex.nix
+    ../../modules/home/language-servers.nix
     ../../modules/home/neovim.nix
     ../../modules/home/dev.nix
     ../../modules/home/gitnexus.nix
     ../../modules/home/context-mode.nix
+    ../../modules/home/pi.nix
   ];
 
   home.username = userSettings.username;
@@ -201,14 +203,13 @@ in
 
   xdg.configFile =
     builtins.mapAttrs
-      (name: subpath: {
-        source = createSymlink "${dotfiles}/${subpath}";
-        recursive = true;
-      })
-      configDirs;
+    (name: subpath: {
+      source = createSymlink "${dotfiles}/${subpath}";
+      recursive = true;
+    })
+    configDirs;
 
   home.packages = with pkgs; [
-    nil
     nixpkgs-fmt
     doppler
     bat
@@ -222,5 +223,7 @@ in
     pavucontrol
     figma-linux
     figma-agent
+    zed-editor
+    telegram-desktop
   ];
 }

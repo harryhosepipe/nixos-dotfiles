@@ -5,6 +5,7 @@
   ...
 }: let
   utils = inputs.nixCats.utils;
+  sharedLanguageServers = import ./language-server-packages.nix pkgs;
 in {
   imports = [
     inputs.nixCats.homeModule
@@ -25,39 +26,39 @@ in {
     luaPath = ../../config/nvim;
 
     categoryDefinitions.replace = {pkgs, ...}: {
-      lspsAndRuntimeDeps.general = with pkgs; [
-        fd
-        ripgrep
-        wl-clipboard
-        git
-        nil
-        alejandra
-        lua-language-server
-        vscode-langservers-extracted
-        typescript-language-server
-        typescript
-        svelte-language-server
-        astro-language-server
-        bash-language-server
-        pyright
-        emmet-language-server
-        eslint_d
-        ruff
-        stylelint
-        htmlhint
-        haskellPackages.ShellCheck
-        zls
-        rust-analyzer
-        clang-tools
-        c3-lsp
-        serve-d
-        haskell-language-server
-        fourmolu
-        gopls
-        templ
-        phpactor
-        php84Packages.php-cs-fixer
-      ];
+      lspsAndRuntimeDeps.general =
+        sharedLanguageServers.all
+        ++ (with pkgs; [
+          fd
+          ripgrep
+          wl-clipboard
+          git
+          lua-language-server
+          vscode-langservers-extracted
+          typescript-language-server
+          typescript
+          svelte-language-server
+          astro-language-server
+          bash-language-server
+          pyright
+          emmet-language-server
+          eslint_d
+          ruff
+          stylelint
+          htmlhint
+          haskellPackages.ShellCheck
+          zls
+          rust-analyzer
+          clang-tools
+          c3-lsp
+          serve-d
+          haskell-language-server
+          fourmolu
+          gopls
+          templ
+          phpactor
+          php84Packages.php-cs-fixer
+        ]);
 
       startupPlugins.general = with pkgs.vimPlugins; [
         plenary-nvim

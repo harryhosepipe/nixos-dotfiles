@@ -49,8 +49,10 @@
   environment.systemPackages = with pkgs; [
     hypridle
     hyprpaper
-    hyprshot
+    grim
+    slurp
     swaynotificationcenter
+    swappy
     waybar
     wl-clipboard
     wofi
