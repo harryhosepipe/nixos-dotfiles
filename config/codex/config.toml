@@ -41,6 +41,15 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/junkmail2"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/osthaven"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/deptest"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/deptest/medusa/deptest"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 

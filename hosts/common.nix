@@ -20,6 +20,7 @@ in {
       "nvidia-settings"
       "nvidia-x11"
       "nvim-highlight-colors"
+      "bws"
     ];
 
   boot.loader.systemd-boot.enable = true;
@@ -85,6 +86,7 @@ in {
     vim
     wget
     alacritty
+    wezterm
     git
     gvfs
     tumbler

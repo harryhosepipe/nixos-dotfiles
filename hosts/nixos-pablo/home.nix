@@ -8,6 +8,55 @@
   shellSettings = import ../../shells/settings.nix;
   fzfShare = "${pkgs.fzf}/share/fzf";
   createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
+  nextcloud-client_4_0_4 = pkgs.nextcloud-client.overrideAttrs (oldAttrs: {
+    version = "4.0.4";
+    src = pkgs.fetchFromGitHub {
+      owner = "nextcloud-releases";
+      repo = "desktop";
+      tag = "v4.0.4";
+      hash = "sha256-BEjsIx0knmTj6kgM7fsJV5XN660cRe9DbYxeL7YHPRo=";
+    };
+  });
+  dokploy-cli = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
+    pname = "dokploy-cli";
+    version = "0.29.2";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "Dokploy";
+      repo = "cli";
+      tag = "v${finalAttrs.version}";
+      hash = "sha256-LH0d7L+xzr+A8QCn/yOpy9UKM4PI47RVZrR4WlZXT6A=";
+    };
+
+    pnpmDeps = pkgs.fetchPnpmDeps {
+      inherit (finalAttrs) pname version src;
+      fetcherVersion = 3;
+      hash = "sha256-RSq0VCHLg+umP7SXgvgaBfxXf0Fr6aaUfJksTH50zM0=";
+    };
+
+    nativeBuildInputs = with pkgs; [
+      nodejs
+      pnpm
+      pnpmConfigHook
+    ];
+
+    buildPhase = ''
+      runHook preBuild
+      pnpm run build
+      substituteInPlace dist/index.js \
+        --replace-fail 'version: "0.3.0"' 'version: "${finalAttrs.version}"'
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/lib/dokploy-cli" "$out/bin"
+      cp -r dist package.json node_modules "$out/lib/dokploy-cli/"
+      chmod +x "$out/lib/dokploy-cli/dist/index.js"
+      ln -s "$out/lib/dokploy-cli/dist/index.js" "$out/bin/dokploy"
+      runHook postInstall
+    '';
+  });
 
   configDirs = {
     bash = "bash";
@@ -20,6 +69,7 @@
     fish = "fish";
     "oh-my-posh" = "oh-my-posh";
     zed = "zed";
+    wezterm = "wezterm";
   };
 in {
   imports = [
@@ -139,52 +189,6 @@ in {
         "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
       };
-
-      # userChrome = ''
-      #   :root {
-      #     --tab-min-height: 28px !important;
-      #     --toolbarbutton-inner-padding: 6px !important;
-      #     --toolbarbutton-outer-padding: 2px !important;
-      #     --urlbar-min-height: 28px !important;
-      #   }
-      #
-      #   #TabsToolbar,
-      #   #tabbrowser-tabs {
-      #     min-height: 30px !important;
-      #   }
-      #
-      #   .tabbrowser-tab {
-      #     min-width: 80px !important;
-      #     max-width: 160px !important;
-      #     min-height: 28px !important;
-      #     max-height: 28px !important;
-      #   }
-      #
-      #   .tab-background {
-      #     min-height: 28px !important;
-      #   }
-      #
-      #   .tab-content {
-      #     padding: 0 8px !important;
-      #   }
-      #
-      #   #nav-bar {
-      #     min-height: 34px !important;
-      #   }
-      #
-      #   #urlbar-container {
-      #     --urlbar-container-height: 32px !important;
-      #   }
-      #
-      #   #urlbar {
-      #     --urlbar-height: 28px !important;
-      #     min-height: 28px !important;
-      #   }
-      #
-      #   #PersonalToolbar {
-      #     min-height: 28px !important;
-      #   }
-      # '';
     };
   };
 
@@ -193,6 +197,15 @@ in {
     settings = {
       # Use HTTPS until the GitHub SSH key is restored on new machines.
       git_protocol = "https";
+    };
+  };
+
+  programs.rbw = {
+    enable = true;
+    settings = {
+      email = userSettings.email;
+      lock_timeout = 18000;
+      pinentry = pkgs.pinentry-curses;
     };
   };
 
@@ -225,5 +238,7 @@ in {
     figma-agent
     zed-editor
     telegram-desktop
+    nextcloud-client_4_0_4
+    dokploy-cli
   ];
 }
