@@ -4,8 +4,11 @@ pkgs: let
     nixd
     alejandra
   ];
+  packageMetadata = with pkgs; [
+    package-version-server
+  ];
 in {
-  inherit nix;
+  inherit nix packageMetadata;
 
-  all = nix;
+  all = nix ++ packageMetadata;
 }

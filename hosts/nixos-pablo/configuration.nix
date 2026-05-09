@@ -1,6 +1,4 @@
-{ host, ... }:
-
-{
+{host, ...}: {
   imports = [
     ../common.nix
     ./hardware-configuration.nix
@@ -13,6 +11,8 @@
   # This file is the machine's own room.
   # The real machine name comes from hosts.nix so you can rename it in one place.
   networking.hostName = host.hostName;
+  networking.networkmanager.dns = "none";
+  networking.nameservers = ["192.168.3.9"];
 
   passthrough.singleGpu = {
     enable = true;
