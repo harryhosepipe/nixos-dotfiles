@@ -2,6 +2,7 @@
   imports = [
     ../common.nix
     ./hardware-configuration.nix
+    ./unfree.nix
     ./nvidia.nix
     ../../modules/system/docker/manifest.nix
     ../../modules/system/gui/hyprland-greetd.nix

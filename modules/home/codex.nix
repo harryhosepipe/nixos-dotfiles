@@ -1,8 +1,9 @@
-{ config
-, inputs
-, pkgs
-, userSettings
-, ...
+{
+  config,
+  inputs,
+  pkgs,
+  userSettings,
+  ...
 }:
 
 let
@@ -36,14 +37,12 @@ let
     write-a-skill = "productivity/write-a-skill";
   };
 
-  mattPocockSkillFiles =
-    builtins.listToAttrs
-      (builtins.map
-        (name: {
-          name = "codex/skills/${name}";
-          value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
-        })
-        (builtins.attrNames mattPocockSkills));
+  mattPocockSkillFiles = builtins.listToAttrs (
+    map (name: {
+      name = "codex/skills/${name}";
+      value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
+    }) (builtins.attrNames mattPocockSkills)
+  );
 in
 {
   home.packages = [
@@ -54,19 +53,14 @@ in
     CODEX_HOME = "${config.xdg.configHome}/codex";
   };
 
-  xdg.configFile =
-    {
-      "codex/AGENTS.md".source =
-        createSymlink "${dotfiles}/codex/AGENTS.md";
+  xdg.configFile = {
+    "codex/AGENTS.md".source = createSymlink "${dotfiles}/codex/AGENTS.md";
 
-      "codex/config.toml".source =
-        createSymlink "${dotfiles}/codex/config.toml";
+    "codex/config.toml".source = createSymlink "${dotfiles}/codex/config.toml";
 
-      "codex/agents".source =
-        createSymlink "${dotfiles}/codex/agents";
+    "codex/agents".source = createSymlink "${dotfiles}/codex/agents";
 
-      "codex/hooks.json".source =
-        createSymlink "${dotfiles}/codex/hooks.json";
-    }
-    // mattPocockSkillFiles;
+    "codex/hooks.json".source = createSymlink "${dotfiles}/codex/hooks.json";
+  }
+  // mattPocockSkillFiles;
 }

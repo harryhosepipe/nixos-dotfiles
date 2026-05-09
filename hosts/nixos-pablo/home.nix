@@ -78,8 +78,7 @@ in {
     ../../modules/home/language-servers.nix
     ../../modules/home/neovim.nix
     ../../modules/home/dev.nix
-    ../../modules/home/gitnexus.nix
-    ../../modules/home/context-mode.nix
+    ../../modules/home/mcp-servers.nix
     ../../modules/home/pi.nix
   ];
 
