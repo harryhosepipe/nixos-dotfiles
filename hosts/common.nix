@@ -1,33 +1,25 @@
 {
-  config,
-  lib,
   pkgs,
   userSettings,
   ...
-}: let
+}:
+let
   shellSettings = import ../shells/settings.nix;
   shellPackages = {
     bash = pkgs.bashInteractive;
     zsh = pkgs.zsh;
     fish = pkgs.fish;
   };
-in {
+in
+{
   # This file is the shared system base.
   # Put settings here when they should be true for every machine.
-
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "nvidia-settings"
-      "nvidia-x11"
-      "nvim-highlight-colors"
-      "bws"
-    ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.networkmanager.enable = true;
-  networking.firewall.allowedTCPPorts = [22];
+  networking.firewall.allowedTCPPorts = [ 22 ];
 
   time.timeZone = "Africa/Johannesburg";
 
@@ -54,11 +46,11 @@ in {
   # This keeps the rule easy to find next to the shared user account.
   security.sudo.extraRules = [
     {
-      users = [userSettings.username];
+      users = [ userSettings.username ];
       commands = [
         {
           command = "ALL";
-          options = ["NOPASSWD"];
+          options = [ "NOPASSWD" ];
         }
       ];
     }
@@ -66,7 +58,10 @@ in {
 
   users.users.${userSettings.username} = {
     isNormalUser = true;
-    extraGroups = ["wheel" "docker"];
+    extraGroups = [
+      "wheel"
+      "docker"
+    ];
     shell = shellPackages.${shellSettings.defaultShell};
     packages = with pkgs; [
       tree
@@ -104,5 +99,8 @@ in {
     nerd-fonts.inconsolata
   ];
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 }

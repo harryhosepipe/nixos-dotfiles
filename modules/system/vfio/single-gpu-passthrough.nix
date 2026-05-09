@@ -7,18 +7,9 @@
 }:
 let
   cfg = config.passthrough.singleGpu;
-  guestNames =
-    if cfg.vmNames != [ ] then
-      cfg.vmNames
-    else
-      [ cfg.vmName ];
+  guestNames = if cfg.vmNames != [ ] then cfg.vmNames else [ cfg.vmName ];
 
-  boolToString =
-    value:
-    if value then
-      "1"
-    else
-      "0";
+  boolToString = value: if value then "1" else "0";
 
   hookScript = pkgs.writeShellScript "libvirt-single-gpu-hook" ''
     #!/bin/bash
@@ -329,23 +320,21 @@ in
       Storage=persistent
     '';
 
-    boot.kernelParams =
-      [
-        (if cfg.cpuVendor == "amd" then "amd_iommu=on" else "intel_iommu=on")
-        "iommu=pt"
-      ]
-      ++ cfg.extraKernelParams;
+    boot.kernelParams = [
+      (if cfg.cpuVendor == "amd" then "amd_iommu=on" else "intel_iommu=on")
+      "iommu=pt"
+    ]
+    ++ cfg.extraKernelParams;
 
-    boot.kernelModules =
-      [
-        "vfio"
-        "vfio_pci"
-        "vfio_iommu_type1"
-        "bridge"
-        "br_netfilter"
-      ]
-      ++ lib.optional (cfg.cpuVendor == "amd") "kvm-amd"
-      ++ lib.optional (cfg.cpuVendor == "intel") "kvm-intel";
+    boot.kernelModules = [
+      "vfio"
+      "vfio_pci"
+      "vfio_iommu_type1"
+      "bridge"
+      "br_netfilter"
+    ]
+    ++ lib.optional (cfg.cpuVendor == "amd") "kvm-amd"
+    ++ lib.optional (cfg.cpuVendor == "intel") "kvm-intel";
 
     users.users.${userSettings.username}.extraGroups = lib.mkAfter [
       "libvirtd"
