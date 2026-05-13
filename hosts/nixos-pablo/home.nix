@@ -1,9 +1,10 @@
-{
-  config,
-  pkgs,
-  userSettings,
-  ...
-}: let
+{ config
+, inputs
+, pkgs
+, userSettings
+, ...
+}:
+let
   dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
   shellSettings = import ../../shells/settings.nix;
   fzfShare = "${pkgs.fzf}/share/fzf";
@@ -61,6 +62,7 @@
   configDirs = {
     bash = "bash";
     hypr = "hypr";
+    kanata = "kanata";
     nvim = "nvim";
     qtile = "qtile";
     swaync = "swaync";
@@ -71,15 +73,18 @@
     zed = "zed";
     wezterm = "wezterm";
   };
-in {
+in
+{
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/codex.nix
     ../../modules/home/language-servers.nix
     ../../modules/home/neovim.nix
     ../../modules/home/dev.nix
+    ../../modules/home/fallow.nix
     ../../modules/home/mcp-servers.nix
     ../../modules/home/pi.nix
+    inputs.handy.homeManagerModules.default
   ];
 
   home.username = userSettings.username;
@@ -142,6 +147,7 @@ in {
   };
 
   services.ssh-agent.enable = true;
+  services.handy.enable = true;
 
   programs.firefox = {
     enable = true;
@@ -194,8 +200,7 @@ in {
   programs.gh = {
     enable = true;
     settings = {
-      # Use HTTPS until the GitHub SSH key is restored on new machines.
-      git_protocol = "https";
+      git_protocol = "ssh";
     };
   };
 
@@ -215,11 +220,11 @@ in {
 
   xdg.configFile =
     builtins.mapAttrs
-    (name: subpath: {
-      source = createSymlink "${dotfiles}/${subpath}";
-      recursive = true;
-    })
-    configDirs;
+      (name: subpath: {
+        source = createSymlink "${dotfiles}/${subpath}";
+        recursive = true;
+      })
+      configDirs;
 
   home.packages = with pkgs; [
     nixpkgs-fmt
@@ -230,6 +235,7 @@ in {
     fzf
     zoxide
     thunar
+    chromium
     signal-desktop
     whatsapp-electron
     pavucontrol
@@ -239,5 +245,6 @@ in {
     telegram-desktop
     nextcloud-client_4_0_4
     dokploy-cli
+    wtype
   ];
 }

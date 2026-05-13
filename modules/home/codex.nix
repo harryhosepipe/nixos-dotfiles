@@ -47,6 +47,7 @@ in
 {
   home.packages = [
     codex
+    pkgs.libnotify
   ];
 
   home.sessionVariables = {
@@ -61,6 +62,8 @@ in
     "codex/agents".source = createSymlink "${dotfiles}/codex/agents";
 
     "codex/hooks.json".source = createSymlink "${dotfiles}/codex/hooks.json";
+
+    "codex/hooks".source = createSymlink "${dotfiles}/codex/hooks";
   }
   // mattPocockSkillFiles;
 }

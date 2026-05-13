@@ -16,6 +16,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    handy = {
+      url = "github:cjpais/Handy";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -48,6 +52,10 @@
       };
       modules = [
         (mainHost.path + "/configuration.nix")
+        inputs.handy.nixosModules.default
+        {
+          programs.handy.enable = true;
+        }
         home-manager.nixosModules.home-manager
         {
           home-manager = {

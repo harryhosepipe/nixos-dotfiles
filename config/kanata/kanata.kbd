@@ -1,0 +1,28 @@
+(defcfg
+  process-unmapped-keys yes
+  tap-hold-require-prior-idle 125
+)
+
+(defsrc
+  a s d f j k l ;
+)
+
+(defvar
+  tap-time 150
+  hold-time 170
+)
+
+(defalias
+  a (tap-hold-tap-keys $tap-time $hold-time a lmet (s d f))
+  s (tap-hold-tap-keys $tap-time $hold-time s lalt (a d f))
+  d d
+  f (tap-hold-tap-keys $tap-time $hold-time f lctl (a s d))
+  j (tap-hold-tap-keys $tap-time $hold-time j rctl (k l ;))
+  k k
+  l (tap-hold-tap-keys $tap-time $hold-time l ralt (j k ;))
+  ; (tap-hold-tap-keys $tap-time $hold-time ; rmet (j k l))
+)
+
+(deflayer base
+  @a @s @d @f @j @k @l @;
+)

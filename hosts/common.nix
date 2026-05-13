@@ -61,6 +61,7 @@ in
     extraGroups = [
       "wheel"
       "docker"
+      "input"
     ];
     shell = shellPackages.${shellSettings.defaultShell};
     packages = with pkgs; [

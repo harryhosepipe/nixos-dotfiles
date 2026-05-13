@@ -1,6 +1,7 @@
 model = "gpt-5.5"
 model_reasoning_effort = "low"
 service_tier = "fast"
+notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
 
 # Manifest custom provider kept disabled for now.
 # Manifest currently works for non-streaming /v1/responses calls, but Codex
@@ -60,6 +61,12 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/3090"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/nxt"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/test"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -69,6 +76,9 @@ enabled = true
 
 [mcp_servers.context-mode]
 command = "context-mode"
+
+[tui]
+notifications = false
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
@@ -86,6 +96,7 @@ goals = true
 trusted_hash = "sha256:92828bbbeb97fe79f0d3acd01c5c37c807636a4e480b24b762c120826bfde0ce"
 
 [hooks.state."/home/pablo/.config/codex/hooks.json:pre_tool_use:0:0"]
+enabled = true
 trusted_hash = "sha256:6dff9ff709a6e56eb81cf60f870520f3e32f18516292ade8906289a59f1142b7"
 
 [hooks.state."/home/pablo/.config/codex/hooks.json:session_start:0:0"]

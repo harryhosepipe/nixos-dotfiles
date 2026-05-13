@@ -8,3 +8,4 @@ alias nrs='sudo nixos-rebuild switch --flake '\''path:/home/pablo/nix-dot#deskto
 alias rbash='source ~/.bashrc'
 alias rfish='source ~/.config/fish/config.fish'
 alias rzsh='source ~/.config/zsh/.zshrc'
+alias rkanata='sudo systemctl restart kanata-internal'

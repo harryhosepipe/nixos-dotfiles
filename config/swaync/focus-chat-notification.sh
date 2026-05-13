@@ -10,6 +10,10 @@ case "$app" in
     ;;
   whatsapp)
     hyprctl dispatch workspace 7 >/dev/null 2>&1 || true
-    hyprctl dispatch focuswindow 'title:WhatsApp Electron.*' >/dev/null 2>&1 || true
+    if ! hyprctl dispatch focuswindow 'class:com.github.dagmoller.whatsapp-electron' >/dev/null 2>&1; then
+      if ! hyprctl dispatch focuswindow 'title:WhatsApp.*' >/dev/null 2>&1; then
+        gtk-launch com.github.dagmoller.whatsapp-electron >/dev/null 2>&1 &
+      fi
+    fi
     ;;
 esac

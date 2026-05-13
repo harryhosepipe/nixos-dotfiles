@@ -20,6 +20,18 @@ fi
 # Load the shared functions and aliases from the repo.
 source ~/.config/zsh/functions.zsh
 source ~/.config/zsh/aliases.zsh
+
+# Ensure GitHub SSH auth uses one long-running user agent.
+if [[ $- == *i* ]]; then
+  export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent"
+  if [[ ! -S "$SSH_AUTH_SOCK" ]]; then
+    systemctl --user start ssh-agent.service >/dev/null 2>&1
+  fi
+  if [[ -S "$SSH_AUTH_SOCK" ]] && ! ssh-add -l >/dev/null 2>&1; then
+    ssh-add ~/.ssh/ansible_razer >/dev/null
+  fi
+fi
+
 zle -N fzf_complete_and_accept
 # Use Ctrl+F to accept the gray inline suggestion from zsh-autosuggestions.
 # Tab still opens completion menus and fzf-based completion.
@@ -59,6 +71,9 @@ zstyle ':fzf-tab:*' fzf-flags --height=100%
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
 
 # Zoxide should be loaded last.
 eval "$(zoxide init --cmd cd zsh)"
