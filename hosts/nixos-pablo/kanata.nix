@@ -1,4 +1,4 @@
-{ lib, pkgs, userSettings, ... }:
+{ config, lib, pkgs, userSettings, ... }:
 let
   kanataVersion = "1.12.0-prerelease-2";
   kanataSrc = pkgs.fetchFromGitHub {
@@ -22,8 +22,12 @@ let
   });
 in
 {
+  environment.systemPackages = [
+    kanataPrerelease
+  ];
+
   services.kanata = {
-    enable = true;
+    enable = false;
     package = kanataPrerelease;
 
     keyboards.internal = {
@@ -32,7 +36,7 @@ in
     };
   };
 
-  systemd.services.kanata-internal.serviceConfig = {
+  systemd.services.kanata-internal.serviceConfig = lib.mkIf config.services.kanata.enable {
     DynamicUser = lib.mkForce false;
     ProtectHome = lib.mkForce false;
     User = userSettings.username;

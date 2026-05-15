@@ -67,6 +67,9 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/test"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/temp"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -79,6 +82,8 @@ command = "context-mode"
 
 [tui]
 notifications = false
+status_line = ["model-with-reasoning", "current-dir", "project-name", "run-state", "context-remaining", "five-hour-limit", "weekly-limit", "task-progress"]
+status_line_use_colors = true
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4

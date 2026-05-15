@@ -58,7 +58,6 @@ let
       runHook postInstall
     '';
   });
-
   configDirs = {
     bash = "bash";
     hypr = "hypr";
@@ -218,6 +217,16 @@ in
   home.file.".profile".source = createSymlink "${dotfiles}/profile/.profile";
   home.file.".zshenv".source = createSymlink "${dotfiles}/zsh/.zshenv";
 
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "text/html" = "firefox.desktop";
+      "application/xhtml+xml" = "firefox.desktop";
+    };
+  };
+
   xdg.configFile =
     builtins.mapAttrs
       (name: subpath: {
@@ -239,6 +248,7 @@ in
     signal-desktop
     whatsapp-electron
     pavucontrol
+    pwvucontrol
     figma-linux
     figma-agent
     zed-editor
@@ -246,5 +256,7 @@ in
     nextcloud-client_4_0_4
     dokploy-cli
     wtype
+    mpv
+    yt-dlp
   ];
 }
