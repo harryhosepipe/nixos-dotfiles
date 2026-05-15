@@ -1,15 +1,11 @@
-{
-  config,
-  inputs,
-  pkgs,
-  userSettings,
-  ...
+{ config
+, inputs
+, pkgs
+, userSettings
+, ...
 }:
 
 let
-  dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
-  createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
-
   # This package comes from the codex-cli-nix flake input.
   # Updating that input in flake.lock is what moves Codex to a newer release.
   codex = inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -38,10 +34,12 @@ let
   };
 
   mattPocockSkillFiles = builtins.listToAttrs (
-    map (name: {
-      name = "codex/skills/${name}";
-      value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
-    }) (builtins.attrNames mattPocockSkills)
+    map
+      (name: {
+        name = "codex/skills/${name}";
+        value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
+      })
+      (builtins.attrNames mattPocockSkills)
   );
 in
 {
@@ -54,16 +52,13 @@ in
     CODEX_HOME = "${config.xdg.configHome}/codex";
   };
 
-  xdg.configFile = {
-    "codex/AGENTS.md".source = createSymlink "${dotfiles}/codex/AGENTS.md";
+  dotfiles.configEntries = {
+    "codex/AGENTS.md" = "codex/AGENTS.md";
+    "codex/config.toml" = "codex/config.toml";
+    "codex/agents" = "codex/agents";
+    "codex/hooks.json" = "codex/hooks.json";
+    "codex/hooks" = "codex/hooks";
+  };
 
-    "codex/config.toml".source = createSymlink "${dotfiles}/codex/config.toml";
-
-    "codex/agents".source = createSymlink "${dotfiles}/codex/agents";
-
-    "codex/hooks.json".source = createSymlink "${dotfiles}/codex/hooks.json";
-
-    "codex/hooks".source = createSymlink "${dotfiles}/codex/hooks";
-  }
-  // mattPocockSkillFiles;
+  xdg.configFile = mattPocockSkillFiles;
 }
