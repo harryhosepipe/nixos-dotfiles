@@ -31,15 +31,15 @@ vim.opt.clipboard:append("unnamedplus")
 vim.opt.isfname:append("@-@")
 
 -- vim.opt.guicursor = ""
-vim.opt.scrolloff = 15
+-- vim.opt.scrolloff = 8
 
 vim.opt.colorcolumn = "0"
 vim.opt.signcolumn = "yes"
 
 -- YANK HIGHLIGHTING
 vim.api.nvim_create_autocmd("TextYankPost", {
-    desc = "Highlight when yanking text",
-    callback = function()
-        vim.hl.on_yank()
-    end,
+	desc = "Highlight when yanking text",
+	callback = function()
+		vim.hl.on_yank()
+	end,
 })

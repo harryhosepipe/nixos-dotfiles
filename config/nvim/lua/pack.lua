@@ -7,16 +7,24 @@ vim.pack.add({
     "https://github.com/mason-org/mason.nvim",
     "https://github.com/tpope/vim-fugitive",
     "https://github.com/nvim-lualine/lualine.nvim",
+    "https://github.com/stevearc/conform.nvim",
+    "https://github.com./folke/snacks.nvim",
 })
 
+require("plugins.mini-icons")
 require("plugins.mini-files")
 require("plugins.mini-notify")
 require("plugins.mini-cmdline")
 require("plugins.mini-surround")
+require("plugins.mini-pairs")
+require("plugins.mini-animate")
 require("plugins.mini-pick")
 require("plugins.mini-completion")
 require("plugins.mini-snippets")
 require("plugins.mini-diff")
+require("plugins.snacks")
+require("plugins.conform")
 require("plugins.lsp")
 require("plugins.treesitter")
 require("plugins.lualine")
+require("plugins.mini-clue")

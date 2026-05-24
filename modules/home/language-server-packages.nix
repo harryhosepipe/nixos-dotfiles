@@ -6,10 +6,15 @@ pkgs: let
   ];
   lua = with pkgs; [
     lua-language-server
+    stylua
   ];
   web = with pkgs; [
     svelte-language-server
     astro-language-server
+    typescript
+    vscode-langservers-extracted
+    eslint
+    prettier
   ];
   packageMetadata = with pkgs; [
     package-version-server
