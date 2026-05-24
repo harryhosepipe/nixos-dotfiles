@@ -15,7 +15,7 @@ in {
     (npmMcpServer {
       name = "context-mode";
       package = "context-mode";
-      version = "1.0.146";
+      version = "1.0.147";
     })
 
     (npmMcpServer {
