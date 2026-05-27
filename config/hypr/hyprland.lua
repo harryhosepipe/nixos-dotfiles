@@ -100,6 +100,12 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 1.94, bezier = "almo
 hl.animation({ leaf = "workspacesIn", enabled = true, speed = 1.21, bezier = "almostLinear", style = "fade" })
 hl.animation({ leaf = "workspacesOut", enabled = true, speed = 1.94, bezier = "almostLinear", style = "fade" })
 
+hl.layer_rule({
+	name = "no-anim-for-selection",
+	match = { namespace = "selection" },
+	no_anim = true,
+})
+
 hl.config({
 	master = {
 		new_status = "master",
@@ -141,7 +147,7 @@ hl.device({
 
 -- Launchers and apps
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float; move center; size 1200 800] " .. fileManager))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float] " .. fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
@@ -212,9 +218,9 @@ hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Screenshots
-hl.bind("Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d)\" - | wl-copy'"))
-hl.bind("ALT + mouse:276", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d)\" - | wl-copy'"))
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d)\" - | swappy -f -'"))
+hl.bind("Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"))
+hl.bind("ALT + mouse:276", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | swappy -f -'"))
 hl.bind(
 	"CTRL + Print",
 	hl.dsp.exec_cmd(
@@ -224,7 +230,7 @@ hl.bind(
 hl.bind(
 	"CTRL + SHIFT + Print",
 	hl.dsp.exec_cmd(
-		'sh -lc \'mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$(slurp -d)" "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"\''
+		'sh -lc \'mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$(slurp -d -w 0)" "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"\''
 	)
 )
 hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"))
@@ -311,6 +317,13 @@ hl.window_rule({
 	match = { class = "hyprland-run" },
 	move = "20 monitor_h-120",
 	float = true,
+})
+
+hl.window_rule({
+	name = "file-manager-popup",
+	match = { class = "thunar" },
+	float = true,
+	size = "1400 1100",
 })
 
 hl.window_rule({

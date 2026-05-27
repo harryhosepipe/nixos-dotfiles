@@ -8,7 +8,11 @@ config.check_for_updates = false
 config.default_prog = { "zsh", "-l" }
 config.default_cwd = wezterm.home_dir
 
+config.font_dirs = {
+    "/tmp/wezterm-font-preview.NQZhHS/TX-02",
+}
 config.font = wezterm.font_with_fallback({
+    "TX-02",
     "Inconsolata Nerd Font Mono",
 })
 config.font_size = 14

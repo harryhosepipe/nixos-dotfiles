@@ -13,6 +13,7 @@ in
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/dotfiles.nix
+    ../../modules/home/firefox.nix
     ../../modules/home/language-toolchain.nix
     ../../modules/home/agent-workspace.nix
     ../../modules/home/dev.nix
@@ -81,54 +82,6 @@ in
   services.ssh-agent.enable = true;
   services.handy.enable = true;
 
-  programs.firefox = {
-    enable = true;
-    package = null;
-    configPath = ".mozilla/firefox";
-
-    profiles.default = {
-      id = 0;
-      isDefault = true;
-      path = "ehs619jc.default";
-
-      settings = {
-        "browser.compactmode.show" = true;
-        "browser.uidensity" = 1;
-        # "browser.tabs.tabMinWidth" = 80;
-        "browser.startup.page" = 1;
-        "browser.sessionstore.resume_from_crash" = false;
-        "browser.sessionstore.max_resumed_crashes" = 0;
-        "browser.aboutwelcome.enabled" = false;
-        "browser.startup.homepage_override.mstone" = "ignore";
-        "startup.homepage_welcome_url" = "";
-        "startup.homepage_welcome_url.additional" = "";
-        "browser.messaging-system.whatsNewPanel.enabled" = false;
-        "dom.disable_beforeunload" = true;
-        "signon.rememberSignons" = false;
-        "privacy.globalprivacycontrol.enabled" = true;
-        "privacy.globalprivacycontrol.functionality.enabled" = true;
-        "privacy.globalprivacycontrol.pbmode.enabled" = true;
-        "nimbus.rollouts.enabled" = false;
-        "datareporting.healthreport.uploadEnabled" = false;
-        "datareporting.policy.dataSubmissionEnabled" = false;
-        "datareporting.usage.uploadEnabled" = false;
-        "toolkit.telemetry.enabled" = false;
-        "toolkit.telemetry.unified" = false;
-        "toolkit.telemetry.archive.enabled" = false;
-        "toolkit.telemetry.server" = "data:,";
-        "app.shield.optoutstudies.enabled" = false;
-        "app.normandy.enabled" = false;
-        "app.normandy.first_run" = false;
-        "browser.discovery.enabled" = false;
-        "extensions.htmlaboutaddons.recommendations.enabled" = false;
-        "browser.newtabpage.activity-stream.feeds.asrouter" = false;
-        "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons" = false;
-        "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-      };
-    };
-  };
-
   programs.gh = {
     enable = true;
     settings = {
@@ -166,16 +119,6 @@ in
       "oh-my-posh" = "oh-my-posh";
       zed = "zed";
       wezterm = "wezterm";
-    };
-  };
-
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = {
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "text/html" = "firefox.desktop";
-      "application/xhtml+xml" = "firefox.desktop";
     };
   };
 

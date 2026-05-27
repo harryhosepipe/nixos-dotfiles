@@ -23,14 +23,20 @@ vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result cursor centered" 
 vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result cursor centered" })
 
 vim.keymap.set("n", "<leader>X", "<cmd>!chmod +x %<CR>", { silent = true, desc = "makes file executable" })
-vim.keymap.set("n", "<leader>r", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Replace word cursor is on globally" })
+vim.keymap.set(
+	"n",
+	"<leader>r",
+	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+	{ desc = "Replace word cursor is on globally" }
+)
 
 vim.keymap.set("n", "<leader>re", "<cmd>RestartLastFile<CR>", { desc = "Restart and reopen last file" })
+vim.keymap.set("n", "<leader>q", "<cmd>quit<CR>", { desc = "Quit" })
 
 vim.keymap.set("n", "<leader>x", "<cmd>Explore<CR>", { desc = "Open native file explorer" })
 
 -- native undotree
 vim.keymap.set("n", "<leader>u", function()
-    vim.cmd.packadd("nvim.undotree")
-    require("undotree").open()
+	vim.cmd.packadd("nvim.undotree")
+	require("undotree").open()
 end, { desc = "Toggle Builtin Undotree" })

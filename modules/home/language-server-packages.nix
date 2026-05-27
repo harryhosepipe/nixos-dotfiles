@@ -13,6 +13,8 @@ pkgs: let
     astro-language-server
     typescript
     vscode-langservers-extracted
+    tailwindcss-language-server
+    emmet-language-server
     eslint
     prettier
   ];

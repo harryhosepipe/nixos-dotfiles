@@ -70,6 +70,18 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/temp"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/paf"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/moodboard"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/stink"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Downloads"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 

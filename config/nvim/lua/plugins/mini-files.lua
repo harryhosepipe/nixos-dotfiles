@@ -61,6 +61,16 @@ vim.api.nvim_create_autocmd("User", {
             desc = "Toggle hidden files",
         })
 
+        vim.keymap.set("n", "<C-l>", MiniFiles.go_in, {
+            buffer = args.data.buf_id,
+            desc = "Enter directory",
+        })
+
+        vim.keymap.set("n", "<C-h>", MiniFiles.go_out, {
+            buffer = args.data.buf_id,
+            desc = "Leave directory",
+        })
+
         vim.keymap.set("n", "<leader>w", synchronize_without_confirm_except_delete, {
             buffer = args.data.buf_id,
             desc = "Apply file changes",

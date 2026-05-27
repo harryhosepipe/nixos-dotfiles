@@ -6,7 +6,7 @@ vim.keymap.set("n", "df", vim.diagnostic.open_float, { desc = "Show line diagnos
 vim.diagnostic.config({ virtual_text = true })
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = vim.tbl_deep_extend("force", capabilities, require("mini.completion").get_lsp_capabilities())
+capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
 
 vim.lsp.config("*", { capabilities = capabilities })
 
@@ -36,9 +36,29 @@ vim.lsp.config("astro", {
     },
 })
 
+vim.lsp.config("cssls", {
+    settings = {
+        css = { validate = true },
+        scss = { validate = true },
+        less = { validate = true },
+    },
+})
+
+vim.lsp.config("tailwindcss", {
+    settings = {
+        tailwindCSS = {
+            classAttributes = { "class", "className", "class:list", "ngClass" },
+            classFunctions = { "clsx", "cn", "cva", "tw" },
+        },
+    },
+})
+
 vim.lsp.enable({
     "lua_ls",
     "eslint",
+    "cssls",
+    "tailwindcss",
+    "emmet_language_server",
     "svelte",
     "astro",
     "marksman",
