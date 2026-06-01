@@ -27,7 +27,7 @@ in
   ];
 
   services.kanata = {
-    enable = false;
+    enable = true;
     package = kanataPrerelease;
 
     keyboards.internal = {

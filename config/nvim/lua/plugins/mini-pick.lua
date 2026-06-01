@@ -10,7 +10,11 @@ MiniPick.setup({
 MiniExtra.setup()
 
 vim.keymap.set("n", "<leader>ff", function()
-    MiniPick.builtin.files()
+    MiniPick.builtin.cli({
+        command = { "rg", "--files", "--hidden", "--no-ignore", "--color=never" },
+    }, {
+        source = { name = "Files (rg --hidden --no-ignore)" },
+    })
 end, { desc = "Mini File Picker" })
 
 vim.keymap.set("n", "<leader>fw", function()

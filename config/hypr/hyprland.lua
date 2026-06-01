@@ -1,4 +1,4 @@
-local terminal = "wezterm"
+local terminal = "ghostty"
 local fileManager = "thunar"
 local browser = "firefox"
 local menu = "wofi --show drun"
@@ -151,6 +151,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float] " .. fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("sh -lc '$HOME/.config/hypr/tmux-session-menu.sh'"))
 hl.bind(
 	mainMod .. " + A",
 	hl.dsp.exec_cmd(

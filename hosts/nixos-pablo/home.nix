@@ -15,6 +15,7 @@ in
     ../../modules/home/dotfiles.nix
     ../../modules/home/firefox.nix
     ../../modules/home/language-toolchain.nix
+    ../../modules/home/tmux.nix
     ../../modules/home/agent-workspace.nix
     ../../modules/home/dev.nix
     inputs.handy.homeManagerModules.default
@@ -113,11 +114,13 @@ in
       nvim = "nvim";
       qtile = "qtile";
       swaync = "swaync";
+      tmux = "tmux";
       waybar = "waybar";
       zsh = "zsh";
       fish = "fish";
       "oh-my-posh" = "oh-my-posh";
       zed = "zed";
+      ghostty = "ghostty";
       wezterm = "wezterm";
     };
   };
@@ -127,6 +130,7 @@ in
     doppler
     bat
     btop
+    eza
     oh-my-posh
     fzf
     zoxide

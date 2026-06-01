@@ -1,7 +1,8 @@
 model = "gpt-5.5"
-model_reasoning_effort = "low"
-service_tier = "fast"
+model_reasoning_effort = "high"
+service_tier = "default"
 notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
+personality = "pragmatic"
 
 # Manifest custom provider kept disabled for now.
 # Manifest currently works for non-streaming /v1/responses calls, but Codex
@@ -82,7 +83,40 @@ trust_level = "trusted"
 [projects."/home/pablo/Downloads"]
 trust_level = "trusted"
 
+[projects."/home/pablo/Documents/sauna"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/paf_v2"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/hothuts-pp-experiment"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/sig"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/cli-printing-press"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
 enabled = true
 
 # [mcp_servers.gitnexus]
@@ -91,6 +125,22 @@ enabled = true
 
 [mcp_servers.context-mode]
 command = "context-mode"
+
+[mcp_servers.node_repl]
+args = []
+command = "/nix/store/b5xhdkcdhkdi0rcnn1m9s881swy1jlqq-codex-desktop-computer-use-ui-remote-mobile-control-26.519.81530/opt/codex-desktop/resources/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = ""
+NODE_REPL_NODE_PATH = "/nix/store/b5xhdkcdhkdi0rcnn1m9s881swy1jlqq-codex-desktop-computer-use-ui-remote-mobile-control-26.519.81530/opt/codex-desktop/resources/node-runtime/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
+CODEX_HOME = "/home/pablo/.config/codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "496c7b3cb95b4bc20cff49b513150606e0da0000c92bf752206bee5a6c248423,c69702d945f8bf56a4a529c4e6ded337b12d40203a3ada637870cceff8d4b900,fc05eca603616d74db7ac587851a19a66d94608533741186c1251f540c5835cd"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_MARKETPLACE_NAME = "openai-bundled"
+NODE_REPL_UNTRUSTED_ENV_ALLOWLIST = "BROWSER_USE_MARKETPLACE_NAME"
 
 [tui]
 notifications = false
@@ -106,6 +156,7 @@ toggle_vim_mode = "|"
 [features]
 terminal_resize_reflow = true
 goals = true
+js_repl = false
 
 [hooks.state]
 
@@ -124,3 +175,24 @@ trusted_hash = "sha256:9fc7312a4a274d40081f6734c6f6553d494e9cfde20fd01339995232a
 
 [hooks.state."/home/pablo/.config/codex/hooks.json:user_prompt_submit:0:0"]
 trusted_hash = "sha256:9f9b46244739e7f6f787757a083d0d65c07db3aa2daaaecb6fe9e65b08f362b2"
+
+[marketplaces.openai-bundled]
+last_updated = "2026-06-01T12:36:26Z"
+source_type = "local"
+source = "/home/pablo/.config/codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-05-28T15:45:52Z"
+source_type = "local"
+source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = false
+notifications-turn-mode = "always"
+
+[desktop.open-in-target-preferences]
+global = "fileManager"
+
+[desktop.open-in-target-preferences.perPath]
+"/home/pablo/projects/moodboard" = "fileManager"

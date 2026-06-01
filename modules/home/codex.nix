@@ -43,6 +43,10 @@ let
   );
 in
 {
+  imports = [
+    inputs.codex-desktop-linux.homeManagerModules.default
+  ];
+
   home.packages = [
     codex
     pkgs.libnotify
@@ -61,4 +65,20 @@ in
   };
 
   xdg.configFile = mattPocockSkillFiles;
+
+  programs.codexDesktopLinux = {
+    enable = true;
+    computerUseUi.enable = true;
+    remoteMobileControl.enable = true;
+    remoteControl = {
+      enable = true;
+      package = codex;
+      codexHome = "${config.xdg.configHome}/codex";
+      extraPackages = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.ydotool
+      ];
+    };
+  };
 }

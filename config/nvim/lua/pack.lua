@@ -8,6 +8,7 @@ vim.pack.add({
 	"https://github.com/neovim/nvim-lspconfig",
 	"https://github.com/mason-org/mason.nvim",
 	"https://github.com/tpope/vim-fugitive",
+	"https://github.com/christoomey/vim-tmux-navigator",
 	"https://github.com/nvim-lualine/lualine.nvim",
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com./folke/snacks.nvim",

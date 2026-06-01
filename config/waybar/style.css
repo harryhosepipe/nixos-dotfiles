@@ -1,5 +1,6 @@
 * {
   border: none;
+
   border-radius: 0;
   font-family: "PP Supply Mono", monospace;
   font-size: 14px;
@@ -29,7 +30,12 @@ tooltip {
 #tray {
   /* margin: 2px 0; */
   /* padding: 0 2px; */
-    padding: 5px;
+  padding: 5px;
+  /* opacity: 0.55; */
+}
+
+#tray image {
+  opacity: 0.25;
 }
 
 #workspaces button {
@@ -45,7 +51,7 @@ tooltip {
 
 #workspaces button.active {
   color: #757575;
-  background: #3E3E3E;
+  background: #3e3e3e;
 }
 
 #workspaces button.urgent {

@@ -10,11 +10,15 @@ local filter_hide = function(fs_entry)
     return fs_entry.name == ".env" or not vim.startswith(fs_entry.name, ".")
 end
 
+local current_filter = function()
+    return show_hidden and filter_show or filter_hide
+end
+
 local toggle_hidden = function()
     show_hidden = not show_hidden
     MiniFiles.refresh({
         content = {
-            filter = show_hidden and filter_show or filter_hide,
+            filter = current_filter(),
         },
     })
 end
@@ -42,7 +46,9 @@ end
 
 MiniFiles.setup({
     content = {
-        filter = filter_hide,
+        filter = function(fs_entry)
+            return current_filter()(fs_entry)
+        end,
     },
     mappings = {
         go_in = "L",

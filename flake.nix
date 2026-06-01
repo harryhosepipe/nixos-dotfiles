@@ -3,9 +3,12 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix";
+      url = "github:sadjow/codex-cli-nix/v0.135.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    codex-desktop-linux = {
+      url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     mattpocock-skills = {

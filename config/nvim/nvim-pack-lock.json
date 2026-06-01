@@ -47,6 +47,10 @@
     "vim-moonfly-colors": {
       "rev": "fe0179e650fac51c9a9190e2fafea69952aba1b6",
       "src": "https://github.com/bluz71/vim-moonfly-colors"
+    },
+    "vim-tmux-navigator": {
+      "rev": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432",
+      "src": "https://github.com/christoomey/vim-tmux-navigator"
     }
   }
 }
