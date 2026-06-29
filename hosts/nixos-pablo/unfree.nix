@@ -8,5 +8,6 @@
       "nvidia-settings"
       "nvidia-x11"
       "nvim-highlight-colors"
+      "obsidian"
     ];
 }

@@ -18,6 +18,7 @@ in
     ../../modules/home/tmux.nix
     ../../modules/home/agent-workspace.nix
     ../../modules/home/dev.nix
+    ../../modules/home/hermes.nix
     inputs.handy.homeManagerModules.default
   ];
 
@@ -136,6 +137,7 @@ in
     zoxide
     thunar
     chromium
+    obsidian
     signal-desktop
     whatsapp-electron
     pavucontrol
@@ -144,6 +146,8 @@ in
     figma-agent
     zed-editor
     telegram-desktop
+    libreoffice-qt
+    inputs.herdr.packages.${pkgs.system}.default
     localPackages.nextcloud-client_4_0_4
     localPackages.dokploy-cli
     wtype

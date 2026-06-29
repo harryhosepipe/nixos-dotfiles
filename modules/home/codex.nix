@@ -13,7 +13,7 @@ let
   # These are the active Codex skills from github:mattpocock/skills.
   # Deprecated skills are left out so they do not appear as normal choices.
   mattPocockSkills = {
-    diagnose = "engineering/diagnose";
+    diagnose = "engineering/diagnosing-bugs";
     grill-with-docs = "engineering/grill-with-docs";
     improve-codebase-architecture = "engineering/improve-codebase-architecture";
     setup-matt-pocock-skills = "engineering/setup-matt-pocock-skills";
@@ -21,16 +21,14 @@ let
     to-issues = "engineering/to-issues";
     to-prd = "engineering/to-prd";
     triage = "engineering/triage";
-    zoom-out = "engineering/zoom-out";
     git-guardrails-claude-code = "misc/git-guardrails-claude-code";
     migrate-to-shoehorn = "misc/migrate-to-shoehorn";
     scaffold-exercises = "misc/scaffold-exercises";
     setup-pre-commit = "misc/setup-pre-commit";
     edit-article = "personal/edit-article";
     obsidian-vault = "personal/obsidian-vault";
-    caveman = "productivity/caveman";
     grill-me = "productivity/grill-me";
-    write-a-skill = "productivity/write-a-skill";
+    write-a-skill = "productivity/writing-great-skills";
   };
 
   mattPocockSkillFiles = builtins.listToAttrs (

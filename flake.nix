@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix/v0.135.0";
+      url = "github:sadjow/codex-cli-nix/v0.142.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     codex-desktop-linux = {
@@ -21,6 +21,14 @@
     };
     handy = {
       url = "github:cjpais/Handy";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    herdr = {
+      url = "github:ogulcancelik/herdr/v0.6.5";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
