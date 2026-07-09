@@ -18,8 +18,8 @@ let
     improve-codebase-architecture = "engineering/improve-codebase-architecture";
     setup-matt-pocock-skills = "engineering/setup-matt-pocock-skills";
     tdd = "engineering/tdd";
-    to-issues = "engineering/to-issues";
-    to-prd = "engineering/to-prd";
+    to-spec = "engineering/to-spec";
+    to-tickets = "engineering/to-tickets";
     triage = "engineering/triage";
     git-guardrails-claude-code = "misc/git-guardrails-claude-code";
     migrate-to-shoehorn = "misc/migrate-to-shoehorn";
@@ -27,7 +27,7 @@ let
     setup-pre-commit = "misc/setup-pre-commit";
     edit-article = "personal/edit-article";
     obsidian-vault = "personal/obsidian-vault";
-    grill-me = "productivity/grill-me";
+    wayfinder = "engineering/wayfinder";
     write-a-skill = "productivity/writing-great-skills";
   };
 

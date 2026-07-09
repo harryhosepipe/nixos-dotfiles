@@ -301,6 +301,12 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	name = "opaque-browsers",
+	match = { class = "^(firefox|chromium|brave-browser)$" },
+	opacity = "1.0 override 1.0 override 1.0 override",
+})
+
+hl.window_rule({
 	name = "fix-xwayland-drags",
 	match = {
 		class = "^$",

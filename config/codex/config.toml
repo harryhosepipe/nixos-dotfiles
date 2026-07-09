@@ -1,6 +1,6 @@
 model = "gpt-5.5"
 model_reasoning_effort = "low"
-service_tier = "priority"
+service_tier = "fast"
 notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
 personality = "pragmatic"
 
@@ -116,6 +116,18 @@ trust_level = "trusted"
 [projects."/home/pablo/Documents/OBSIDIAN"]
 trust_level = "trusted"
 
+[projects."/home/pablo/Documents/Figma test"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/swiftm"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/rb"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -156,21 +168,26 @@ CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/c36zmiy6a2zr0y131j5xmlp9qyfv571n-codex-desktop-computer-use-ui-remote-mobile-control-26.609.41114/opt/codex-desktop/resources/node_repl"
+command = "/nix/store/yyyxq9ihmywchlmig5gs62ky3ha7grnm-codex-desktop-computer-use-ui-remote-mobile-control-26.623.101652/opt/codex-desktop/resources/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/nix/store/c36zmiy6a2zr0y131j5xmlp9qyfv571n-codex-desktop-computer-use-ui-remote-mobile-control-26.609.41114/opt/codex-desktop/resources/node-runtime/bin/node"
+NODE_REPL_NODE_PATH = "/nix/store/yyyxq9ihmywchlmig5gs62ky3ha7grnm-codex-desktop-computer-use-ui-remote-mobile-control-26.623.101652/opt/codex-desktop/resources/node-runtime/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
 CODEX_HOME = "/home/pablo/.config/codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "27dca86fd6b571c49414a4b78e46b57bcf683a46cd1319799c11fbb6cfae3110,fbb43c1823a437e53c290a96a552343953833138320b862835c1779488c3e94b,b939d00b823958b4092cbfcf99ee2e16565f49d557e2de8c6ddb47558897903a"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "97669f77b3ca7114a2df05d55646416ea34b28100c07213ef9f643803449ef2f"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.609.41114"
+BROWSER_USE_CODEX_APP_VERSION = "26.623.141536"
+
+[mcp_servers.node_repl.tools]
+
+[mcp_servers.node_repl.tools.js]
+approval_mode = "approve"
 
 [tui]
 notifications = false
@@ -229,12 +246,12 @@ trusted_hash = "sha256:e237486526f1cf8b394a7c9d48de70eed40d09aecf29704939444cdfe
 trusted_hash = "sha256:51ecfc4277a64a6684e1bae31f925f6d37fd4226a45c12cdb73500d192fde0ff"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-06-27T18:17:00Z"
+last_updated = "2026-07-06T19:08:14Z"
 source_type = "local"
 source = "/home/pablo/.config/codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-06-24T19:27:21Z"
+last_updated = "2026-07-04T15:27:38Z"
 source_type = "local"
 source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -242,6 +259,7 @@ source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai
 conversationDetailMode = "STEPS_COMMANDS"
 ambient-suggestions-enabled = false
 notifications-turn-mode = "always"
+followUpQueueMode = "queue"
 
 [desktop.open-in-target-preferences]
 global = "fileManager"

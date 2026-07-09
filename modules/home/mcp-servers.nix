@@ -16,7 +16,7 @@ in {
     (npmMcpServer {
       name = "context-mode";
       package = "context-mode";
-      version = "1.0.168";
+      version = "1.0.169";
       runtimeTools = with pkgs; [
         bashInteractive
         coreutils

@@ -22,6 +22,8 @@
         "startup.homepage_welcome_url" = "";
         "startup.homepage_welcome_url.additional" = "";
         "browser.messaging-system.whatsNewPanel.enabled" = false;
+        "dom.webgpu.enabled" = true;
+        "gfx.webrender.all" = true;
         "dom.disable_beforeunload" = true;
         "middlemouse.paste" = false;
         "signon.rememberSignons" = false;
