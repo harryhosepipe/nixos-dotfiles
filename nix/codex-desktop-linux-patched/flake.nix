@@ -13,17 +13,7 @@
     flake-utils,
     ...
   }: let
-    patchForSystem = system: let
-      pkgs = import nixpkgs {inherit system;};
-    in
-      pkgs.applyPatches {
-        name = "codex-desktop-linux-patched-source";
-        src = upstream;
-        patches = [./codex-dmg-hash.patch];
-      };
-
-    patchedSource = patchForSystem "x86_64-linux";
-    upstreamFlake = import "${patchedSource}/flake.nix";
+    upstreamFlake = import "${upstream}/flake.nix";
     patchedOutputs =
       upstreamFlake.outputs {
         self =

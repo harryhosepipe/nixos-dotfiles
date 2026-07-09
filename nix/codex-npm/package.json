@@ -1,0 +1,8 @@
+{
+  "name": "codex-npm-wrapper",
+  "version": "0.144.0",
+  "private": true,
+  "dependencies": {
+    "@openai/codex": "0.144.0"
+  }
+}

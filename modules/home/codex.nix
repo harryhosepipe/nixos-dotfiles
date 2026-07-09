@@ -6,15 +6,42 @@
 }:
 
 let
-  # This package comes from the codex-cli-nix flake input.
-  # Updating that input in flake.lock is what moves Codex to a newer release.
-  codex = inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  codex = pkgs.buildNpmPackage {
+    pname = "codex-cli";
+    version = "0.144.0";
+
+    src = ../../nix/codex-npm;
+    npmDepsHash = "sha256-4Ry00XNNFp8WEv/bK8dbB8YDI+uN1uaEjwj2l5e917k=";
+
+    dontNpmBuild = true;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p "$out/lib/codex-cli" "$out/bin"
+      cp -r node_modules package.json package-lock.json "$out/lib/codex-cli/"
+
+      makeWrapper ${pkgs.nodejs_22}/bin/node "$out/bin/codex" \
+        --add-flags "$out/lib/codex-cli/node_modules/@openai/codex/bin/codex.js"
+
+      if [ ! -e "$out/bin/codex-code-mode-host" ]; then
+        ln -s codex "$out/bin/codex-code-mode-host"
+      fi
+
+      runHook postInstall
+    '';
+
+    meta.mainProgram = "codex";
+  };
 
   # These are the active Codex skills from github:mattpocock/skills.
   # Deprecated skills are left out so they do not appear as normal choices.
   mattPocockSkills = {
+    code-review = "engineering/code-review";
     diagnose = "engineering/diagnosing-bugs";
     grill-with-docs = "engineering/grill-with-docs";
+    implement = "engineering/implement";
     improve-codebase-architecture = "engineering/improve-codebase-architecture";
     setup-matt-pocock-skills = "engineering/setup-matt-pocock-skills";
     tdd = "engineering/tdd";
