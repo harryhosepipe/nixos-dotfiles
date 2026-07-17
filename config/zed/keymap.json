@@ -1,0 +1,89 @@
+[
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "ctrl-c": "vim::NormalBefore",
+      "j j": "vim::NormalBefore"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == visual && !menu",
+    "bindings": {
+      "shift-j": "editor::MoveLineDown",
+      "shift-k": "editor::MoveLineUp",
+      "f3": "editor::Format",
+      "f4": "editor::ToggleCodeActions",
+      "space c a": "editor::ToggleCodeActions",
+      "space d": ["workspace::SendKeystrokes", "\" _ d"],
+      "space p": ["workspace::SendKeystrokes", "\" _ d shift-p"],
+      "space y": ["workspace::SendKeystrokes", "\" + y"]
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !menu",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-d": ["workspace::SendKeystrokes", "z z ctrl-d"],
+      "ctrl-u": ["workspace::SendKeystrokes", "z z ctrl-u"],
+      "f2": "editor::Rename",
+      "f3": "editor::Format",
+      "f4": "editor::ToggleCodeActions",
+      "g i": "editor::GoToImplementation",
+      "g l": "editor::Hover",
+      "g o": "editor::GoToTypeDefinition",
+      "g r": "editor::FindAllReferences",
+      "g s": "editor::ShowSignatureHelp",
+      "shift-q": null,
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-k": "editor::Hover",
+      "shift-l": "pane::ActivateNextItem",
+      "space c a": "editor::ToggleCodeActions",
+      "space c d": "editor::Hover",
+      "space c shift-d": "diagnostics::Deploy",
+      "space c shift-f": "editor::Format",
+      "space c shift-r": "editor::FindAllReferences",
+      "space c n": "editor::GoToDiagnostic",
+      "space c o": "diagnostics::Deploy",
+      "space c p": "editor::GoToPreviousDiagnostic",
+      "space c r": "editor::Rename",
+      "space c s": "editor::ShowSignatureHelp",
+      "space d": ["workspace::SendKeystrokes", "\" _ d"],
+      "space e": "project_panel::ToggleFocus",
+      "space f b": "tab_switcher::Toggle",
+      "space f f": "file_finder::Toggle",
+      "space f s": "workspace::NewSearch",
+      "space f t": "terminal_panel::Toggle",
+      "space f w": "pane::DeploySearch",
+      "space j": "editor::GoToPreviousDiagnostic",
+      "space k": "editor::GoToDiagnostic",
+      "space x x": "diagnostics::Deploy",
+      "space y": ["workspace::SendKeystrokes", "\" + y"]
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "space e": "workspace::ToggleLeftDock"
+    }
+  },
+  {
+    "context": "TabSwitcher",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "escape escape": "terminal::ToggleViMode"
+    }
+  }
+]
