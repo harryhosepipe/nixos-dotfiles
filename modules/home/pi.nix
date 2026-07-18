@@ -1,10 +1,10 @@
 { config, pkgs, userSettings, ... }:
 let
-  piVersion = "0.73.0";
+  piVersion = "0.80.10";
 
   pi = pkgs.writeShellScriptBin "pi" ''
     export PATH=${pkgs.nodejs_22}/bin:$PATH
-    exec ${pkgs.nodejs_22}/bin/npx -y @mariozechner/pi-coding-agent@${piVersion} "$@"
+    exec ${pkgs.nodejs_22}/bin/npx -y @earendil-works/pi-coding-agent@${piVersion} "$@"
   '';
 in
 {
