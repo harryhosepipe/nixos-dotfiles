@@ -1,3 +1,31 @@
+local function attached_language_servers()
+	local names = {}
+
+	for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+		table.insert(names, client.name)
+	end
+
+	table.sort(names)
+	return names
+end
+
+local function has_attached_language_server()
+	return next(vim.lsp.get_clients({ bufnr = 0 })) ~= nil
+end
+
+local function show_language_servers(_, button)
+	if button ~= "l" then
+		return
+	end
+
+	local names = attached_language_servers()
+	local message = #names > 0 and table.concat(names, "\n") or "None attached to this buffer"
+
+	vim.notify(message, vim.log.levels.INFO, {
+		title = "Language servers",
+	})
+end
+
 require("lualine").setup({
 	options = {
 		theme = "moonfly",
@@ -52,6 +80,16 @@ require("lualine").setup({
 				cond = function()
 					return vim.bo.fileformat ~= "unix"
 				end,
+			},
+			{
+				function()
+					return "󰒋"
+				end,
+				color = function()
+					return { fg = has_attached_language_server() and "#36c692" or "#6f737b" }
+				end,
+				on_click = show_language_servers,
+				padding = { left = 1, right = 1 },
 			},
 			{ "filetype", icon_only = false },
 		},
