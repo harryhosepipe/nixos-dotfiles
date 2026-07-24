@@ -32,6 +32,10 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";
+    hermes-pyproject-build-systems.follows = "hermes-agent/pyproject-build-systems";
+    hermes-pyproject-nix.follows = "hermes-agent/pyproject-nix";
+    hermes-uv2nix.follows = "hermes-agent/uv2nix";
   };
 
   outputs = inputs @ {

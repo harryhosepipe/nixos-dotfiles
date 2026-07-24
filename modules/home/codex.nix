@@ -23,7 +23,8 @@ let
       cp -r node_modules package.json package-lock.json "$out/lib/codex-cli/"
 
       makeWrapper ${pkgs.nodejs_22}/bin/node "$out/bin/codex" \
-        --add-flags "$out/lib/codex-cli/node_modules/@openai/codex/bin/codex.js"
+        --add-flags "$out/lib/codex-cli/node_modules/@openai/codex/bin/codex.js" \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.bubblewrap ]}
 
       if [ ! -e "$out/bin/codex-code-mode-host" ]; then
         ln -s codex "$out/bin/codex-code-mode-host"

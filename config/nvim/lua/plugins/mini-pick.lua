@@ -11,9 +11,9 @@ MiniExtra.setup()
 
 vim.keymap.set("n", "<leader>ff", function()
     MiniPick.builtin.cli({
-        command = { "rg", "--files", "--hidden", "--no-ignore", "--color=never" },
+        command = { "rg", "--files", "--hidden", "--color=never", "--glob=!.git/**" },
     }, {
-        source = { name = "Files (rg --hidden --no-ignore)" },
+        source = { name = "Files (rg --hidden, excluding .git)" },
     })
 end, { desc = "Mini File Picker" })
 
@@ -22,7 +22,7 @@ vim.keymap.set("n", "<leader>fw", function()
 end, { desc = "Grep word/Search word" })
 
 vim.keymap.set("n", "<leader>fs", function()
-    MiniPick.builtin.grep_live()
+    MiniPick.builtin.grep_live({ globs = { "!.git/**" } })
 end, { desc = "Live grep" })
 
 vim.keymap.set("n", "<leader>vh", function()

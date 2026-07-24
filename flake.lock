@@ -213,11 +213,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1783386793,
-        "narHash": "sha256-icaquF4kTvImRhntTeGKu6R+Ybp3fGZk5Jz0aFiGpVk=",
+        "lastModified": 1784482154,
+        "narHash": "sha256-MP/HnnlIHyJgrN/YARxQjVhovH0/uwxZlk+CB3goD4Q=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "05cbddc01234ea120cccc1f62d36f1ef352b0d52",
+        "rev": "299e409f15aa5615a8a64be488580be92cda351e",
         "type": "github"
       },
       "original": {
@@ -385,6 +385,22 @@
         "handy": "handy",
         "herdr": "herdr",
         "hermes-agent": "hermes-agent",
+        "hermes-npm-lockfile-fix": [
+          "hermes-agent",
+          "npm-lockfile-fix"
+        ],
+        "hermes-pyproject-build-systems": [
+          "hermes-agent",
+          "pyproject-build-systems"
+        ],
+        "hermes-pyproject-nix": [
+          "hermes-agent",
+          "pyproject-nix"
+        ],
+        "hermes-uv2nix": [
+          "hermes-agent",
+          "uv2nix"
+        ],
         "home-manager": "home-manager",
         "mattpocock-skills": "mattpocock-skills",
         "nixpkgs": "nixpkgs"
@@ -480,11 +496,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783597710,
-        "narHash": "sha256-ji/Sn8hpIouj1U5NzBI7GIEVJDwRAEF87E1WFf3A18M=",
+        "lastModified": 1784389652,
+        "narHash": "sha256-LRnL+bLyHwyaOVwM3p1UZOAeFlwsWAXdhmbJCIXX2e4=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "ddcd9b559274abc7d4c8ae8ba54813a8acbcb982",
+        "rev": "bf6e6be58f7fbf1ea90a2a27ebbff12c4989e5a1",
         "type": "github"
       },
       "original": {

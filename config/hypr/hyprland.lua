@@ -237,6 +237,8 @@ hl.bind(
 hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"))
 
 -- Mouse controls
+hl.bind("mouse:276", hl.dsp.focus({ workspace = "e-1" })) -- previous workspace
+hl.bind("mouse:275", hl.dsp.focus({ workspace = "e+1" })) -- next workspace
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })

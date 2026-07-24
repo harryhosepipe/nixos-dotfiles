@@ -44,6 +44,10 @@ vim.lsp.config("cssls", {
     },
 })
 
+vim.lsp.config("css_variables", {
+    filetypes = { "css", "scss", "less", "astro", "svelte" },
+})
+
 vim.lsp.config("tailwindcss", {
     settings = {
         tailwindCSS = {
@@ -53,10 +57,19 @@ vim.lsp.config("tailwindcss", {
     },
 })
 
+vim.lsp.config("eslint", {
+    settings = {
+        experimental = {
+            useFlatConfig = true,
+        },
+    },
+})
+
 vim.lsp.enable({
     "lua_ls",
     "eslint",
     "cssls",
+    "css_variables",
     "tailwindcss",
     "emmet_language_server",
     "svelte",

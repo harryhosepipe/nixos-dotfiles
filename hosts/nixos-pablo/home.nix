@@ -137,6 +137,7 @@ in
     zoxide
     thunar
     chromium
+    google-chrome
     obsidian
     signal-desktop
     whatsapp-electron

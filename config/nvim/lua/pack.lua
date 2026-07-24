@@ -8,6 +8,8 @@ vim.pack.add({
 	"https://github.com/neovim/nvim-lspconfig",
 	"https://github.com/mason-org/mason.nvim",
 	"https://github.com/tpope/vim-fugitive",
+	"https://github.com/nvim-lua/plenary.nvim",
+	{ src = "https://github.com/ThePrimeagen/harpoon", version = "harpoon2" },
 	"https://github.com/christoomey/vim-tmux-navigator",
 	"https://github.com/nvim-lualine/lualine.nvim",
 	"https://github.com/stevearc/conform.nvim",
@@ -24,6 +26,7 @@ require("plugins.mini-pairs")
 require("plugins.mini-pick")
 require("plugins.mini-snippets")
 require("plugins.mini-diff")
+require("plugins.harpoon")
 require("plugins.snacks")
 require("plugins.blink-cmp")
 require("plugins.conform")

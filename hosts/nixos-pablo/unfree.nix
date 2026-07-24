@@ -5,6 +5,7 @@
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
+      "google-chrome"
       "nvidia-settings"
       "nvidia-x11"
       "nvim-highlight-colors"
