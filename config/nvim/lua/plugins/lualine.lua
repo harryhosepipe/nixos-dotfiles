@@ -1,45 +1,3 @@
-local colors = {
-	green = "#36c692",
-	red = "#ff5454",
-	yellow = "#e3c78a",
-}
-
-local conform = require("conform")
-
-local function window_is_wide()
-	return vim.o.columns > 100
-end
-
-local function lsp_status()
-	local clients = vim.lsp.get_clients({ bufnr = 0 })
-	if #clients == 0 then
-		return "󰅚 no lsp"
-	end
-
-	local names = {}
-	for _, client in ipairs(clients) do
-		table.insert(names, client.name)
-	end
-	table.sort(names)
-
-	return "󰒋 " .. table.concat(names, ", ")
-end
-
-local function formatter_status()
-	local names = {}
-	for _, formatter in ipairs(conform.list_formatters(0)) do
-		if formatter.available then
-			table.insert(names, formatter.name)
-		end
-	end
-
-	if #names == 0 then
-		return ""
-	end
-
-	return "󰉼 " .. table.concat(names, ", ")
-end
-
 require("lualine").setup({
 	options = {
 		theme = "moonfly",
@@ -52,19 +10,13 @@ require("lualine").setup({
 	},
 	sections = {
 		lualine_a = {
-			{
-				"mode",
-				fmt = function(mode)
-					return mode:sub(1, 1)
-				end,
-			},
+			"mode",
 		},
 		lualine_b = {
 			{ "branch", icon = "" },
 			{
 				"diff",
-				symbols = { added = " ", modified = " ", removed = " " },
-				cond = window_is_wide,
+				symbols = { added = "+", modified = "~", removed = "-" },
 			},
 		},
 		lualine_c = {
@@ -85,25 +37,22 @@ require("lualine").setup({
 			{
 				"diagnostics",
 				sources = { "nvim_diagnostic" },
-				sections = { "error", "warn", "info", "hint" },
-				symbols = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
+				sections = { "error", "warn" },
+				symbols = { error = " ", warn = " " },
 				update_in_insert = false,
 			},
 			{
-				formatter_status,
-				cond = window_is_wide,
-				color = { fg = colors.yellow },
-			},
-			{
-				lsp_status,
-				cond = window_is_wide,
-				color = function()
-					local clients = vim.lsp.get_clients({ bufnr = 0 })
-					return { fg = #clients > 0 and colors.green or colors.red }
+				"encoding",
+				cond = function()
+					return vim.bo.fileencoding ~= "" and vim.bo.fileencoding ~= "utf-8"
 				end,
 			},
-			{ "encoding", cond = window_is_wide },
-			{ "fileformat", cond = window_is_wide },
+			{
+				"fileformat",
+				cond = function()
+					return vim.bo.fileformat ~= "unix"
+				end,
+			},
 			{ "filetype", icon_only = false },
 		},
 		lualine_y = {
