@@ -108,6 +108,7 @@ end
 local function jump_to(definition)
 	vim.cmd.edit(vim.fn.fnameescape(definition.filename))
 	vim.api.nvim_win_set_cursor(0, { definition.lnum, definition.col - 1 })
+	vim.cmd("normal! zz")
 end
 
 local function go_to_css_definition()
@@ -130,6 +131,10 @@ local function go_to_css_definition()
 			items = definitions,
 		})
 		vim.cmd.copen()
+		vim.keymap.set("n", "<CR>", function()
+			vim.cmd("cc")
+			vim.cmd("normal! zz")
+		end, { buffer = true, desc = "Jump to centered CSS definition" })
 	end
 end
 
