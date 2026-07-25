@@ -64,6 +64,11 @@ in
     };
   };
 
+  qt = {
+    enable = true;
+    platformTheme.name = "qtct";
+  };
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
