@@ -21,7 +21,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("sh -lc '$HOME/.config/hypr/random-wallpaper.sh'")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("swaync")
-	hl.exec_cmd("handy --start-hidden")
+	hl.exec_cmd("systemctl --user start handy.service")
 end)
 
 hl.env("XCURSOR_SIZE", "24")
@@ -179,7 +179,7 @@ hl.bind(
 	{ description = "Open session menu" }
 )
 
-hl.bind("CTRL + M", hl.dsp.exec_cmd("~/.config/hypr/handy-toggle-notify.sh"), { description = "Toggle Handy notifications" })
+hl.bind("CTRL + M", hl.dsp.exec_cmd("handy --toggle-transcription"), { description = "Toggle Handy recording" })
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("sh -lc "), { description = "Reserved shortcut" })
 hl.bind(
 	mainMod .. " + SHIFT + B",
