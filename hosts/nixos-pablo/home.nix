@@ -1,6 +1,5 @@
 { config
 , inputs
-, lib
 , pkgs
 , userSettings
 , ...
@@ -90,15 +89,6 @@ in
   services.handy.enable = true;
 
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
-
-  home.activation.qbittorrentDraculaTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    qbittorrentConfig="${config.xdg.configHome}/qBittorrent/qBittorrent.conf"
-    run mkdir -p "$(dirname "$qbittorrentConfig")"
-    run touch "$qbittorrentConfig"
-    run ${pkgs.crudini}/bin/crudini --set "$qbittorrentConfig" Preferences 'General\UseCustomUITheme' true
-    run ${pkgs.crudini}/bin/crudini --set "$qbittorrentConfig" Preferences 'General\CustomUIThemePath' \
-      "${config.xdg.configHome}/qBittorrent/themes/dracula.qbtheme"
-  '';
 
   programs.gh = {
     enable = true;
