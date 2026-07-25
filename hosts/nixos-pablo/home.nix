@@ -1,5 +1,6 @@
 { config
 , inputs
+, lib
 , pkgs
 , userSettings
 , ...
@@ -9,6 +10,13 @@ let
     url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
     hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
   };
+  initialQt6ctConfig = pkgs.writeText "qt6ct-initial.conf" ''
+    [Appearance]
+    color_scheme_path=${config.xdg.configHome}/qt6ct/colors/darker.conf
+    custom_palette=true
+    standard_dialogs=default
+    style=Fusion
+  '';
   shellSettings = import ../../shells/settings.nix;
   localPackages = import ../../packages { inherit pkgs; };
   fzfShare = "${pkgs.fzf}/share/fzf";
@@ -69,6 +77,14 @@ in
     platformTheme.name = "qtct";
   };
 
+  # Seed a dark palette once, then leave qt6ct's settings mutable.
+  home.activation.initializeQt6ct = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    qt6ctConfig="${config.xdg.configHome}/qt6ct/qt6ct.conf"
+    if [[ ! -e "$qt6ctConfig" ]]; then
+      run install -Dm600 ${initialQt6ctConfig} "$qt6ctConfig"
+    fi
+  '';
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -94,6 +110,8 @@ in
   services.handy.enable = true;
 
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
+  xdg.configFile."qt6ct/colors/darker.conf".source =
+    "${pkgs.qt6Packages.qt6ct}/share/qt6ct/colors/darker.conf";
 
   programs.gh = {
     enable = true;
