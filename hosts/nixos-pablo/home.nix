@@ -10,6 +10,16 @@ let
     url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
     hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
   };
+  qbittorrentQt6ct = pkgs.symlinkJoin {
+    name = "qbittorrent-qt6ct";
+    paths = [ pkgs.qbittorrent ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram "$out/bin/qbittorrent" \
+        --set QT_QPA_PLATFORMTHEME qt6ct \
+        --prefix QT_PLUGIN_PATH : "${pkgs.qt6Packages.qt6ct}/lib/qt-6/plugins"
+    '';
+  };
   initialQt6ctConfig = pkgs.writeText "qt6ct-initial.conf" ''
     [Appearance]
     color_scheme_path=${config.xdg.configHome}/qt6ct/colors/darker.conf
@@ -167,7 +177,7 @@ in
     thunar
     chromium
     google-chrome
-    qbittorrent
+    qbittorrentQt6ct
     obsidian
     signal-desktop
     whatsapp-electron
