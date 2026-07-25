@@ -21,6 +21,7 @@ tooltip {
 
 #workspaces,
 #custom-window,
+#custom-keybinds,
 #clock,
 #cpu,
 #memory,
@@ -62,6 +63,18 @@ tooltip {
 #custom-window {
   color: #444444;
   font-size: 12px;
+}
+
+#custom-keybinds {
+  color: #757575;
+  font-size: 17px;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+
+#custom-keybinds:hover {
+  color: #e6e1cf;
+  background: rgba(68, 170, 136, 0.22);
 }
 
 #clock {

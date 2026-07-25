@@ -60,6 +60,7 @@
     hypridle
     hyprpaper
     grim
+    jq
     slurp
     swaynotificationcenter
     swappy

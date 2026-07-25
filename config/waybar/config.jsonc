@@ -11,6 +11,7 @@
   "modules-left": ["hyprland/workspaces", "custom/window"],
   //  "modules-center": ["clock"],
   "modules-right": [
+    "custom/keybinds",
     "cpu",
     "memory",
     "disk",
@@ -29,6 +30,13 @@
     "exec": "$HOME/.config/waybar/window-title-uppercase.sh",
     "restart-interval": 1,
     "max-length": 60,
+  },
+
+  "custom/keybinds": {
+    "format": "󰌌",
+    "tooltip": true,
+    "tooltip-format": "Keyboard shortcuts",
+    "on-click": "$HOME/.config/waybar/keybinds-overlay.sh",
   },
 
   "clock": {

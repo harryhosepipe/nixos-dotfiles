@@ -146,154 +146,183 @@ hl.device({
 })
 
 -- Launchers and apps
-hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float] " .. fileManager))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("sh -lc '$HOME/.config/hypr/tmux-session-menu.sh'"))
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal), { description = "Open terminal" })
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float] " .. fileManager), { description = "Open file manager" })
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser), { description = "Open browser" })
+hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser), { description = "Open browser" })
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu), { description = "Open application launcher" })
+hl.bind(
+	mainMod .. " + T",
+	hl.dsp.exec_cmd("sh -lc '$HOME/.config/hypr/tmux-session-menu.sh'"),
+	{ description = "Open tmux sessions" }
+)
 hl.bind(
 	mainMod .. " + A",
 	hl.dsp.exec_cmd(
 		"sh -lc 'if pgrep -x pwvucontrol >/dev/null 2>&1; then pkill -x pwvucontrol; else pwvucontrol >/tmp/pwvucontrol.log 2>&1 & fi'"
-	)
+	),
+	{ description = "Open audio controls" }
 )
 
 -- Window actions
-hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ state = 0 }))
-hl.bind(altMod .. " + F", hl.dsp.window.fullscreen({ state = 1 }))
-hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl kill"))
+hl.bind(mainMod .. " + Q", hl.dsp.window.close(), { description = "Close active window" })
+hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ state = 0 }), { description = "Toggle fullscreen" })
+hl.bind(altMod .. " + F", hl.dsp.window.fullscreen({ state = 1 }), { description = "Toggle maximized window" })
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprctl kill"), { description = "Pick a window to close" })
 
 -- Session and desktop controls
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock session" })
 hl.bind(
 	mainMod .. " + SHIFT + Escape",
-	hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit")
+	hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"),
+	{ description = "Open session menu" }
 )
 
-hl.bind("CTRL + M", hl.dsp.exec_cmd("~/.config/hypr/handy-toggle-notify.sh"))
-hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("sh -lc "))
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("sh -lc '$HOME/.config/hypr/random-wallpaper.sh'"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/waybar/toggle-waybar.sh"))
+hl.bind("CTRL + M", hl.dsp.exec_cmd("~/.config/hypr/handy-toggle-notify.sh"), { description = "Toggle Handy notifications" })
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("sh -lc "), { description = "Reserved shortcut" })
+hl.bind(
+	mainMod .. " + SHIFT + B",
+	hl.dsp.exec_cmd("sh -lc '$HOME/.config/hypr/random-wallpaper.sh'"),
+	{ description = "Choose a new wallpaper" }
+)
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/waybar/toggle-waybar.sh"), { description = "Toggle Waybar" })
 hl.bind(
 	mainMod .. " + SHIFT + W",
-	hl.dsp.exec_cmd("sh -lc 'pkill -SIGUSR2 -x waybar || pkill -SIGUSR2 -x .waybar-wrapped'")
+	hl.dsp.exec_cmd("sh -lc 'pkill -SIGUSR2 -x waybar || pkill -SIGUSR2 -x .waybar-wrapped'"),
+	{ description = "Reload Waybar" }
 )
 
 -- Layout-specific bindings
 dofile(configDir .. "layouts/" .. layoutPreset .. ".lua")(hl, mainMod)
 
 if layoutPreset == "scrolling" then
-	hl.bind(mainMod .. " + comma", hl.dsp.layout("move -col"))
-	hl.bind(mainMod .. " + period", hl.dsp.layout("move +col"))
-	hl.bind(mainMod .. " + SHIFT + H", hl.dsp.layout("swapcol l"))
-	hl.bind(mainMod .. " + SHIFT + L", hl.dsp.layout("swapcol r"))
-	hl.bind(mainMod .. " + CTRL + comma", hl.dsp.layout("colresize -conf"))
-	hl.bind(mainMod .. " + CTRL + period", hl.dsp.layout("colresize +conf"))
-	hl.bind(mainMod .. " + backslash", hl.dsp.layout("fit active"))
-	hl.bind(mainMod .. " + SHIFT + backslash", hl.dsp.layout("consume_or_expel next"))
+	hl.bind(mainMod .. " + comma", hl.dsp.layout("move -col"), { description = "Scroll layout left" })
+	hl.bind(mainMod .. " + period", hl.dsp.layout("move +col"), { description = "Scroll layout right" })
+	hl.bind(mainMod .. " + SHIFT + H", hl.dsp.layout("swapcol l"), { description = "Move column left" })
+	hl.bind(mainMod .. " + SHIFT + L", hl.dsp.layout("swapcol r"), { description = "Move column right" })
+	hl.bind(mainMod .. " + CTRL + comma", hl.dsp.layout("colresize -conf"), { description = "Narrow active column" })
+	hl.bind(mainMod .. " + CTRL + period", hl.dsp.layout("colresize +conf"), { description = "Widen active column" })
+	hl.bind(mainMod .. " + backslash", hl.dsp.layout("fit active"), { description = "Fit active column to screen" })
+	hl.bind(
+		mainMod .. " + SHIFT + backslash",
+		hl.dsp.layout("consume_or_expel next"),
+		{ description = "Join or separate next window" }
+	)
 end
 
 -- Focus navigation
-hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }))
-hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
+hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }), { description = "Focus left" })
+hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }), { description = "Focus right" })
+hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }), { description = "Focus up" })
+hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }), { description = "Focus down" })
 
 -- Window movement and resizing
-hl.bind(mainMod .. " + CTRL + H", hl.dsp.window.resize({ x = -40, y = 0 }))
-hl.bind(mainMod .. " + CTRL + L", hl.dsp.window.resize({ x = 40, y = 0 }))
-hl.bind(mainMod .. " + CTRL + K", hl.dsp.window.resize({ x = 0, y = -40 }))
-hl.bind(mainMod .. " + CTRL + J", hl.dsp.window.resize({ x = 0, y = 40 }))
+hl.bind(mainMod .. " + CTRL + H", hl.dsp.window.resize({ x = -40, y = 0 }), { description = "Shrink window horizontally" })
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.window.resize({ x = 40, y = 0 }), { description = "Grow window horizontally" })
+hl.bind(mainMod .. " + CTRL + K", hl.dsp.window.resize({ x = 0, y = -40 }), { description = "Shrink window vertically" })
+hl.bind(mainMod .. " + CTRL + J", hl.dsp.window.resize({ x = 0, y = 40 }), { description = "Grow window vertically" })
 
 -- Workspaces
 for i = 1, 10 do
 	local key = i == 10 and "0" or tostring(i)
-	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
-	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
+	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }), { description = "Go to workspace " .. i })
+	hl.bind(
+		mainMod .. " + SHIFT + " .. key,
+		hl.dsp.window.move({ workspace = i, follow = false }),
+		{ description = "Move window to workspace " .. i }
+	)
 end
 
-hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"), { description = "Toggle scratch workspace" })
+hl.bind(
+	mainMod .. " + SHIFT + S",
+	hl.dsp.window.move({ workspace = "special:magic" }),
+	{ description = "Move window to scratch workspace" }
+)
 
 -- Screenshots
-hl.bind("Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"))
-hl.bind("ALT + mouse:276", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"))
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | swappy -f -'"))
+hl.bind("Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"), { description = "Copy area screenshot" })
+hl.bind("ALT + mouse:276", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"), { description = "Copy area screenshot" })
+hl.bind(
+	"SHIFT + Print",
+	hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | swappy -f -'"),
+	{ description = "Capture and annotate an area" }
+)
 hl.bind(
 	"CTRL + Print",
 	hl.dsp.exec_cmd(
 		'sh -lc \'mkdir -p "$HOME/Pictures/Screenshots" && grim "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"\''
-	)
+	),
+	{ description = "Save full-screen screenshot" }
 )
 hl.bind(
 	"CTRL + SHIFT + Print",
 	hl.dsp.exec_cmd(
 		'sh -lc \'mkdir -p "$HOME/Pictures/Screenshots" && grim -g "$(slurp -d -w 0)" "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"\''
-	)
+	),
+	{ description = "Save area screenshot" }
 )
-hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"))
+hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"), { description = "Copy full-screen screenshot" })
 
 -- Mouse controls
-hl.bind("mouse:276", hl.dsp.focus({ workspace = "e-1" })) -- previous workspace
-hl.bind("mouse:275", hl.dsp.focus({ workspace = "e+1" })) -- next workspace
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+hl.bind("mouse:276", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
+hl.bind("mouse:275", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Drag active window" })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize active window" })
 
 -- Hardware keys
 hl.bind(
 	"XF86AudioRaiseVolume",
 	hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Raise volume" }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
 	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Lower volume" }
 )
 hl.bind(
 	"XF86AudioMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Mute audio" }
 )
 hl.bind(
 	"XF86AudioMicMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Mute microphone" }
 )
 hl.bind(
 	"XF86MonBrightnessUp",
 	hl.dsp.exec_cmd("sh -c 'command -v brightnessctl >/dev/null 2>&1 && brightnessctl -e4 -n2 set 5%+'"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Raise screen brightness" }
 )
 hl.bind(
 	"XF86MonBrightnessDown",
 	hl.dsp.exec_cmd("sh -c 'command -v brightnessctl >/dev/null 2>&1 && brightnessctl -e4 -n2 set 5%-'"),
-	{ locked = true, repeating = true }
+	{ locked = true, repeating = true, description = "Lower screen brightness" }
 )
 hl.bind(
 	"XF86AudioNext",
 	hl.dsp.exec_cmd("sh -c 'command -v playerctl >/dev/null 2>&1 && playerctl next'"),
-	{ locked = true }
+	{ locked = true, description = "Play next track" }
 )
 hl.bind(
 	"XF86AudioPause",
 	hl.dsp.exec_cmd("sh -c 'command -v playerctl >/dev/null 2>&1 && playerctl play-pause'"),
-	{ locked = true }
+	{ locked = true, description = "Pause or resume media" }
 )
 hl.bind(
 	"XF86AudioPlay",
 	hl.dsp.exec_cmd("sh -c 'command -v playerctl >/dev/null 2>&1 && playerctl play-pause'"),
-	{ locked = true }
+	{ locked = true, description = "Play or pause media" }
 )
 hl.bind(
 	"XF86AudioPrev",
 	hl.dsp.exec_cmd("sh -c 'command -v playerctl >/dev/null 2>&1 && playerctl previous'"),
-	{ locked = true }
+	{ locked = true, description = "Play previous track" }
 )
 
 hl.window_rule({
