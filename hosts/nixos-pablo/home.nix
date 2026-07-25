@@ -138,6 +138,7 @@ in
     thunar
     chromium
     google-chrome
+    qbittorrent
     obsidian
     signal-desktop
     whatsapp-electron
