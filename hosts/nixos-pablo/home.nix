@@ -1,10 +1,15 @@
 { config
 , inputs
+, lib
 , pkgs
 , userSettings
 , ...
 }:
 let
+  draculaQbittorrentTheme = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
+    hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
+  };
   shellSettings = import ../../shells/settings.nix;
   localPackages = import ../../packages { inherit pkgs; };
   fzfShare = "${pkgs.fzf}/share/fzf";
@@ -83,6 +88,17 @@ in
 
   services.ssh-agent.enable = true;
   services.handy.enable = true;
+
+  xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
+
+  home.activation.qbittorrentDraculaTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    qbittorrentConfig="${config.xdg.configHome}/qBittorrent/qBittorrent.conf"
+    run mkdir -p "$(dirname "$qbittorrentConfig")"
+    run touch "$qbittorrentConfig"
+    run ${pkgs.crudini}/bin/crudini --set "$qbittorrentConfig" Preferences 'General\UseCustomUITheme' true
+    run ${pkgs.crudini}/bin/crudini --set "$qbittorrentConfig" Preferences 'General\CustomUIThemePath' \
+      "${config.xdg.configHome}/qBittorrent/themes/dracula.qbtheme"
+  '';
 
   programs.gh = {
     enable = true;
