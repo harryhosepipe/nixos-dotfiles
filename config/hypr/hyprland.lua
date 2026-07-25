@@ -179,7 +179,7 @@ hl.bind(
 	{ description = "Open session menu" }
 )
 
-hl.bind("CTRL + M", hl.dsp.exec_cmd("handy --toggle-transcription"), { description = "Toggle Handy recording" })
+hl.bind("CTRL + M", hl.dsp.exec_cmd("~/.config/hypr/handy-toggle.sh"), { description = "Toggle Handy recording" })
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("sh -lc "), { description = "Reserved shortcut" })
 hl.bind(
 	mainMod .. " + SHIFT + B",
