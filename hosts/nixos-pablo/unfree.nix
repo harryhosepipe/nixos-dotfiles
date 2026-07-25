@@ -10,5 +10,6 @@
       "nvidia-x11"
       "nvim-highlight-colors"
       "obsidian"
+      "paper-desktop"
     ];
 }

@@ -1,5 +1,42 @@
 { pkgs }:
+let
+  paperDesktopVersion = "0.5.0";
+  paperDesktopSrc = pkgs.fetchurl {
+    url = "https://download.paper.design/linux/appImage";
+    hash = "sha256-1Ezg5+5AgotZCa7meMqYdPf6UP/hJxlm5AONbx1OZWE=";
+  };
+  paperDesktopContents = pkgs.appimageTools.extractType2 {
+    pname = "paper-desktop";
+    version = paperDesktopVersion;
+    src = paperDesktopSrc;
+  };
+in
 {
+  paper-desktop = pkgs.appimageTools.wrapType2 {
+    pname = "paper-desktop";
+    version = paperDesktopVersion;
+    src = paperDesktopSrc;
+
+    extraInstallCommands = ''
+      install -Dm444 ${paperDesktopContents}/paper-desktop.desktop \
+        $out/share/applications/paper-desktop.desktop
+      substituteInPlace $out/share/applications/paper-desktop.desktop \
+        --replace-fail 'Exec=AppRun' 'Exec=paper-desktop'
+
+      while IFS= read -r icon; do
+        install -Dm444 "$icon" "$out/share/''${icon#${paperDesktopContents}/usr/share/}"
+      done < <(find ${paperDesktopContents}/usr/share/icons -type f)
+    '';
+
+    meta = {
+      description = "Collaborative interface design tool";
+      homepage = "https://paper.design";
+      license = pkgs.lib.licenses.unfree;
+      mainProgram = "paper-desktop";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
   nextcloud-client_4_0_4 = pkgs.nextcloud-client.overrideAttrs (_oldAttrs: {
     version = "4.0.4";
     src = pkgs.fetchFromGitHub {

@@ -143,6 +143,7 @@ in
     whatsapp-electron
     pavucontrol
     pwvucontrol
+    localPackages.paper-desktop
     figma-linux
     figma-agent
     zed-editor
