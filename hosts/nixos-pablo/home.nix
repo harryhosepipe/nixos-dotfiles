@@ -1,6 +1,5 @@
 { config
 , inputs
-, lib
 , pkgs
 , userSettings
 , ...
@@ -10,23 +9,10 @@ let
     url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
     hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
   };
-  qbittorrentQt6ct = pkgs.symlinkJoin {
-    name = "qbittorrent-qt6ct";
-    paths = [ pkgs.qbittorrent ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram "$out/bin/qbittorrent" \
-        --set QT_QPA_PLATFORMTHEME qt6ct \
-        --prefix QT_PLUGIN_PATH : "${pkgs.qt6Packages.qt6ct}/lib/qt-6/plugins"
-    '';
+  solarizedLightQbittorrentTheme = pkgs.fetchurl {
+    url = "https://github.com/MahdiMirzadeh/qbittorrent/releases/download/v0.6.6/solarized-light.qbtheme";
+    hash = "sha256-DUfJEt2uUSgW8yeW57AL0h2mGVn5TPGznDqeDduhcRM=";
   };
-  initialQt6ctConfig = pkgs.writeText "qt6ct-initial.conf" ''
-    [Appearance]
-    color_scheme_path=${config.xdg.configHome}/qt6ct/colors/darker.conf
-    custom_palette=true
-    standard_dialogs=default
-    style=Fusion
-  '';
   shellSettings = import ../../shells/settings.nix;
   localPackages = import ../../packages { inherit pkgs; };
   fzfShare = "${pkgs.fzf}/share/fzf";
@@ -82,19 +68,6 @@ in
     };
   };
 
-  qt = {
-    enable = true;
-    platformTheme.name = "qtct";
-  };
-
-  # Seed a dark palette once, then leave qt6ct's settings mutable.
-  home.activation.initializeQt6ct = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    qt6ctConfig="${config.xdg.configHome}/qt6ct/qt6ct.conf"
-    if [[ ! -e "$qt6ctConfig" ]]; then
-      run install -Dm600 ${initialQt6ctConfig} "$qt6ctConfig"
-    fi
-  '';
-
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -120,8 +93,8 @@ in
   services.handy.enable = true;
 
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
-  xdg.configFile."qt6ct/colors/darker.conf".source =
-    "${pkgs.qt6Packages.qt6ct}/share/qt6ct/colors/darker.conf";
+  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
+    solarizedLightQbittorrentTheme;
 
   programs.gh = {
     enable = true;
@@ -177,7 +150,7 @@ in
     thunar
     chromium
     google-chrome
-    qbittorrentQt6ct
+    qbittorrent
     obsidian
     signal-desktop
     whatsapp-electron
