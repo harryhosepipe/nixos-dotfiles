@@ -102,21 +102,57 @@ hyprctl binds -j |
     | "\(category)\t\($keys)\t\(.description)"
   ' >"$bindings_file"
 
-categories_file="${work_dir}/categories"
-cat >"$categories_file" <<'EOF'
-󰀻  Applications
-󰖲  Windows
-󰕮  Layout
-󰍹  Workspaces
-󰹑  Screenshots
-󰒓  System & Media
-EOF
+categories=(
+  "󰀻|Applications"
+  "󰖲|Windows"
+  "󰕮|Layout"
+  "󰍹|Workspaces"
+  "󰹑|Screenshots"
+  "󰒓|System & Media"
+)
+
+root_menu_file="${work_dir}/root-menu"
+: >"$root_menu_file"
+
+# Keep the six subject headings at the top, then expose every shortcut to
+# Wofi's fuzzy matcher. The category prefix gives global results context.
+for category_entry in "${categories[@]}"; do
+  icon="${category_entry%%|*}"
+  category="${category_entry#*|}"
+  printf '%s  %s\n' "$icon" "$category" >>"$root_menu_file"
+done
+
+for category_entry in "${categories[@]}"; do
+  category="${category_entry#*|}"
+  awk -F '\t' -v category="$category" '
+    $1 == category {
+      printf "  %s  ›  %-28s  %s\n", $1, $2, $3
+    }
+  ' "$bindings_file" >>"$root_menu_file"
+done
 
 while true; do
-  show_menu "$categories_file" "Keyboard shortcuts"
+  show_menu "$root_menu_file" "Keyboard shortcuts"
   category_choice="$menu_choice"
   [[ -n "$category_choice" ]] || exit 0
-  category="${category_choice#*  }"
+
+  category=""
+  for category_entry in "${categories[@]}"; do
+    icon="${category_entry%%|*}"
+    candidate="${category_entry#*|}"
+    if [[ "$category_choice" == "$icon  $candidate" ]]; then
+      category="$candidate"
+      break
+    fi
+  done
+
+  # A global shortcut result carries its category before the › separator.
+  if [[ -z "$category" && "$category_choice" == *"  ›  "* ]]; then
+    category="${category_choice#  }"
+    category="${category%%  ›  *}"
+  fi
+
+  [[ -n "$category" ]] || continue
 
   shortcuts_file="${work_dir}/shortcuts"
   {
