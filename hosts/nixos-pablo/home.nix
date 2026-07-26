@@ -156,9 +156,9 @@ in
     whatsapp-electron
     pavucontrol
     pwvucontrol
+    localPackages.figma-desktop
     localPackages.paper-desktop
-    figma-linux
-    figma-agent
+    localPackages.t3code
     zed-editor
     telegram-desktop
     libreoffice-qt

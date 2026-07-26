@@ -1,5 +1,15 @@
 { pkgs }:
 let
+  figmaDesktopVersion = "126.5.6";
+  figmaDesktopSrc = pkgs.fetchurl {
+    url = "https://github.com/IliyaBrook/figma-linux/releases/download/${figmaDesktopVersion}/figma-desktop-${figmaDesktopVersion}-amd64.AppImage";
+    hash = "sha256-SLn4y+NVCcBDZrGqIpmpIEQavY7xngt5JMI8yG1g6/0=";
+  };
+  figmaDesktopContents = pkgs.appimageTools.extractType2 {
+    pname = "figma-desktop";
+    version = figmaDesktopVersion;
+    src = figmaDesktopSrc;
+  };
   paperDesktopVersion = "0.5.0";
   paperDesktopSrc = pkgs.fetchurl {
     url = "https://download.paper.design/linux/appImage";
@@ -10,8 +20,46 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
+  t3codeVersion = "0.0.28";
+  t3codeSrc = pkgs.fetchurl {
+    url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
+    hash = "sha256-+mBp+wPrJRV/HpaimQHcqBuwqZcPWTbKJVNCVW7ELgo=";
+  };
+  t3codeContents = pkgs.appimageTools.extractType2 {
+    pname = "t3code";
+    version = t3codeVersion;
+    src = t3codeSrc;
+  };
 in
 {
+  figma-desktop = pkgs.appimageTools.wrapType2 {
+    pname = "figma-desktop";
+    version = figmaDesktopVersion;
+    src = figmaDesktopSrc;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    extraInstallCommands = ''
+      wrapProgram $out/bin/figma-desktop \
+        --set FIGMA_USE_WAYLAND 1 \
+        --run 'export XDG_DATA_HOME="''${XDG_CACHE_HOME:-$HOME/.cache}/figma-desktop-linux/xdg-data"'
+
+      install -Dm444 ${figmaDesktopContents}/io.github.nickvdp.figma-desktop-linux.desktop \
+        $out/share/applications/io.github.nickvdp.figma-desktop-linux.desktop
+      install -Dm444 ${figmaDesktopContents}/io.github.nickvdp.figma-desktop-linux.png \
+        $out/share/icons/hicolor/512x512/apps/io.github.nickvdp.figma-desktop-linux.png
+      substituteInPlace $out/share/applications/io.github.nickvdp.figma-desktop-linux.desktop \
+        --replace-fail 'Exec=AppRun' 'Exec=figma-desktop'
+    '';
+
+    meta = {
+      description = "Unofficial Figma desktop application for Linux";
+      homepage = "https://github.com/IliyaBrook/figma-linux";
+      license = pkgs.lib.licenses.unfree;
+      mainProgram = "figma-desktop";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
   paper-desktop = pkgs.appimageTools.wrapType2 {
     pname = "paper-desktop";
     version = paperDesktopVersion;
@@ -33,6 +81,31 @@ in
       homepage = "https://paper.design";
       license = pkgs.lib.licenses.unfree;
       mainProgram = "paper-desktop";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
+  t3code = pkgs.appimageTools.wrapType2 {
+    pname = "t3code";
+    version = t3codeVersion;
+    src = t3codeSrc;
+
+    extraInstallCommands = ''
+      install -Dm444 ${t3codeContents}/t3code.desktop \
+        $out/share/applications/t3code.desktop
+      substituteInPlace $out/share/applications/t3code.desktop \
+        --replace-fail 'Exec=AppRun' 'Exec=t3code'
+
+      while IFS= read -r icon; do
+        install -Dm444 "$icon" "$out/share/''${icon#${t3codeContents}/usr/share/}"
+      done < <(find ${t3codeContents}/usr/share/icons -type f)
+    '';
+
+    meta = {
+      description = "Minimal desktop GUI for coding agents";
+      homepage = "https://github.com/pingdotgg/t3code";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "t3code";
       platforms = [ "x86_64-linux" ];
     };
   };

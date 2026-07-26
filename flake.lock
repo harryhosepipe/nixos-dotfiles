@@ -34,16 +34,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1783474727,
-        "narHash": "sha256-B9YkDIny2OxBU4/MJ41wRpsSi/ujl/zfWatlJvNgP9c=",
+        "lastModified": 1784658824,
+        "narHash": "sha256-TYW3rOz0V0NgXCTW+/GcdX5kNyRsMsxoS5FGRKmo0Jw=",
         "owner": "sadjow",
         "repo": "codex-cli-nix",
-        "rev": "e02cb196c37be4e7e960b8fb3d3fe00131f1b49d",
+        "rev": "bd1773d0f796c93de7f4f00ea6c2469e95e44b62",
         "type": "github"
       },
       "original": {
         "owner": "sadjow",
-        "ref": "v0.143.0",
+        "ref": "v0.145.0",
         "repo": "codex-cli-nix",
         "type": "github"
       }
@@ -167,11 +167,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777509983,
-        "narHash": "sha256-89HU4ri7CNum66cpjOpTmsdr2QyLCYvNBDqqWxvbqOI=",
+        "lastModified": 1784811615,
+        "narHash": "sha256-ZFsCS1qr5+eAvYloLM5A9L3w7oo9p8OXL4gcovcA9NA=",
         "owner": "cjpais",
         "repo": "Handy",
-        "rev": "a385371c32613c1ec2649a4f51522a7ddefb5d4c",
+        "rev": "390729a8007a9c09be38416bc7755e4fa04165c3",
         "type": "github"
       },
       "original": {
@@ -223,6 +223,7 @@
       "original": {
         "owner": "NousResearch",
         "repo": "hermes-agent",
+        "rev": "299e409f15aa5615a8a64be488580be92cda351e",
         "type": "github"
       }
     },
@@ -496,11 +497,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784389652,
-        "narHash": "sha256-LRnL+bLyHwyaOVwM3p1UZOAeFlwsWAXdhmbJCIXX2e4=",
+        "lastModified": 1784887500,
+        "narHash": "sha256-Ix/p0MC7uW2kwYowMuVrDSYUka4EZ7prX2Tt6Acckkg=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "bf6e6be58f7fbf1ea90a2a27ebbff12c4989e5a1",
+        "rev": "13947373c29fd3bb0a90a10d17fdbe8570c890dd",
         "type": "github"
       },
       "original": {

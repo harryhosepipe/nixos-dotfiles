@@ -8,10 +8,10 @@
 let
   codex = pkgs.buildNpmPackage {
     pname = "codex-cli";
-    version = "0.144.0";
+    version = "0.145.0";
 
     src = ../../nix/codex-npm;
-    npmDepsHash = "sha256-4Ry00XNNFp8WEv/bK8dbB8YDI+uN1uaEjwj2l5e917k=";
+    npmDepsHash = "sha256-/AXNEl1Bw9bKT6fuj6bX3Rimafc5Fwmt+5tw7ryhH3o=";
 
     dontNpmBuild = true;
     nativeBuildInputs = [ pkgs.makeWrapper ];

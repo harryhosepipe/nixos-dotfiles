@@ -149,6 +149,42 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/cube"]
 trust_level = "trusted"
 
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-2"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-3"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-4"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-5"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-6"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-7"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/i-cant-seem-to-get-voice"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-8"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-24/realtime-voice-chat-9"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/Swift VMv2"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-26/can"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -185,6 +221,9 @@ enabled = false
 [plugins."visualize@openai-bundled"]
 enabled = false
 
+[plugins."paper-desktop@paper"]
+enabled = true
+
 # [mcp_servers.gitnexus]
 # command = "npx"
 # args = ["-y", "gitnexus@1.6.3", "mcp"]
@@ -198,21 +237,21 @@ CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/la5yw7sf0429p2cvddbzbax9lw0fxdlv-codex-desktop-computer-use-ui-remote-mobile-control-26.715.31925/opt/codex-desktop/resources/node_repl"
+command = "/nix/store/h3qd8wsjccm2vxlyq1m830qkqcfvnj4b-codex-desktop-computer-use-ui-remote-mobile-control-26.721.31836/opt/codex-desktop/resources/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/nix/store/la5yw7sf0429p2cvddbzbax9lw0fxdlv-codex-desktop-computer-use-ui-remote-mobile-control-26.715.31925/opt/codex-desktop/resources/node-runtime/bin/node"
+NODE_REPL_NODE_PATH = "/nix/store/h3qd8wsjccm2vxlyq1m830qkqcfvnj4b-codex-desktop-computer-use-ui-remote-mobile-control-26.721.31836/opt/codex-desktop/resources/node-runtime/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
 CODEX_HOME = "/home/pablo/.config/codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "461c4ba94b821ec805da79c8e8138fe510b1b3358609fc93da47387a2cf3fbf3,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,4cab8529c1e4dfdc54af637a5e3b12340d528c8647f56d25eb8cf55abeddca3f,589f52ab01afe66e202a81b320053d3af676981d348890cc9cff76c39984b64f"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "3fdfe9a7ad39456da69c5e8fa7bbf7229ec2fe9de5f4cf2e476166bf30a08a7e,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,e2e631b79f15eaa8ddc13f9764240c49044bbbe32c06d42301f5f2c564339fa8,d34bb41149f8b35e06f4377ba85200443cdfb21c02d8d4ee2164b237e9c0c38a"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.715.31925"
+BROWSER_USE_CODEX_APP_VERSION = "26.721.31836"
 
 [mcp_servers.node_repl.tools]
 
@@ -277,7 +316,7 @@ trusted_hash = "sha256:e237486526f1cf8b394a7c9d48de70eed40d09aecf29704939444cdfe
 trusted_hash = "sha256:51ecfc4277a64a6684e1bae31f925f6d37fd4226a45c12cdb73500d192fde0ff"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-07-24T09:34:43Z"
+last_updated = "2026-07-26T09:12:15Z"
 source_type = "local"
 source = "/home/pablo/.config/codex/.tmp/bundled-marketplaces/openai-bundled"
 
@@ -286,11 +325,19 @@ last_updated = "2026-07-24T10:27:32Z"
 source_type = "local"
 source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
+[marketplaces.paper]
+last_updated = "2026-07-25T20:04:35Z"
+last_revision = "a30668a826916aa68fee8be0a00c85692ec9ffc4"
+source_type = "git"
+source = "https://github.com/paper-design/agent-plugins.git"
+
 [desktop]
 conversationDetailMode = "STEPS_COMMANDS"
 ambient-suggestions-enabled = false
 notifications-turn-mode = "always"
 followUpQueueMode = "queue"
+show-context-window-usage = true
+microphoneInputDeviceId = "0d08bb25675d379eabd3b9971dc248f9a26bcb74abc8b72b94a5c0fcbd87b84c"
 
 [desktop.open-in-target-preferences]
 global = "fileManager"

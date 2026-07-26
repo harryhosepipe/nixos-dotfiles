@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix/v0.143.0";
+      url = "github:sadjow/codex-cli-nix/v0.145.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     codex-desktop-linux = {
@@ -29,7 +29,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent";
+      # Pinned because newer revisions leave Hermes Desktop stuck connecting
+      # without starting its local backend on NixOS.
+      url = "github:NousResearch/hermes-agent/299e409f15aa5615a8a64be488580be92cda351e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";

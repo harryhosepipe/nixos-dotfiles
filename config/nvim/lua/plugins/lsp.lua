@@ -49,6 +49,21 @@ vim.lsp.config("css_variables", {
 })
 
 vim.lsp.config("tailwindcss", {
+    -- The upstream config includes Markdown, which makes Tailwind scan the
+    -- entire Git workspace when editing documentation such as AGENTS.md.
+    filetypes = {
+        "astro",
+        "css",
+        "html",
+        "javascript",
+        "javascriptreact",
+        "less",
+        "scss",
+        "svelte",
+        "typescript",
+        "typescriptreact",
+        "vue",
+    },
     settings = {
         tailwindCSS = {
             classAttributes = { "class", "className", "class:list", "ngClass" },
