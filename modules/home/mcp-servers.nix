@@ -4,9 +4,10 @@
     package,
     version,
     node ? pkgs.nodejs_22,
+    runtimeTools ? [],
   }:
     pkgs.writeShellScriptBin name ''
-      export PATH=${node}/bin:$PATH
+      export PATH=${pkgs.lib.makeBinPath ([node] ++ runtimeTools)}:$PATH
       exec ${node}/bin/npx -y ${package}@${version} "$@"
     '';
 in {
@@ -15,7 +16,16 @@ in {
     (npmMcpServer {
       name = "context-mode";
       package = "context-mode";
-      version = "1.0.135";
+      version = "1.0.169";
+      runtimeTools = with pkgs; [
+        bashInteractive
+        coreutils
+        findutils
+        git
+        gnugrep
+        gnused
+        ripgrep
+      ];
     })
 
     (npmMcpServer {

@@ -1,0 +1,36 @@
+window {
+  margin: 0;
+  border: 1px solid rgba(117, 117, 117, 0.65);
+  border-radius: 12px;
+  background-color: rgba(18, 20, 24, 0.97);
+  font-family: "PP Supply Mono", monospace;
+  font-size: 14px;
+}
+
+#input {
+  margin: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(117, 117, 117, 0.45);
+  border-radius: 8px;
+  color: #e6e1cf;
+  background-color: #1b1f27;
+}
+
+#inner-box {
+  margin: 0 14px 14px;
+}
+
+#entry {
+  padding: 10px 12px;
+  border-radius: 7px;
+  color: #a7abb3;
+}
+
+#entry:selected {
+  color: #f2eee2;
+  background-color: rgba(68, 170, 136, 0.28);
+}
+
+#text {
+  margin-left: 4px;
+}

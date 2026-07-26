@@ -3,10 +3,14 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix";
+      url = "github:sadjow/codex-cli-nix/v0.145.0";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    codex-desktop-linux = {
+      url = "path:./nix/codex-desktop-linux-patched";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.upstream.inputs.nixpkgs.follows = "nixpkgs";
     };
     mattpocock-skills = {
       url = "github:mattpocock/skills";
@@ -20,6 +24,20 @@
       url = "github:cjpais/Handy";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    herdr = {
+      url = "github:ogulcancelik/herdr/v0.6.5";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hermes-agent = {
+      # Pinned because newer revisions leave Hermes Desktop stuck connecting
+      # without starting its local backend on NixOS.
+      url = "github:NousResearch/hermes-agent/299e409f15aa5615a8a64be488580be92cda351e";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";
+    hermes-pyproject-build-systems.follows = "hermes-agent/pyproject-build-systems";
+    hermes-pyproject-nix.follows = "hermes-agent/pyproject-nix";
+    hermes-uv2nix.follows = "hermes-agent/uv2nix";
   };
 
   outputs = inputs @ {

@@ -5,84 +5,28 @@
 , ...
 }:
 let
-  dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
-  shellSettings = import ../../shells/settings.nix;
-  fzfShare = "${pkgs.fzf}/share/fzf";
-  createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
-  nextcloud-client_4_0_4 = pkgs.nextcloud-client.overrideAttrs (oldAttrs: {
-    version = "4.0.4";
-    src = pkgs.fetchFromGitHub {
-      owner = "nextcloud-releases";
-      repo = "desktop";
-      tag = "v4.0.4";
-      hash = "sha256-BEjsIx0knmTj6kgM7fsJV5XN660cRe9DbYxeL7YHPRo=";
-    };
-  });
-  dokploy-cli = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-    pname = "dokploy-cli";
-    version = "0.29.2";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "Dokploy";
-      repo = "cli";
-      tag = "v${finalAttrs.version}";
-      hash = "sha256-LH0d7L+xzr+A8QCn/yOpy9UKM4PI47RVZrR4WlZXT6A=";
-    };
-
-    pnpmDeps = pkgs.fetchPnpmDeps {
-      inherit (finalAttrs) pname version src;
-      fetcherVersion = 3;
-      hash = "sha256-RSq0VCHLg+umP7SXgvgaBfxXf0Fr6aaUfJksTH50zM0=";
-    };
-
-    nativeBuildInputs = with pkgs; [
-      nodejs
-      pnpm
-      pnpmConfigHook
-    ];
-
-    buildPhase = ''
-      runHook preBuild
-      pnpm run build
-      substituteInPlace dist/index.js \
-        --replace-fail 'version: "0.3.0"' 'version: "${finalAttrs.version}"'
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p "$out/lib/dokploy-cli" "$out/bin"
-      cp -r dist package.json node_modules "$out/lib/dokploy-cli/"
-      chmod +x "$out/lib/dokploy-cli/dist/index.js"
-      ln -s "$out/lib/dokploy-cli/dist/index.js" "$out/bin/dokploy"
-      runHook postInstall
-    '';
-  });
-  configDirs = {
-    bash = "bash";
-    hypr = "hypr";
-    kanata = "kanata";
-    nvim = "nvim";
-    qtile = "qtile";
-    swaync = "swaync";
-    waybar = "waybar";
-    zsh = "zsh";
-    fish = "fish";
-    "oh-my-posh" = "oh-my-posh";
-    zed = "zed";
-    wezterm = "wezterm";
+  draculaQbittorrentTheme = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
+    hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
   };
+  solarizedLightQbittorrentTheme = pkgs.fetchurl {
+    url = "https://github.com/MahdiMirzadeh/qbittorrent/releases/download/v0.6.6/solarized-light.qbtheme";
+    hash = "sha256-DUfJEt2uUSgW8yeW57AL0h2mGVn5TPGznDqeDduhcRM=";
+  };
+  shellSettings = import ../../shells/settings.nix;
+  localPackages = import ../../packages { inherit pkgs; };
+  fzfShare = "${pkgs.fzf}/share/fzf";
 in
 {
   imports = [
     ../../modules/home/git.nix
-    ../../modules/home/codex.nix
-    ../../modules/home/language-servers.nix
-    ../../modules/home/neovim.nix
+    ../../modules/home/dotfiles.nix
+    ../../modules/home/firefox.nix
+    ../../modules/home/language-toolchain.nix
+    ../../modules/home/tmux.nix
+    ../../modules/home/agent-workspace.nix
     ../../modules/home/dev.nix
-    ../../modules/home/fallow.nix
-    ../../modules/home/mcp-servers.nix
-    ../../modules/home/pi.nix
+    ../../modules/home/hermes.nix
     inputs.handy.homeManagerModules.default
   ];
 
@@ -148,53 +92,9 @@ in
   services.ssh-agent.enable = true;
   services.handy.enable = true;
 
-  programs.firefox = {
-    enable = true;
-    package = null;
-    configPath = ".mozilla/firefox";
-
-    profiles.default = {
-      id = 0;
-      isDefault = true;
-      path = "ehs619jc.default";
-
-      settings = {
-        "browser.compactmode.show" = true;
-        "browser.uidensity" = 1;
-        # "browser.tabs.tabMinWidth" = 80;
-        "browser.startup.page" = 1;
-        "browser.sessionstore.resume_from_crash" = false;
-        "browser.sessionstore.max_resumed_crashes" = 0;
-        "browser.aboutwelcome.enabled" = false;
-        "browser.startup.homepage_override.mstone" = "ignore";
-        "startup.homepage_welcome_url" = "";
-        "startup.homepage_welcome_url.additional" = "";
-        "browser.messaging-system.whatsNewPanel.enabled" = false;
-        "dom.disable_beforeunload" = true;
-        "signon.rememberSignons" = false;
-        "privacy.globalprivacycontrol.enabled" = true;
-        "privacy.globalprivacycontrol.functionality.enabled" = true;
-        "privacy.globalprivacycontrol.pbmode.enabled" = true;
-        "nimbus.rollouts.enabled" = false;
-        "datareporting.healthreport.uploadEnabled" = false;
-        "datareporting.policy.dataSubmissionEnabled" = false;
-        "datareporting.usage.uploadEnabled" = false;
-        "toolkit.telemetry.enabled" = false;
-        "toolkit.telemetry.unified" = false;
-        "toolkit.telemetry.archive.enabled" = false;
-        "toolkit.telemetry.server" = "data:,";
-        "app.shield.optoutstudies.enabled" = false;
-        "app.normandy.enabled" = false;
-        "app.normandy.first_run" = false;
-        "browser.discovery.enabled" = false;
-        "extensions.htmlaboutaddons.recommendations.enabled" = false;
-        "browser.newtabpage.activity-stream.feeds.asrouter" = false;
-        "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons" = false;
-        "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-      };
-    };
-  };
+  xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
+  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
+    solarizedLightQbittorrentTheme;
 
   programs.gh = {
     enable = true;
@@ -212,49 +112,59 @@ in
     };
   };
 
-  home.file.".bashrc".source = createSymlink "${dotfiles}/bash/.bashrc";
-  home.file.".bash_profile".source = createSymlink "${dotfiles}/bash/.bash_profile";
-  home.file.".profile".source = createSymlink "${dotfiles}/profile/.profile";
-  home.file.".zshenv".source = createSymlink "${dotfiles}/zsh/.zshenv";
+  dotfiles = {
+    homeFiles = {
+      ".bashrc" = "bash/.bashrc";
+      ".bash_profile" = "bash/.bash_profile";
+      ".profile" = "profile/.profile";
+      ".zshenv" = "zsh/.zshenv";
+    };
 
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = {
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "text/html" = "firefox.desktop";
-      "application/xhtml+xml" = "firefox.desktop";
+    configDirs = {
+      bash = "bash";
+      hypr = "hypr";
+      kanata = "kanata";
+      nvim = "nvim";
+      qtile = "qtile";
+      swaync = "swaync";
+      tmux = "tmux";
+      waybar = "waybar";
+      zsh = "zsh";
+      fish = "fish";
+      "oh-my-posh" = "oh-my-posh";
+      zed = "zed";
+      ghostty = "ghostty";
+      wezterm = "wezterm";
     };
   };
-
-  xdg.configFile =
-    builtins.mapAttrs
-      (name: subpath: {
-        source = createSymlink "${dotfiles}/${subpath}";
-        recursive = true;
-      })
-      configDirs;
 
   home.packages = with pkgs; [
     nixpkgs-fmt
     doppler
     bat
     btop
+    eza
     oh-my-posh
     fzf
     zoxide
     thunar
     chromium
+    google-chrome
+    qbittorrent
+    obsidian
     signal-desktop
     whatsapp-electron
     pavucontrol
     pwvucontrol
-    figma-linux
-    figma-agent
+    localPackages.figma-desktop
+    localPackages.paper-desktop
+    localPackages.t3code
     zed-editor
     telegram-desktop
-    nextcloud-client_4_0_4
-    dokploy-cli
+    libreoffice-qt
+    inputs.herdr.packages.${pkgs.system}.default
+    localPackages.nextcloud-client_4_0_4
+    localPackages.dokploy-cli
     wtype
     mpv
     yt-dlp

@@ -1,24 +1,23 @@
-{ config, pkgs, userSettings, ... }:
+{ pkgs, ... }:
 let
-  piVersion = "0.73.0";
-  dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
-  createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
+  piVersion = "0.82.1";
 
   pi = pkgs.writeShellScriptBin "pi" ''
     export PATH=${pkgs.nodejs_22}/bin:$PATH
-    exec ${pkgs.nodejs_22}/bin/npx -y @mariozechner/pi-coding-agent@${piVersion} "$@"
+    unset PI_CODING_AGENT_DIR PI_CODING_AGENT_SESSION_DIR PI_PACKAGE_DIR
+    exec ${pkgs.nodejs_22}/bin/npx --prefer-offline -y @earendil-works/pi-coding-agent@${piVersion} "$@"
   '';
 in
 {
-  # Pi is an npm coding-agent CLI.
-  # Nix provides Node and the command wrapper; Pi owns ~/.pi at runtime.
   home.packages = [
     pi
   ];
 
-  # Local Pi resources. These stay out-of-store so extension TypeScript and
-  # npm dependencies can be edited/installed without rebuilding the system.
-  home.file.".pi/agent/AGENTS.md".source = createSymlink "${dotfiles}/pi/AGENTS.md";
-  home.file.".pi/agent/mcp.json".source = createSymlink "${dotfiles}/pi/mcp.json";
-  home.file.".pi/agent/extensions/mcp-bridge".source = createSymlink "${dotfiles}/pi/extensions/mcp-bridge";
+  # Keep editable declarative resources in the dotfiles repo while Pi owns
+  # credentials, settings, sessions, and other runtime state in ~/.pi/agent.
+  dotfiles.homeFiles = {
+    ".pi/agent/AGENTS.md" = "pi/AGENTS.md";
+    ".pi/agent/mcp.json" = "pi/mcp.json";
+    ".pi/agent/extensions/mcp-bridge" = "pi/extensions/mcp-bridge";
+  };
 }

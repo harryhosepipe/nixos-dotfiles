@@ -9,7 +9,6 @@
       init.defaultBranch = "main";
       pull.rebase = true;
       rebase.autoStash = true;
-      "url \"git@github.com:\"".insteadOf = "https://github.com/";
     };
   };
 }

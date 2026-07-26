@@ -1,28 +1,41 @@
 (defcfg
   process-unmapped-keys yes
+  concurrent-tap-hold yes
+  tap-hold-require-prior-idle 150
 )
 
 (defsrc
-  caps a s d f j k l ;
+  caps
+  a s d f
+  j k l ;
+)
+
+(defhands
+  (left  q w e r t a s d f g z x c v b)
+  (right y u i o p h j k l ; n m , . /)
 )
 
 (defvar
   tap-time 150
   hold-time 200
+  hrm-time 280
 )
 
 (defalias
-  escctrl (tap-hold 100 100 esc lctl)
-  a (multi f24 (tap-hold $tap-time $hold-time a lmet))
-  s (multi f24 (tap-hold $tap-time $hold-time s lalt))
-  d (multi f24 (tap-hold $tap-time $hold-time d lsft))
-  f (multi f24 (tap-hold $tap-time $hold-time f lctl))
-  j (multi f24 (tap-hold $tap-time $hold-time j rctl))
-  k (multi f24 (tap-hold $tap-time $hold-time k rsft))
-  l (multi f24 (tap-hold $tap-time $hold-time l ralt))
-  ; (multi f24 (tap-hold $tap-time $hold-time ; rmet))
+  caps (tap-hold $tap-time $hold-time (multi lctl spc) lctl)
+
+  ;; a    (tap-hold-opposite-hand-release $hrm-time a lctl (timeout hold))
+  ;; s    (tap-hold-opposite-hand-release $hrm-time s lmet (timeout hold))
+  ;; d    (tap-hold-opposite-hand-release $hrm-time d lalt (timeout hold))
+  ;; f    (tap-hold-opposite-hand-release $hrm-time f lsft (timeout hold))
+  ;; j    (tap-hold-opposite-hand-release $hrm-time j rsft (timeout hold))
+  ;; k    (tap-hold-opposite-hand-release $hrm-time k ralt (timeout hold))
+  ;; l    (tap-hold-opposite-hand-release $hrm-time l rmet (timeout hold))
+  ;; scln (tap-hold-opposite-hand-release $hrm-time ; rctl (timeout hold))
 )
 
 (deflayer base
-  @escctrl @a @s @d @f @j @k @l @;
+  @caps
+  a s d f
+  j k l ;
 )

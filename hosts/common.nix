@@ -1,10 +1,20 @@
-{
-  pkgs,
-  userSettings,
-  ...
+{ pkgs
+, userSettings
+, ...
 }:
 let
   shellSettings = import ../shells/settings.nix;
+  tx-02 = pkgs.stdenvNoCC.mkDerivation {
+    pname = "tx-02";
+    version = "local";
+    src = ../fonts/TX-02;
+
+    installPhase = ''
+      runHook preInstall
+      install -Dm644 *.otf -t $out/share/fonts/opentype/TX-02
+      runHook postInstall
+    '';
+  };
   shellPackages = {
     bash = pkgs.bashInteractive;
     zsh = pkgs.zsh;
@@ -17,6 +27,7 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelModules = [ "uinput" ];
 
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
@@ -82,13 +93,25 @@ in
     vim
     wget
     alacritty
+    ghostty
     wezterm
     git
     gvfs
     tumbler
     thunar-volman
     ripgrep
+    ydotool
   ];
+
+  systemd.services.ydotoold = {
+    description = "ydotool input daemon";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.ydotool}/bin/ydotoold";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+  };
 
   environment.shells = with pkgs; [
     bashInteractive
@@ -97,6 +120,7 @@ in
   ];
 
   fonts.packages = with pkgs; [
+    tx-02
     nerd-fonts.inconsolata
   ];
 

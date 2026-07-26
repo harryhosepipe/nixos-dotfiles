@@ -19,5 +19,6 @@
     gnumake
     gcc
     pkg-config
+    tree-sitter
   ];
 }

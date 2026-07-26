@@ -9,39 +9,54 @@
   "reload_style_on_change": true,
 
   "modules-left": ["hyprland/workspaces", "custom/window"],
-//  "modules-center": ["clock"],
-  "modules-right": ["cpu", "memory", "disk", "network", "custom/volume", "tray"],
+  //  "modules-center": ["clock"],
+  "modules-right": [
+    "custom/keybinds",
+    "cpu",
+    "memory",
+    "disk",
+    "network",
+    "custom/volume",
+    "tray",
+  ],
 
   "hyprland/workspaces": {
     "disable-scroll": true,
     "all-outputs": true,
-    "format": "{name}"
+    "format": "{name}",
   },
 
   "custom/window": {
     "exec": "$HOME/.config/waybar/window-title-uppercase.sh",
     "restart-interval": 1,
-    "max-length": 60
+    "max-length": 60,
+  },
+
+  "custom/keybinds": {
+    "format": "󰌌",
+    "tooltip": true,
+    "tooltip-format": "Keyboard shortcuts",
+    "on-click": "$HOME/.config/waybar/keybinds-overlay.sh",
   },
 
   "clock": {
     "format": "{:%Y-%m-%d  %H:%M}",
-    "tooltip-format": "<big>{:%A, %d %B %Y}</big>\n<tt>{calendar}</tt>"
+    "tooltip-format": "<big>{:%A, %d %B %Y}</big>\n<tt>{calendar}</tt>",
   },
 
   "cpu": {
     "format": "CPU {usage}%",
-    "tooltip": true
+    "tooltip": true,
   },
 
   "memory": {
-    "format": "RAM {}%"
+    "format": "RAM {}%",
   },
 
   "disk": {
     "path": "/",
     "format": "DISK {percentage_used}%",
-    "tooltip-format": "{used} USED / {total} TOTAL"
+    "tooltip-format": "{used} USED / {total} TOTAL",
   },
 
   "network": {
@@ -49,7 +64,7 @@
     "format-ethernet": "LAN",
     "format-linked": "NETWORK READY",
     "format-disconnected": "OFFLINE",
-    "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
   },
 
   "custom/volume": {
@@ -60,10 +75,10 @@
     "on-click": "sh -lc 'if pgrep -x pwvucontrol >/dev/null 2>&1; then pkill -x pwvucontrol; else pwvucontrol >/tmp/pwvucontrol.log 2>&1 & fi'",
     "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+",
-    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
   },
 
   "tray": {
-    "spacing": 6
-  }
+    "spacing": 6,
+  },
 }

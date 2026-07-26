@@ -1,50 +1,78 @@
-{
-  config,
-  inputs,
-  pkgs,
-  userSettings,
-  ...
+{ config
+, inputs
+, pkgs
+, userSettings
+, ...
 }:
 
 let
-  dotfiles = "${config.home.homeDirectory}/${userSettings.dotFiles}/config";
-  createSymlink = path: config.lib.file.mkOutOfStoreSymlink path;
+  codex = pkgs.buildNpmPackage {
+    pname = "codex-cli";
+    version = "0.145.0";
 
-  # This package comes from the codex-cli-nix flake input.
-  # Updating that input in flake.lock is what moves Codex to a newer release.
-  codex = inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    src = ../../nix/codex-npm;
+    npmDepsHash = "sha256-/AXNEl1Bw9bKT6fuj6bX3Rimafc5Fwmt+5tw7ryhH3o=";
+
+    dontNpmBuild = true;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p "$out/lib/codex-cli" "$out/bin"
+      cp -r node_modules package.json package-lock.json "$out/lib/codex-cli/"
+
+      makeWrapper ${pkgs.nodejs_22}/bin/node "$out/bin/codex" \
+        --add-flags "$out/lib/codex-cli/node_modules/@openai/codex/bin/codex.js" \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.bubblewrap ]}
+
+      if [ ! -e "$out/bin/codex-code-mode-host" ]; then
+        ln -s codex "$out/bin/codex-code-mode-host"
+      fi
+
+      runHook postInstall
+    '';
+
+    meta.mainProgram = "codex";
+  };
 
   # These are the active Codex skills from github:mattpocock/skills.
   # Deprecated skills are left out so they do not appear as normal choices.
   mattPocockSkills = {
-    diagnose = "engineering/diagnose";
+    code-review = "engineering/code-review";
+    diagnose = "engineering/diagnosing-bugs";
     grill-with-docs = "engineering/grill-with-docs";
+    implement = "engineering/implement";
     improve-codebase-architecture = "engineering/improve-codebase-architecture";
     setup-matt-pocock-skills = "engineering/setup-matt-pocock-skills";
     tdd = "engineering/tdd";
-    to-issues = "engineering/to-issues";
-    to-prd = "engineering/to-prd";
+    to-spec = "engineering/to-spec";
+    to-tickets = "engineering/to-tickets";
     triage = "engineering/triage";
-    zoom-out = "engineering/zoom-out";
     git-guardrails-claude-code = "misc/git-guardrails-claude-code";
     migrate-to-shoehorn = "misc/migrate-to-shoehorn";
     scaffold-exercises = "misc/scaffold-exercises";
     setup-pre-commit = "misc/setup-pre-commit";
     edit-article = "personal/edit-article";
     obsidian-vault = "personal/obsidian-vault";
-    caveman = "productivity/caveman";
-    grill-me = "productivity/grill-me";
-    write-a-skill = "productivity/write-a-skill";
+    wayfinder = "engineering/wayfinder";
+    write-a-skill = "productivity/writing-great-skills";
   };
 
   mattPocockSkillFiles = builtins.listToAttrs (
-    map (name: {
-      name = "codex/skills/${name}";
-      value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
-    }) (builtins.attrNames mattPocockSkills)
+    map
+      (name: {
+        name = "codex/skills/${name}";
+        value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
+      })
+      (builtins.attrNames mattPocockSkills)
   );
 in
 {
+  imports = [
+    inputs.codex-desktop-linux.homeManagerModules.default
+  ];
+
   home.packages = [
     codex
     pkgs.libnotify
@@ -54,16 +82,29 @@ in
     CODEX_HOME = "${config.xdg.configHome}/codex";
   };
 
-  xdg.configFile = {
-    "codex/AGENTS.md".source = createSymlink "${dotfiles}/codex/AGENTS.md";
+  dotfiles.configEntries = {
+    "codex/AGENTS.md" = "codex/AGENTS.md";
+    "codex/config.toml" = "codex/config.toml";
+    "codex/agents" = "codex/agents";
+    "codex/hooks.json" = "codex/hooks.json";
+    "codex/hooks" = "codex/hooks";
+  };
 
-    "codex/config.toml".source = createSymlink "${dotfiles}/codex/config.toml";
+  xdg.configFile = mattPocockSkillFiles;
 
-    "codex/agents".source = createSymlink "${dotfiles}/codex/agents";
-
-    "codex/hooks.json".source = createSymlink "${dotfiles}/codex/hooks.json";
-
-    "codex/hooks".source = createSymlink "${dotfiles}/codex/hooks";
-  }
-  // mattPocockSkillFiles;
+  programs.codexDesktopLinux = {
+    enable = true;
+    computerUseUi.enable = true;
+    remoteMobileControl.enable = true;
+    remoteControl = {
+      enable = true;
+      package = codex;
+      codexHome = "${config.xdg.configHome}/codex";
+      extraPackages = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.ydotool
+      ];
+    };
+  };
 }

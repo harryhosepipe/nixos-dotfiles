@@ -1,4 +1,4 @@
-{ host, ... }: {
+{host, ...}: {
   imports = [
     ../common.nix
     ./hardware-configuration.nix
@@ -6,6 +6,7 @@
     ./unfree.nix
     ./nvidia.nix
     ../../modules/system/docker/manifest.nix
+    ../../modules/system/docker/penpot.nix
     ../../modules/system/gui/hyprland-greetd.nix
     ../../modules/system/vfio/single-gpu-passthrough.nix
   ];
@@ -14,7 +15,7 @@
   # The real machine name comes from hosts.nix so you can rename it in one place.
   networking.hostName = host.hostName;
   networking.networkmanager.dns = "none";
-  networking.nameservers = [ "192.168.3.9" ];
+  networking.nameservers = ["192.168.3.9"];
 
   passthrough.singleGpu = {
     enable = true;
