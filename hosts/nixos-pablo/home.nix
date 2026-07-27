@@ -95,6 +95,7 @@ in
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
   xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
     solarizedLightQbittorrentTheme;
+  xdg.configFile."superfile/hotkeys.toml".source = ../../config/superfile/hotkeys.toml;
 
   programs.gh = {
     enable = true;
@@ -147,6 +148,7 @@ in
     oh-my-posh
     fzf
     zoxide
+    superfile
     thunar
     chromium
     google-chrome
