@@ -15,6 +15,35 @@ is_recording() {
     ''|0|*[!0-9]*) return 1 ;;
   esac
 
+  # When Handy records through the system-default device, PipeWire owns the
+  # ALSA hardware. Match Handy's running capture node through its client PID.
+  if command -v pw-dump >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    if pw-dump 2>/dev/null |
+      jq -e --argjson main_pid "$main_pid" '
+        [
+          .[]
+          | select(.type == "PipeWire:Interface:Client")
+          | select(.info.props["application.process.id"] == $main_pid)
+          | .id
+        ] as $handy_clients
+        | any(
+            .[];
+            .type == "PipeWire:Interface:Node"
+            and .info.state == "running"
+            and .info.props["media.class"] == "Stream/Input/Audio"
+            and (
+              .info.props["client.id"] as $client_id
+              | $handy_clients
+              | index($client_id) != null
+            )
+          )
+      ' >/dev/null
+    then
+      return 0
+    fi
+  fi
+
+  # Fallback for a directly opened ALSA capture device.
   for status_file in /proc/asound/card*/pcm*c/sub*/status; do
     [ -r "$status_file" ] || continue
     [ "$(sed -n 's/^state: *//p' "$status_file")" = "RUNNING" ] || continue
