@@ -8,12 +8,30 @@ lock_file="${XDG_RUNTIME_DIR:-/tmp}/handy-toggle.lock"
 exec 9>"$lock_file"
 flock --wait 3 9
 
-is_recording() {
+handy_main_pid() {
   main_pid="$(systemctl --user show handy.service --property MainPID --value)"
 
   case "$main_pid" in
-    ''|0|*[!0-9]*) return 1 ;;
+    ''|0|*[!0-9]*) ;;
+    *)
+      [ -r "/proc/$main_pid/status" ] && {
+        printf '%s\n' "$main_pid"
+        return 0
+      }
+      ;;
   esac
+
+  # Handy may have been reopened from the app launcher rather than systemd.
+  # Accept that instance so Ctrl+M continues to work without starting a duplicate.
+  main_pid="$(pgrep -u "$(id -u)" -x 'handy|\.handy-wrapped' 2>/dev/null | head -n 1)"
+  case "$main_pid" in
+    ''|0|*[!0-9]*) return 1 ;;
+    *) printf '%s\n' "$main_pid" ;;
+  esac
+}
+
+is_recording() {
+  main_pid="$(handy_main_pid)" || return 1
 
   # When Handy records through the system-default device, PipeWire owns the
   # ALSA hardware. Match Handy's running capture node through its client PID.
@@ -89,9 +107,19 @@ notify() {
   printf '%s\n' "$notification_id" >"$notification_id_file"
 }
 
-if ! systemctl --user is-active --quiet handy.service; then
-  notify "Handy is unavailable" "The Handy service is not running." 5000
-  exit 1
+if ! handy_main_pid >/dev/null; then
+  systemctl --user start handy.service || true
+
+  attempts=0
+  while [ "$attempts" -lt 40 ] && ! handy_main_pid >/dev/null; do
+    attempts=$((attempts + 1))
+    sleep 0.05
+  done
+
+  if ! handy_main_pid >/dev/null; then
+    notify "Handy is unavailable" "The Handy service could not be started." 5000
+    exit 1
+  fi
 fi
 
 if is_recording; then
