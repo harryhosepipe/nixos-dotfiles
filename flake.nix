@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix/v0.145.0";
+      url = "github:sadjow/codex-cli-nix/v0.147.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     codex-desktop-linux = {
@@ -20,8 +20,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-flatpak = {
+      url = "github:gmodena/nix-flatpak/v0.7.0";
+    };
     handy = {
-      url = "github:cjpais/Handy";
+      url = "github:cjpais/Handy/v0.9.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     herdr = {
@@ -29,9 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      # Pinned because newer revisions leave Hermes Desktop stuck connecting
-      # without starting its local backend on NixOS.
-      url = "github:NousResearch/hermes-agent/299e409f15aa5615a8a64be488580be92cda351e";
+      url = "github:NousResearch/hermes-agent/v2026.8.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";
@@ -70,6 +71,7 @@
       };
       modules = [
         (mainHost.path + "/configuration.nix")
+        inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.handy.nixosModules.default
         {
           programs.handy.enable = true;

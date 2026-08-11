@@ -17,6 +17,12 @@
   networking.networkmanager.dns = "none";
   networking.nameservers = ["192.168.3.9"];
 
+  services.flatpak = {
+    enable = true;
+    packages = ["info.beyondallreason.bar"];
+    update.auto.enable = true;
+  };
+
   passthrough.singleGpu = {
     enable = true;
     vmNames = [

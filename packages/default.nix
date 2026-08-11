@@ -1,5 +1,78 @@
 { pkgs }:
 let
+  buzzVersion = "0.5.8";
+  buzzSrc = pkgs.fetchurl {
+    url = "https://github.com/block/buzz/releases/download/desktop-v${buzzVersion}/Buzz_${buzzVersion}_amd64.AppImage";
+    hash = "sha256-VVWoJA8cyipv9BtCwme+GjcP/kKN1Lt+1wL3AU4SHYs=";
+  };
+  # Tauri's opener resolves xdg-open inside the AppImage FHS. Delegate that
+  # call to NixOS's host opener, where the desktop MIME associations and the
+  # user's browser are available.
+  buzzBrowserLauncher = pkgs.writeShellScriptBin "xdg-open" ''
+    runtimeDir="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+    export XDG_RUNTIME_DIR="$runtimeDir"
+    export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$runtimeDir/bus}"
+    export PATH="/etc/profiles/per-user/''${USER:-$(id -un)}/bin:/run/current-system/sw/bin:$PATH"
+    exec /run/current-system/sw/bin/xdg-open "$@"
+  '';
+  buzzContents = pkgs.appimageTools.extractType2 {
+    pname = "buzz";
+    version = buzzVersion;
+    src = buzzSrc;
+    postExtract = ''
+      substituteInPlace $out/apprun-hooks/linuxdeploy-plugin-gtk.sh \
+        --replace-fail 'export GDK_BACKEND=x11' 'export GDK_BACKEND=wayland'
+      install -Dm755 ${buzzBrowserLauncher}/bin/xdg-open $out/usr/bin/xdg-open
+    '';
+  };
+  codexAcpVersion = "1.1.14";
+  codexAcp = pkgs.buildNpmPackage {
+    pname = "codex-acp";
+    version = codexAcpVersion;
+    src = ../nix/codex-acp-npm;
+    npmDepsHash = "sha256-0RuBcLWnWWvCiyPtEMWNMyCDl2SVKiubFVaVNnBgh8U=";
+    dontNpmBuild = true;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/bin" "$out/lib/node_modules"
+      cp -r node_modules/. "$out/lib/node_modules/"
+      makeWrapper ${pkgs.nodejs}/bin/node "$out/bin/codex-acp" \
+        --run 'if [ -z "''${CODEX_PATH:-}" ] && command -v codex >/dev/null 2>&1; then export CODEX_PATH="$(command -v codex)"; fi' \
+        --add-flags "$out/lib/node_modules/@agentclientprotocol/codex-acp/dist/index.js"
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Codex adapter for the Agent Client Protocol";
+      homepage = "https://github.com/agentclientprotocol/codex-acp";
+      license = pkgs.lib.licenses.asl20;
+      mainProgram = "codex-acp";
+    };
+  };
+  buzzTerminalLauncher = pkgs.writeShellScriptBin "x-terminal-emulator" ''
+    exec ${pkgs.ghostty}/bin/ghostty "$@"
+  '';
+  # Buzz's GUI readiness probe can report logged out even when codex-acp can
+  # initialize with the existing credentials. Keep the workaround scoped to
+  # Buzz's FHS environment and delegate every non-status command to the real
+  # Home Manager Codex CLI.
+  buzzCodexProbeShim = pkgs.writeShellScriptBin "codex" ''
+    codexHome="''${CODEX_HOME:-$HOME/.codex}"
+    if [ "$#" -eq 2 ] && [ "$1" = login ] && [ "$2" = status ] \
+      && [ -s "$codexHome/auth.json" ]; then
+      echo "Logged in using ChatGPT"
+      exit 0
+    fi
+
+    codexProfile="/etc/profiles/per-user/''${USER:-$(id -un)}/bin/codex"
+    if [ ! -x "$codexProfile" ]; then
+      echo "Buzz: Codex CLI is missing at $codexProfile" >&2
+      exit 127
+    fi
+    exec "$codexProfile" "$@"
+  '';
   figmaDesktopVersion = "126.5.6";
   figmaDesktopSrc = pkgs.fetchurl {
     url = "https://github.com/IliyaBrook/figma-linux/releases/download/${figmaDesktopVersion}/figma-desktop-${figmaDesktopVersion}-amd64.AppImage";
@@ -20,10 +93,10 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
-  t3codeVersion = "0.0.32";
+  t3codeVersion = "0.0.33";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-SS7ctI7vlzCfNMS3CoEhuGfDronCBowuKLs5Oo2CLCI=";
+    hash = "sha256-QVyGSPQ8PSLVcvJ/LFD9yMMQ6n/N6VN7kD4eLxyHdaE=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
@@ -32,6 +105,67 @@ let
   };
 in
 {
+  buzz = pkgs.appimageTools.wrapAppImage {
+    pname = "buzz";
+    version = buzzVersion;
+    src = buzzContents;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    extraPkgs = pkgs: [
+      codexAcp
+      buzzCodexProbeShim
+      buzzTerminalLauncher
+      pkgs.elfutils
+      pkgs.zstd
+      pkgs.gst_all_1.gstreamer
+      pkgs.gst_all_1.gst-plugins-base
+      pkgs.gst_all_1.gst-plugins-good
+      pkgs.gst_all_1.gst-plugins-bad
+      pkgs.gst_all_1.gst-libav
+    ];
+
+    extraInstallCommands = ''
+      wrapProgram $out/bin/buzz \
+        --run 'export CODEX_HOME="''${CODEX_HOME:-$HOME/.config/codex}"' \
+        --prefix PATH : ${buzzBrowserLauncher}/bin \
+        --set GDK_BACKEND wayland \
+        --set GST_PLUGIN_PATH_1_0 \
+          ${pkgs.lib.makeSearchPath "lib/gstreamer-1.0" [
+            pkgs.gst_all_1.gst-plugins-base
+            pkgs.gst_all_1.gst-plugins-good
+            pkgs.gst_all_1.gst-plugins-bad
+            pkgs.gst_all_1.gst-libav
+          ]} \
+        --set GST_PLUGIN_SCANNER_1_0 \
+          ${pkgs.gst_all_1.gstreamer.out}/libexec/gstreamer-1.0/gst-plugin-scanner
+
+      while IFS= read -r desktopFile; do
+        install -Dm444 "$desktopFile" \
+          "$out/share/applications/$(basename "$desktopFile")"
+        substituteInPlace "$out/share/applications/$(basename "$desktopFile")" \
+          --replace-fail 'Exec=buzz-desktop' 'Exec=buzz'
+      done < <(find ${buzzContents} -name '*.desktop' -type f)
+
+      install -Dm444 ${buzzContents}/Buzz.png \
+        $out/share/icons/hicolor/512x512/apps/buzz-desktop.png
+
+      if [ -d ${buzzContents}/usr/share/icons ]; then
+        while IFS= read -r icon; do
+          install -Dm444 "$icon" "$out/share/''${icon#${buzzContents}/usr/share/}"
+        done < <(find ${buzzContents}/usr/share/icons -type f)
+      fi
+    '';
+
+    meta = {
+      description = "Workspace where people and AI agents build together";
+      homepage = "https://buzz.xyz";
+      license = pkgs.lib.licenses.asl20;
+      mainProgram = "buzz";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
+  codex-acp = codexAcp;
+
   figma-desktop = pkgs.appimageTools.wrapType2 {
     pname = "figma-desktop";
     version = figmaDesktopVersion;
@@ -122,13 +256,13 @@ in
 
   dokploy-cli = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
     pname = "dokploy-cli";
-    version = "0.29.2";
+    version = "0.29.4";
 
     src = pkgs.fetchFromGitHub {
       owner = "Dokploy";
       repo = "cli";
       tag = "v${finalAttrs.version}";
-      hash = "sha256-LH0d7L+xzr+A8QCn/yOpy9UKM4PI47RVZrR4WlZXT6A=";
+      hash = "sha256-WTNzjUP2pMmYnyAPkf5kbnu3CNH0Va1Mk7T7CDtdB/8=";
     };
 
     pnpmDeps = pkgs.fetchPnpmDeps {
@@ -142,6 +276,17 @@ in
       pnpm
       pnpmConfigHook
     ];
+
+    postPatch = ''
+      substituteInPlace src/client.ts \
+        --replace-fail \
+          'const configPath = path.join(__dirname, "..", "config.json");' \
+          'const configPath = path.join(process.env.XDG_CONFIG_HOME ?? path.join(process.env.HOME ?? ".", ".config"), "dokploy", "config.json");'
+      substituteInPlace src/client.ts \
+        --replace-fail \
+          'fs.writeFileSync(configPath, JSON.stringify({ url, token }, null, 2));' \
+          'fs.mkdirSync(path.dirname(configPath), { recursive: true, mode: 0o700 }); fs.writeFileSync(configPath, JSON.stringify({ url, token }, null, 2), { mode: 0o600 });'
+    '';
 
     buildPhase = ''
       runHook preBuild

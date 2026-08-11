@@ -8,10 +8,10 @@
 let
   codex = pkgs.buildNpmPackage {
     pname = "codex-cli";
-    version = "0.145.0";
+    version = "0.147.0";
 
     src = ../../nix/codex-npm;
-    npmDepsHash = "sha256-/AXNEl1Bw9bKT6fuj6bX3Rimafc5Fwmt+5tw7ryhH3o=";
+    npmDepsHash = "sha256-pTr0xEpkwEV7CK3vuJ4MxhhkFB1y0+b/kvFBOHvf8/Q=";
 
     dontNpmBuild = true;
     nativeBuildInputs = [ pkgs.makeWrapper ];
@@ -38,39 +38,69 @@ let
 
   # These are the active Codex skills from github:mattpocock/skills.
   # Deprecated skills are left out so they do not appear as normal choices.
-  mattPocockSkills = {
-    code-review = "engineering/code-review";
-    diagnose = "engineering/diagnosing-bugs";
-    grill-with-docs = "engineering/grill-with-docs";
-    implement = "engineering/implement";
-    improve-codebase-architecture = "engineering/improve-codebase-architecture";
-    setup-matt-pocock-skills = "engineering/setup-matt-pocock-skills";
-    tdd = "engineering/tdd";
-    to-spec = "engineering/to-spec";
-    to-tickets = "engineering/to-tickets";
-    triage = "engineering/triage";
-    git-guardrails-claude-code = "misc/git-guardrails-claude-code";
-    migrate-to-shoehorn = "misc/migrate-to-shoehorn";
-    scaffold-exercises = "misc/scaffold-exercises";
-    setup-pre-commit = "misc/setup-pre-commit";
-    edit-article = "personal/edit-article";
-    obsidian-vault = "personal/obsidian-vault";
-    wayfinder = "engineering/wayfinder";
-    write-a-skill = "productivity/writing-great-skills";
-  };
+  # Destination directory names are read from each SKILL.md rather than duplicated
+  # here, because Codex requires the directory and manifest names to agree.
+  mattPocockSkillPaths = [
+    "engineering/code-review"
+    "engineering/diagnosing-bugs"
+    "engineering/domain-modeling"
+    "engineering/grill-with-docs"
+    "engineering/implement"
+    "engineering/improve-codebase-architecture"
+    "engineering/prototype"
+    "engineering/research"
+    "engineering/setup-matt-pocock-skills"
+    "engineering/tdd"
+    "engineering/to-spec"
+    "engineering/to-tickets"
+    "engineering/triage"
+    "misc/git-guardrails-claude-code"
+    "misc/migrate-to-shoehorn"
+    "misc/scaffold-exercises"
+    "misc/setup-pre-commit"
+    "personal/edit-article"
+    "personal/obsidian-vault"
+    "engineering/wayfinder"
+    "productivity/writing-great-skills"
+  ];
+
+  skillName = path:
+    let
+      manifest = "${inputs.mattpocock-skills}/skills/${path}/SKILL.md";
+      nameLines = builtins.filter
+        (line: builtins.match "name:[[:space:]]*.*" line != null)
+        (pkgs.lib.splitString "\n" (builtins.readFile manifest));
+    in
+    if builtins.length nameLines != 1 then
+      throw "Expected exactly one top-level name in ${manifest}"
+    else
+      builtins.elemAt (builtins.match "name:[[:space:]]*(.*)" (builtins.head nameLines)) 0;
 
   mattPocockSkillFiles = builtins.listToAttrs (
     map
-      (name: {
-        name = "codex/skills/${name}";
-        value.source = "${inputs.mattpocock-skills}/skills/${mattPocockSkills.${name}}";
-      })
-      (builtins.attrNames mattPocockSkills)
+      (path:
+        let name = skillName path;
+        in {
+          name = "codex/skills/${name}";
+          value.source = "${inputs.mattpocock-skills}/skills/${path}";
+        })
+      mattPocockSkillPaths
   );
+
+  skillNamesAreUnique =
+    builtins.length (builtins.attrNames mattPocockSkillFiles)
+    == builtins.length mattPocockSkillPaths;
 in
 {
   imports = [
     inputs.codex-desktop-linux.homeManagerModules.default
+  ];
+
+  assertions = [
+    {
+      assertion = skillNamesAreUnique;
+      message = "Matt Pocock's selected skills must have unique names in their SKILL.md files";
+    }
   ];
 
   home.packages = [

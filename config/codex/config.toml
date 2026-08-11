@@ -1,5 +1,5 @@
 model = "gpt-5.6-sol"
-model_reasoning_effort = "low"
+model_reasoning_effort = "high"
 service_tier = "priority"
 notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
 personality = "pragmatic"
@@ -185,6 +185,45 @@ trust_level = "trusted"
 [projects."/home/pablo/Documents/Codex/2026-07-26/can"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/tokenflow"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/Z"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-30/whe"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/vox"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/this"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/is"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/i-m-currently-building-a-plugin"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Dashboard"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/stacki"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/TokenFlow2"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-08-05/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/gotempl"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/gotempl"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -237,26 +276,22 @@ CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/sjvnycqbl8ab3sxl4yswpwdb197zss2i-codex-desktop-computer-use-ui-remote-mobile-control-26.721.41059/opt/codex-desktop/resources/node_repl"
+command = "/nix/store/sghfjb0mg571kiwwann4bcfiavkydkvr-codex-desktop-computer-use-ui-remote-mobile-control-26.730.61639/opt/codex-desktop/resources/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/nix/store/sjvnycqbl8ab3sxl4yswpwdb197zss2i-codex-desktop-computer-use-ui-remote-mobile-control-26.721.41059/opt/codex-desktop/resources/node-runtime/bin/node"
+NODE_REPL_NODE_PATH = "/nix/store/sghfjb0mg571kiwwann4bcfiavkydkvr-codex-desktop-computer-use-ui-remote-mobile-control-26.730.61639/opt/codex-desktop/resources/node-runtime/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
 CODEX_HOME = "/home/pablo/.config/codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,e13fd947e846d3d306e9249dd3c73d14931b6494803dbafb16cef85e6add9506,c3e900740ecb6294a07afd3fb5958dacc46ee1487fb2f4b1227d42475c659f7e,0b7480e2adf90e0099be29f73c6ed8c22e381db62f83f87e843c0a657fc063e0"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.721.41059"
-
-[mcp_servers.node_repl.tools]
-
-[mcp_servers.node_repl.tools.js]
-approval_mode = "approve"
+BROWSER_USE_CODEX_APP_VERSION = "26.730.61639"
+CODEX_CLI_PATH = "/nix/store/8cm54mim5g0qp63qwg1lh790dgzbicw2-codex-cli-0.147.0/bin/codex"
 
 [tui]
 notifications = false
@@ -316,18 +351,18 @@ trusted_hash = "sha256:e237486526f1cf8b394a7c9d48de70eed40d09aecf29704939444cdfe
 trusted_hash = "sha256:51ecfc4277a64a6684e1bae31f925f6d37fd4226a45c12cdb73500d192fde0ff"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-07-28T17:35:10Z"
+last_updated = "2026-08-11T16:50:16Z"
 source_type = "local"
 source = "/home/pablo/.config/codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-07-28T07:27:14Z"
+last_updated = "2026-08-06T09:42:49Z"
 source_type = "local"
 source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [marketplaces.paper]
-last_updated = "2026-07-25T20:04:35Z"
-last_revision = "a30668a826916aa68fee8be0a00c85692ec9ffc4"
+last_updated = "2026-07-29T10:43:06Z"
+last_revision = "cd89a2fd012cac8d6c0fa8f5420c9e49577f0c49"
 source_type = "git"
 source = "https://github.com/paper-design/agent-plugins.git"
 
@@ -378,15 +413,7 @@ name = "mattpocock-skills:setup-pre-commit"
 enabled = false
 
 [[skills.config]]
-name = "mattpocock-skills:tdd"
-enabled = false
-
-[[skills.config]]
 name = "mattpocock-skills:git-guardrails-claude-code"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:implement"
 enabled = false
 
 [[skills.config]]
@@ -397,29 +424,10 @@ enabled = false
 name = "mattpocock-skills:code-review"
 enabled = false
 
-[[skills.config]]
-name = "mattpocock-skills:grill-with-docs"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:improve-codebase-architecture"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:to-spec"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:to-tickets"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:triage"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:wayfinder"
-enabled = false
-
 [apps.connector_20205bf7d4e99a89d7154bb849718324]
 enabled = false
+
+[shell_environment_policy.set]
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"

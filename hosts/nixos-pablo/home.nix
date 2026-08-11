@@ -92,6 +92,18 @@ in
   services.ssh-agent.enable = true;
   services.handy.enable = true;
 
+  # Buzz replaces ~/.local/bin/buzz symlinks with its bundled, unpatched CLI.
+  # Keep a regular-file shim there so it resolves to the Nix-wrapped package.
+  home.activation.installBuzzCliShim = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    buzzCliShim="${config.home.homeDirectory}/.local/bin/buzz"
+    $DRY_RUN_CMD rm -f "$buzzCliShim"
+    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm755 \
+      ${pkgs.writeShellScript "buzz-cli-shim" ''
+        exec ${localPackages.buzz}/bin/buzz "$@"
+      ''} \
+      "$buzzCliShim"
+  '';
+
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
   xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
     solarizedLightQbittorrentTheme;
@@ -158,6 +170,8 @@ in
     whatsapp-electron
     pavucontrol
     pwvucontrol
+    localPackages.buzz
+    localPackages.codex-acp
     localPackages.figma-desktop
     localPackages.paper-desktop
     localPackages.t3code

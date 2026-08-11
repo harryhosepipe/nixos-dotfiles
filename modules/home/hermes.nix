@@ -7,29 +7,18 @@ let
   system = pkgs.stdenv.hostPlatform.system;
   upstreamRoot = inputs.hermes-agent.outPath;
 
-  # Hermes' current main branch has two packaging defects. Electron replaced
-  # its v41.7.2 headers archive without changing the URL, and the TUI source
-  # filter omits apps/shared. Keep these patches narrow and fail explicitly
-  # when upstream changes either target, so they can be removed safely.
-  upstreamTuiSource = builtins.readFile "${upstreamRoot}/nix/tui.nix";
-  hermesTuiSource =
-    assert lib.hasInfix "dirs = [ \"ui-tui\" ];" upstreamTuiSource;
-    pkgs.writeText "hermes-tui-patched.nix" (builtins.replaceStrings
-      [ "dirs = [ \"ui-tui\" ];" ]
-      [ "dirs = [ \"ui-tui\" \"apps/shared\" ];" ]
-      upstreamTuiSource);
-
+  # Electron replaced its v41.7.2 headers archive without changing the URL.
   upstreamDesktopSource = builtins.readFile "${upstreamRoot}/nix/desktop.nix";
   hermesDesktopSource =
-    assert lib.hasInfix "sha256-zi/QMwRZ0+FwE9XTE+DiSIeJXAwxmLKEaBWD5W3pMOI=" upstreamDesktopSource;
+    assert lib.hasInfix "sha256-f8bSbLRmtbP93CJAvEBs+sHWDZ1xP2bcpLhC1EnOmZU=" upstreamDesktopSource;
     pkgs.writeText "hermes-desktop-patched.nix" (builtins.replaceStrings
-      [ "sha256-zi/QMwRZ0+FwE9XTE+DiSIeJXAwxmLKEaBWD5W3pMOI=" ]
+      [ "sha256-f8bSbLRmtbP93CJAvEBs+sHWDZ1xP2bcpLhC1EnOmZU=" ]
       [ "sha256-0nUJBQDEikyYntZwq+ycH32mzEQtQmz3ICz9eeTMpJk=" ]
       upstreamDesktopSource);
 
   upstreamAgentSource = builtins.readFile "${upstreamRoot}/nix/hermes-agent.nix";
   hermesAgentSource =
-    assert lib.hasInfix "callPackage ./tui.nix" upstreamAgentSource;
+    assert lib.hasInfix "callPackage ./desktop.nix" upstreamAgentSource;
     pkgs.writeText "hermes-agent-patched.nix" (builtins.replaceStrings
       [
         "  rev ? null,\n"
@@ -46,10 +35,10 @@ let
         "callPackage ./desktop.nix"
       ]
       [
-        "  rev ? null,\n  tuiSource ? ./tui.nix,\n  desktopSource ? ./desktop.nix,\n"
+        "  rev ? null,\n  desktopSource ? ./desktop.nix,\n"
         "callPackage ${upstreamRoot}/nix/python.nix"
         "callPackage ${upstreamRoot}/nix/lib.nix"
-        "callPackage tuiSource"
+        "callPackage ${upstreamRoot}/nix/tui.nix"
         "callPackage ${upstreamRoot}/nix/web.nix"
         "src = ${upstreamRoot}/skills;"
         "src = ${upstreamRoot}/optional-skills;"
@@ -67,7 +56,6 @@ let
     pyproject-build-systems = inputs.hermes-pyproject-build-systems;
     npm-lockfile-fix = inputs.hermes-npm-lockfile-fix.packages.${system}.default;
     rev = inputs.hermes-agent.rev or null;
-    tuiSource = hermesTuiSource;
     desktopSource = hermesDesktopSource;
   };
   hermesAgent = hermesAgentBase.override {
