@@ -16,5 +16,12 @@ result-*
 # Runtime caches and generated files.
 __pycache__/
 *.pyc
+node_modules/
 config/zsh/.zcompdump*
 config/zsh/.zsh_history
+
+# Pi credentials and machine-local runtime metadata.
+config/pi/auth.json
+config/pi/trust.json
+config/pi/models-store.json
+config/pi/pi-debug.log

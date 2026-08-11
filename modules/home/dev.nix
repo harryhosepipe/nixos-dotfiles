@@ -8,9 +8,9 @@
   };
 
   home.packages = with pkgs; [
+    bun
     nodejs
     pnpm
-    bun
     jq
     just
     curl
@@ -19,5 +19,6 @@
     gnumake
     gcc
     pkg-config
+    tree-sitter
   ];
 }

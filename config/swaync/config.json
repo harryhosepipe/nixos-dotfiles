@@ -5,22 +5,32 @@
     "focus-signal-by-name": {
       "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" signal'",
       "app-name": "Signal",
-      "run-on": "action"
+      "run-on": "receive"
     },
     "focus-signal-by-desktop-entry": {
       "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" signal'",
-      "desktop-entry": "signal",
-      "run-on": "action"
+      "desktop-entry": "signal|signal-desktop",
+      "run-on": "receive"
     },
     "focus-whatsapp-by-name": {
       "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" whatsapp'",
       "app-name": "WhatsApp|Whatsapp|WhatsApp Electron",
-      "run-on": "action"
+      "run-on": "receive"
     },
     "focus-whatsapp-by-desktop-entry": {
       "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" whatsapp'",
       "desktop-entry": "com.github.dagmoller.whatsapp-electron",
-      "run-on": "action"
+      "run-on": "receive"
+    },
+    "focus-telegram-by-name": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" telegram'",
+      "app-name": "Telegram|Telegram Desktop",
+      "run-on": "receive"
+    },
+    "focus-telegram-by-desktop-entry": {
+      "exec": "sh -lc 'exec \"$HOME/.config/swaync/focus-chat-notification.sh\" telegram'",
+      "desktop-entry": "org.telegram.desktop|telegramdesktop|telegram-desktop",
+      "run-on": "receive"
     }
   }
 }

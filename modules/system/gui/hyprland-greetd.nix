@@ -1,6 +1,16 @@
 { pkgs, ... }:
 
 {
+  nixpkgs.overlays = [
+    (_final: prev: {
+      waybar = prev.waybar.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [
+          ../../../patches/waybar-hyprland-lua-workspace-click.patch
+        ];
+      });
+    })
+  ];
+
   boot = {
     # Keep the greeter screen calm by hiding routine boot and device chatter.
     # Serious errors can still show up, but warnings like noisy USB messages stay
@@ -49,8 +59,11 @@
   environment.systemPackages = with pkgs; [
     hypridle
     hyprpaper
-    hyprshot
+    grim
+    jq
+    slurp
     swaynotificationcenter
+    swappy
     waybar
     wl-clipboard
     wofi
