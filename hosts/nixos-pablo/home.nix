@@ -134,7 +134,6 @@ in
     };
 
     configDirs = {
-      "audio-popup" = "audio-popup";
       bash = "bash";
       hypr = "hypr";
       kanata = "kanata";
@@ -153,7 +152,6 @@ in
   };
 
   home.packages = with pkgs; [
-    ags
     nixpkgs-fmt
     doppler
     bat
@@ -171,7 +169,7 @@ in
     signal-desktop
     whatsapp-electron
     pavucontrol
-    pulseaudio
+    pwvucontrol
     localPackages.buzz
     localPackages.codex-acp
     localPackages.figma-desktop

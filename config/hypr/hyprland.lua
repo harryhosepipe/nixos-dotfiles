@@ -158,7 +158,7 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + A",
-	hl.dsp.exec_cmd("$HOME/.config/audio-popup/toggle.sh"),
+	hl.dsp.exec_cmd("$HOME/.config/hypr/audio-popup-toggle.sh"),
 	{ description = "Choose audio output" }
 )
 
