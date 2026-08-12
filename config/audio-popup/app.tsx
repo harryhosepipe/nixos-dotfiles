@@ -291,13 +291,18 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
     const refreshTimer = setInterval(refresh, 1000)
 
-    const mixerButton = new Gtk.Button({ tooltipText: "Open full audio settings" })
+    const mixerButton = new Gtk.Button({
+        tooltipText: "Playback, recording, inputs, outputs, and device profiles",
+    })
     addClass(mixerButton, "mixer")
     const mixerContent = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 5 })
     mixerContent.pack_start(new Gtk.Image({ iconName: "emblem-system-symbolic", pixelSize: 14 }), false, false, 0)
-    mixerContent.pack_start(new Gtk.Label({ label: "More settings" }), false, false, 0)
+    mixerContent.pack_start(new Gtk.Label({ label: "All audio controls" }), false, false, 0)
     mixerButton.add(mixerContent)
-    mixerButton.connect("clicked", () => execAsync("pavucontrol").catch(print))
+    mixerButton.connect("clicked", async () => {
+        await execAsync(["sh", "-lc", "pwvucontrol >/tmp/pwvucontrol.log 2>&1 &"]).catch(print)
+        App.quit()
+    })
 
     const win = <window
         name={WINDOW_NAME}
