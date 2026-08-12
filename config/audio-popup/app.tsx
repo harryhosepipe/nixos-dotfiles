@@ -3,7 +3,7 @@ import { execAsync } from "astal/process"
 import style from "./style.scss"
 
 const WINDOW_NAME = "audio-popup"
-const POPUP_VERSION = "audio-popup pactl-ui v2"
+const POPUP_VERSION = "audio-popup pactl-ui v3"
 
 type PactlSink = {
     name: string
@@ -37,10 +37,6 @@ function setClass(widget: StyledWidget, name: string, enabled: boolean): void {
     const style = widget.get_style_context()
     if (enabled) style.add_class(name)
     else style.remove_class(name)
-}
-
-function shellQuote(value: string): string {
-    return `'${value.replace(/'/g, "'\\''")}'`
 }
 
 function volumePercent(sink: PactlSink): number {
@@ -82,13 +78,9 @@ function friendlyLabel(sink: PactlSink): string {
         || sink.description
         || sink.name
 
-    const activePort = typeof sink.active_port === "string" ? sink.active_port : sink.active_port?.name ?? ""
-    const lower = `${explicit} ${sink.name} ${activePort}`.toLowerCase()
-    if (lower.includes("hdmi")) return "HDMI Display"
-    if (lower.includes("headphone")) return "Headphones"
-    if (lower.includes("headset")) return "Headset"
-    if (lower.includes("speaker")) return "Built-in Speakers"
-
+    // Keep manufacturer/product names intact (for example, DragonFly Red and
+    // Audeze Maxwell). Genericising every sink containing "headset" made the
+    // most important distinction in this picker disappear.
     return explicit
         .replace(/^alsa_output\./, "")
         .replace(/\.(analog|digital|hdmi).*$/i, "")
@@ -142,6 +134,13 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
         orientation: Gtk.Orientation.VERTICAL,
         spacing: 4,
     })
+    const currentOutputLabel = new Gtk.Label({
+        label: "Finding output…",
+        xalign: 0,
+        hexpand: true,
+        ellipsize: 3,
+    })
+    addClass(currentOutputLabel, "current-output")
     const volumeIcon = new Gtk.Image({ iconName: "audio-volume-medium-symbolic", pixelSize: 16 })
     const volumeLabel = new Gtk.Label({ label: "--%", xalign: 1 })
     const volumeScale = new Gtk.Scale({
@@ -159,11 +158,13 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     const renderVolume = () => {
         const output = activeOutput()
         if (!output) {
+            currentOutputLabel.label = "No output selected"
             volumeLabel.label = "--%"
             volumeScale.sensitive = false
             return
         }
 
+        currentOutputLabel.label = output.label
         volumeScale.sensitive = true
         settingVolume = true
         volumeScale.set_value(output.volume)
@@ -210,31 +211,50 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
                 hexpand: true,
                 ellipsize: 3,
             })
+            addClass(label, "device-name")
             text.pack_start(label, false, false, 0)
 
-            if (output.detail) {
-                const detail = new Gtk.Label({
-                    label: output.detail,
-                    xalign: 0,
-                    hexpand: true,
-                    ellipsize: 3,
-                })
-                addClass(detail, "detail")
-                text.pack_start(detail, false, false, 0)
-            }
+            const detailParts = [output.active ? "Current output" : "Use this output"]
+            if (output.detail) detailParts.push(output.detail)
+            const detail = new Gtk.Label({
+                label: detailParts.join(" · "),
+                xalign: 0,
+                hexpand: true,
+                ellipsize: 3,
+            })
+            addClass(detail, "detail")
+            if (output.active) addClass(detail, "active-detail")
+            text.pack_start(detail, false, false, 0)
 
             row.pack_start(new Gtk.Image({ iconName: output.icon, pixelSize: 16 }), false, false, 0)
             row.pack_start(text, true, true, 0)
-            row.pack_end(new Gtk.Image({
-                iconName: "object-select-symbolic",
-                pixelSize: 14,
-                visible: output.active,
-            }), false, false, 0)
+            const state = new Gtk.Label({
+                label: output.active ? "CURRENT" : "SELECT",
+                xalign: 1,
+            })
+            addClass(state, "device-state")
+            if (output.active) addClass(state, "active-state")
+            row.pack_end(state, false, false, 0)
 
             button.add(row)
             button.connect("clicked", async () => {
-                const sink = shellQuote(output.name)
-                await execAsync(`sh -lc "pactl set-default-sink ${sink}; pactl list short sink-inputs | cut -f1 | while read -r input; do pactl move-sink-input \\"\\$input\\" ${sink}; done"`).catch(print)
+                if (output.active) return
+
+                button.sensitive = false
+                state.label = "SWITCHING…"
+                try {
+                    await execAsync(["pactl", "set-default-sink", output.name])
+                    const rawInputs = await execAsync(["pactl", "list", "short", "sink-inputs"])
+                    const inputIds = rawInputs
+                        .split("\n")
+                        .map((line) => line.split("\t")[0])
+                        .filter(Boolean)
+                    for (const inputId of inputIds) {
+                        await execAsync(["pactl", "move-sink-input", inputId, output.name]).catch(print)
+                    }
+                } catch (error) {
+                    print(error)
+                }
                 await refresh()
             })
             deviceList.add(button)
@@ -271,9 +291,12 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
     const refreshTimer = setInterval(refresh, 1000)
 
-    const mixerButton = new Gtk.Button()
+    const mixerButton = new Gtk.Button({ tooltipText: "Open full audio settings" })
     addClass(mixerButton, "mixer")
-    mixerButton.add(new Gtk.Image({ iconName: "emblem-system-symbolic", pixelSize: 15 }))
+    const mixerContent = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 5 })
+    mixerContent.pack_start(new Gtk.Image({ iconName: "emblem-system-symbolic", pixelSize: 14 }), false, false, 0)
+    mixerContent.pack_start(new Gtk.Label({ label: "More settings" }), false, false, 0)
+    mixerButton.add(mixerContent)
     mixerButton.connect("clicked", () => execAsync("pavucontrol").catch(print))
 
     const win = <window
@@ -292,6 +315,14 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
             }
         }}>
         <box className="panel" orientation={Gtk.Orientation.VERTICAL} spacing={10}>
+            <box className="heading" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
+                <label className="title" label="Sound output" xalign={0} />
+                <label className="subtitle" label="Choose where your audio plays" xalign={0} />
+            </box>
+            <box className="current" orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
+                <label className="current-label" label="PLAYING THROUGH" xalign={0} />
+                {currentOutputLabel}
+            </box>
             <box className="volume" orientation={Gtk.Orientation.HORIZONTAL} spacing={10}>
                 {volumeIcon}
                 {volumeScale}
@@ -299,7 +330,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
             </box>
             {deviceList}
             <box className="footer" orientation={Gtk.Orientation.HORIZONTAL}>
-                <label label="OUTPUT" xalign={0} hexpand={true} />
+                <label label="CLICK A DEVICE TO SWITCH ALL PLAYING APPS" xalign={0} hexpand={true} />
                 {mixerButton}
             </box>
         </box>

@@ -10,13 +10,45 @@ window.AudioPopupDismiss {
 }
 
 .panel {
-    min-width: 340px;
+    min-width: 380px;
     margin: 8px 10px 0 0;
     padding: 10px;
     border: 1px solid rgba(216, 222, 233, 0.14);
     border-radius: 8px;
     background: rgba(18, 20, 24, 0.92);
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
+}
+
+.heading {
+    padding: 2px 4px 0;
+}
+
+.title {
+    color: #eceff4;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #7d8490;
+    font-size: 10px;
+}
+
+.current {
+    margin: 0 4px;
+    padding: 7px 9px;
+    border-radius: 5px;
+    background: rgba(143, 188, 187, 0.08);
+}
+
+.current-label {
+    color: #7d8490;
+    font-size: 9px;
+}
+
+.current-output {
+    color: #8fbcbb;
+    font-weight: 700;
 }
 
 .volume {
@@ -71,8 +103,13 @@ button {
 }
 
 button.device {
-    min-height: 32px;
-    padding: 8px;
+    min-height: 38px;
+    padding: 9px 10px;
+}
+
+.device-name {
+    color: #d8dee9;
+    font-weight: 600;
 }
 
 button.device:hover {
@@ -89,6 +126,20 @@ button.device.active {
     font-size: 10px;
 }
 
+.active-detail {
+    color: #8fbcbb;
+}
+
+.device-state {
+    color: #7d8490;
+    font-size: 9px;
+}
+
+.active-state {
+    color: #8fbcbb;
+    font-weight: 700;
+}
+
 .empty {
     padding: 8px;
     color: #7d8490;
@@ -101,8 +152,9 @@ button.device.active {
 }
 
 button.mixer {
-    padding: 4px;
+    padding: 4px 6px;
     color: #aeb6c2;
+    font-size: 10px;
 }
 
 button.mixer:hover {

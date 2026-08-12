@@ -158,10 +158,8 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + A",
-	hl.dsp.exec_cmd(
-		"sh -lc 'if pgrep -x pwvucontrol >/dev/null 2>&1; then pkill -x pwvucontrol; else pwvucontrol >/tmp/pwvucontrol.log 2>&1 & fi'"
-	),
-	{ description = "Open audio controls" }
+	hl.dsp.exec_cmd("$HOME/.config/audio-popup/toggle.sh"),
+	{ description = "Choose audio output" }
 )
 
 -- Window actions
@@ -362,15 +360,6 @@ hl.window_rule({
 	match = { class = "thunar" },
 	float = true,
 	size = "1400 1100",
-})
-
-hl.window_rule({
-	name = "audio-control-popup",
-	match = { class = "com.saivert.pwvucontrol" },
-	float = true,
-	pin = true,
-	size = "520 620",
-	move = "monitor_w-540 42",
 })
 
 hl.window_rule({
