@@ -82,6 +82,33 @@ let
     pname = "figma-desktop";
     version = figmaDesktopVersion;
     src = figmaDesktopSrc;
+    postExtract = ''
+      # Figma sends process.argv as Electron single-instance additionalData.
+      # Chromium rejects that payload before the running app can receive a
+      # figma:// callback. Use Electron's normal second-instance argv channel
+      # instead; handleCommandLineArgs already scans every Linux argv entry.
+      asarFile="$out/usr/lib/node_modules/electron/dist/resources/app.asar"
+      asarDir="$TMPDIR/figma-app-asar"
+      patchedAsar="$TMPDIR/figma-app-patched.asar"
+
+      ${pkgs.asar}/bin/asar extract "$asarFile" "$asarDir"
+      substituteInPlace "$asarDir/main.js" \
+        --replace-fail \
+          'Je.app.requestSingleInstanceLock(r)||Je.app.exit()' \
+          'Je.app.requestSingleInstanceLock()||Je.app.exit()' \
+        --replace-fail \
+          'let a=MLt(o);if(a){if(await V.handleCommandLineArgs(a.originalArgs))return}else dd.error("Failed to parse second instance additional data:",o);' \
+          'let a=MLt(o);if(a){if(await V.handleCommandLineArgs(a.originalArgs))return}else if(await V.handleCommandLineArgs(r))return;'
+      ${pkgs.asar}/bin/asar pack "$asarDir" "$patchedAsar"
+      install -m444 "$patchedAsar" "$asarFile"
+
+      # The Nix package installs the stable desktop entry. Prevent AppRun from
+      # replacing it with an entry in the wrapper's private XDG data directory.
+      substituteInPlace "$out/AppRun" \
+        --replace-fail \
+          'integrate_desktop 2>/dev/null || true' \
+          ': # Desktop integration is managed by the Nix package'
+    '';
   };
   paperDesktopVersion = "0.5.0";
   paperDesktopSrc = pkgs.fetchurl {
@@ -166,10 +193,10 @@ in
 
   codex-acp = codexAcp;
 
-  figma-desktop = pkgs.appimageTools.wrapType2 {
+  figma-desktop = pkgs.appimageTools.wrapAppImage {
     pname = "figma-desktop";
     version = figmaDesktopVersion;
-    src = figmaDesktopSrc;
+    src = figmaDesktopContents;
     nativeBuildInputs = [ pkgs.makeWrapper ];
 
     extraInstallCommands = ''
