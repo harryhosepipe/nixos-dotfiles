@@ -276,22 +276,22 @@ CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/sghfjb0mg571kiwwann4bcfiavkydkvr-codex-desktop-computer-use-ui-remote-mobile-control-26.730.61639/opt/codex-desktop/resources/node_repl"
+command = "/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/nix/store/sghfjb0mg571kiwwann4bcfiavkydkvr-codex-desktop-computer-use-ui-remote-mobile-control-26.730.61639/opt/codex-desktop/resources/node-runtime/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/pablo/.config/codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "2158647076eed887c7591cca0957da78747ab9155819d64409d6b895e84ed99b"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.730.61639"
-CODEX_CLI_PATH = "/nix/store/8cm54mim5g0qp63qwg1lh790dgzbicw2-codex-cli-0.147.0/bin/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.820.60940"
+CODEX_CLI_PATH = "/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/codex"
 
 [tui]
 notifications = false
@@ -429,5 +429,5 @@ enabled = false
 
 [shell_environment_policy.set]
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "2158647076eed887c7591cca0957da78747ab9155819d64409d6b895e84ed99b"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/8hmjflza17hbdj0idfk7k6pw0kmhd1w7-codex-desktop-computer-use-linux-26.820.60940/opt/codex-desktop/resources/cua_node/lib/node_modules"

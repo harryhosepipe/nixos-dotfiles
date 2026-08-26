@@ -8,10 +8,10 @@
 let
   codex = pkgs.buildNpmPackage {
     pname = "codex-cli";
-    version = "0.147.0";
+    version = "0.149.1";
 
     src = ../../nix/codex-npm;
-    npmDepsHash = "sha256-pTr0xEpkwEV7CK3vuJ4MxhhkFB1y0+b/kvFBOHvf8/Q=";
+    npmDepsHash = "sha256-vnTVnRrLO7HDhCNCcCRZx9yLsfHafslH+SZs+k2rS/E=";
 
     dontNpmBuild = true;
     nativeBuildInputs = [ pkgs.makeWrapper ];
@@ -125,16 +125,9 @@ in
   programs.codexDesktopLinux = {
     enable = true;
     computerUseUi.enable = true;
-    remoteMobileControl.enable = true;
-    remoteControl = {
-      enable = true;
-      package = codex;
-      codexHome = "${config.xdg.configHome}/codex";
-      extraPackages = [
-        pkgs.bash
-        pkgs.coreutils
-        pkgs.ydotool
-      ];
-    };
+    # The official Linux app's remote-control proxy currently times out during
+    # its initialize handshake. Keep it disabled until upstream fixes it.
+    remoteMobileControl.enable = false;
+    remoteControl.enable = false;
   };
 }

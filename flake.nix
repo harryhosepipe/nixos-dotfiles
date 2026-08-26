@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix/v0.147.0";
+      url = "github:sadjow/codex-cli-nix/v0.149.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     codex-desktop-linux = {
@@ -32,7 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.8.3";
+      url = "github:NousResearch/hermes-agent/v2026.8.19";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";

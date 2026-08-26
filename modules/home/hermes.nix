@@ -12,8 +12,16 @@ let
   hermesDesktopSource =
     assert lib.hasInfix "sha256-f8bSbLRmtbP93CJAvEBs+sHWDZ1xP2bcpLhC1EnOmZU=" upstreamDesktopSource;
     pkgs.writeText "hermes-desktop-patched.nix" (builtins.replaceStrings
-      [ "sha256-f8bSbLRmtbP93CJAvEBs+sHWDZ1xP2bcpLhC1EnOmZU=" ]
-      [ "sha256-0nUJBQDEikyYntZwq+ycH32mzEQtQmz3ICz9eeTMpJk=" ]
+      [
+        "sha256-f8bSbLRmtbP93CJAvEBs+sHWDZ1xP2bcpLhC1EnOmZU="
+        "../apps/desktop/assets/icon.png"
+        "../hermes_cli/linux_desktop_entry.py"
+      ]
+      [
+        "sha256-0nUJBQDEikyYntZwq+ycH32mzEQtQmz3ICz9eeTMpJk="
+        "${upstreamRoot}/apps/desktop/assets/icon.png"
+        "${upstreamRoot}/hermes_cli/linux_desktop_entry.py"
+      ]
       upstreamDesktopSource);
 
   upstreamAgentSource = builtins.readFile "${upstreamRoot}/nix/hermes-agent.nix";

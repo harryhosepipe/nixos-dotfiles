@@ -120,10 +120,10 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
-  t3codeVersion = "0.0.33";
+  t3codeVersion = "0.0.34";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-QVyGSPQ8PSLVcvJ/LFD9yMMQ6n/N6VN7kD4eLxyHdaE=";
+    hash = "sha256-YHfiB8wefmWFj3MxNTSr4do1cif0AiWFThq6w03tugQ=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
