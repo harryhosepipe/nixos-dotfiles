@@ -1,5 +1,21 @@
 { pkgs }:
 let
+  blenderVersion = "5.2.1";
+  blenderSrc = pkgs.stdenvNoCC.mkDerivation {
+    pname = "blender-unwrapped";
+    version = blenderVersion;
+    src = pkgs.fetchurl {
+      url = "https://download.blender.org/release/Blender5.2/blender-${blenderVersion}-linux-x64.tar.xz";
+      hash = "sha256-ox9ST6maUn09Urf1qqaMNOGhnVoclHP3nFzGEP1bEOk=";
+    };
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/opt/blender"
+      cp -a . "$out/opt/blender/"
+      runHook postInstall
+    '';
+  };
   buzzVersion = "0.5.8";
   buzzSrc = pkgs.fetchurl {
     url = "https://github.com/block/buzz/releases/download/desktop-v${buzzVersion}/Buzz_${buzzVersion}_amd64.AppImage";
@@ -120,10 +136,20 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
-  t3codeVersion = "0.0.34";
+  signalDesktopVersion = "8.25.0";
+  signalDesktopSrc = pkgs.fetchurl {
+    url = "https://updates.signal.org/desktop/signal-desktop.AppImage";
+    hash = "sha256-tUw4JT2Qc+ZQ/NitY6kejtJ+MJMPPqYhnebyy3WY7KM=";
+  };
+  signalDesktopContents = pkgs.appimageTools.extractType2 {
+    pname = "signal-desktop";
+    version = signalDesktopVersion;
+    src = signalDesktopSrc;
+  };
+  t3codeVersion = "0.0.42";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-YHfiB8wefmWFj3MxNTSr4do1cif0AiWFThq6w03tugQ=";
+    hash = "sha256-jcH8zavC7TpZo5RMx3LvEZMbk1FAHAlj7TBdX5bjzfQ=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
@@ -132,6 +158,56 @@ let
   };
 in
 {
+  blender = pkgs.buildFHSEnv {
+    pname = "blender";
+    version = blenderVersion;
+    runScript = pkgs.writeShellScript "blender-launcher" ''
+      # Use the driver selected by NixOS instead of Mesa from the FHS runtime.
+      export LD_LIBRARY_PATH="/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+      export __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json
+      export __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS=/run/opengl-driver/share/egl/egl_external_platform.d
+      export __GLX_VENDOR_LIBRARY_NAME=nvidia
+      exec ${blenderSrc}/opt/blender/blender "$@"
+    '';
+    targetPkgs = pkgs: with pkgs; [
+      alsa-lib
+      dbus
+      fontconfig
+      freetype
+      libGL
+      libdecor
+      libdrm
+      libpulseaudio
+      libice
+      libsm
+      libxkbcommon
+      wayland
+      libx11
+      libxcursor
+      libxext
+      libxfixes
+      libxi
+      libxinerama
+      libxrandr
+      libxrender
+      libxxf86vm
+    ];
+    extraInstallCommands = ''
+      install -Dm444 ${blenderSrc}/opt/blender/blender.desktop \
+        $out/share/applications/blender.desktop
+      install -Dm444 ${blenderSrc}/opt/blender/blender.svg \
+        $out/share/icons/hicolor/scalable/apps/blender.svg
+    '';
+
+    meta = {
+      description = "3D creation suite";
+      homepage = "https://www.blender.org";
+      license = pkgs.lib.licenses.gpl3Plus;
+      mainProgram = "blender";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
   buzz = pkgs.appimageTools.wrapAppImage {
     pname = "buzz";
     version = buzzVersion;
@@ -156,12 +232,14 @@ in
         --prefix PATH : ${buzzBrowserLauncher}/bin \
         --set GDK_BACKEND wayland \
         --set GST_PLUGIN_PATH_1_0 \
-          ${pkgs.lib.makeSearchPath "lib/gstreamer-1.0" [
-            pkgs.gst_all_1.gst-plugins-base
-            pkgs.gst_all_1.gst-plugins-good
-            pkgs.gst_all_1.gst-plugins-bad
-            pkgs.gst_all_1.gst-libav
-          ]} \
+          ${
+            pkgs.lib.makeSearchPath "lib/gstreamer-1.0" [
+              pkgs.gst_all_1.gst-plugins-base
+              pkgs.gst_all_1.gst-plugins-good
+              pkgs.gst_all_1.gst-plugins-bad
+              pkgs.gst_all_1.gst-libav
+            ]
+          } \
         --set GST_PLUGIN_SCANNER_1_0 \
           ${pkgs.gst_all_1.gstreamer.out}/libexec/gstreamer-1.0/gst-plugin-scanner
 
@@ -246,6 +324,35 @@ in
     };
   };
 
+  signal-desktop = pkgs.appimageTools.wrapType2 {
+    pname = "signal-desktop";
+    version = signalDesktopVersion;
+    src = signalDesktopSrc;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    extraInstallCommands = ''
+      wrapProgram $out/bin/signal-desktop \
+        --add-flags "--ozone-platform=wayland --disable-vulkan --disable-features=Vulkan"
+
+      install -Dm444 ${signalDesktopContents}/signal-desktop.desktop \
+        $out/share/applications/signal-desktop.desktop
+      substituteInPlace $out/share/applications/signal-desktop.desktop \
+        --replace-fail 'Exec=AppRun %U' 'Exec=signal-desktop %U'
+
+      while IFS= read -r icon; do
+        install -Dm444 "$icon" "$out/share/''${icon#${signalDesktopContents}/usr/share/}"
+      done < <(find ${signalDesktopContents}/usr/share/icons -type f)
+    '';
+
+    meta = {
+      description = "Private messaging from your desktop";
+      homepage = "https://signal.org";
+      license = pkgs.lib.licenses.agpl3Only;
+      mainProgram = "signal-desktop";
+      platforms = [ "x86_64-linux" ];
+    };
+  };
+
   t3code = pkgs.appimageTools.wrapType2 {
     pname = "t3code";
     version = t3codeVersion;
@@ -270,6 +377,35 @@ in
       platforms = [ "x86_64-linux" ];
     };
   };
+
+  cliamp = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
+    pname = "cliamp";
+    version = "1.63.2";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/bjarneo/cliamp/releases/download/v${finalAttrs.version}/cliamp-linux-amd64";
+      hash = "sha256-sGaDLITLnf/LEmJS3ttVoOvNE8uslbv/EDsRG4jOF8k=";
+    };
+
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    buildInputs = [ pkgs.alsa-lib ];
+
+    dontUnpack = true;
+
+    installPhase = ''
+      runHook preInstall
+      install -Dm755 "$src" "$out/bin/cliamp"
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Terminal music player inspired by Winamp";
+      homepage = "https://www.cliamp.stream";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "cliamp";
+      platforms = [ "x86_64-linux" ];
+    };
+  });
 
   nextcloud-client_4_0_4 = pkgs.nextcloud-client.overrideAttrs (_oldAttrs: {
     version = "4.0.4";

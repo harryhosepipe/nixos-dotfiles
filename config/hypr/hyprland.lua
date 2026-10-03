@@ -159,7 +159,7 @@ hl.bind(
 hl.bind(
 	mainMod .. " + A",
 	hl.dsp.exec_cmd("$HOME/.config/hypr/audio-popup-toggle.sh"),
-	{ description = "Choose audio output" }
+	{ locked = true, description = "Audio output and volume" }
 )
 
 -- Window actions
@@ -266,6 +266,8 @@ hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"), { descripti
 -- Mouse controls
 hl.bind("mouse:276", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
 hl.bind("mouse:275", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
+hl.bind("SHIFT + mouse:276", hl.dsp.focus({ direction = "left" }), { description = "Focus left" })
+hl.bind("SHIFT + mouse:275", hl.dsp.focus({ direction = "right" }), { description = "Focus right" })
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Drag active window" })

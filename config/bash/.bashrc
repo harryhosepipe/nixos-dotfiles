@@ -16,3 +16,6 @@ fi
 
 # Zoxide should be loaded last
 eval "$(zoxide init --cmd cd bash)"
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"

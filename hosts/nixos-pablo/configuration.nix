@@ -15,7 +15,11 @@
   # The real machine name comes from hosts.nix so you can rename it in one place.
   networking.hostName = host.hostName;
   networking.networkmanager.dns = "none";
-  networking.nameservers = ["192.168.3.9"];
+  networking.nameservers = ["192.168.88.247"];
+  services.tailscale.extraSetFlags = ["--accept-dns=false"];
+  users.users.pablo.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5hBuvy7gqjDvkeyZLWUpk8FH9gTKJeC/2jOlmAdoeE pablo@renderbros.com"
+  ];
 
   services.flatpak = {
     enable = true;

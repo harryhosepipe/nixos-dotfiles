@@ -1,8 +1,8 @@
 {
   "name": "pi-npm-wrapper",
-  "version": "0.83.0",
+  "version": "0.87.1",
   "private": true,
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.84.3"
+    "@earendil-works/pi-coding-agent": "0.87.1"
   }
 }

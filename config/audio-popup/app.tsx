@@ -3,7 +3,23 @@ import { execAsync } from "astal/process"
 import style from "./style.scss"
 
 const WINDOW_NAME = "audio-popup"
-const POPUP_VERSION = "audio-popup pactl-ui v3"
+const POPUP_VERSION = "audio-popup pactl-ui v5"
+
+let onVisibilityChanged = (_visible: boolean) => {}
+
+function setPopupVisible(visible: boolean) {
+    // The click-away layer must always follow the popup, including on Escape.
+    const dismiss = App.get_window(`${WINDOW_NAME}-dismiss`)
+    const popup = App.get_window(WINDOW_NAME)
+    if (visible) {
+        dismiss?.show()
+        popup?.show()
+    } else {
+        popup?.hide()
+        dismiss?.hide()
+    }
+    onVisibilityChanged(visible)
+}
 
 type PactlSink = {
     name: string
@@ -99,8 +115,8 @@ function iconName(output: Output): string {
 
 async function loadOutputs(): Promise<Output[]> {
     const [defaultSink, rawSinks] = await Promise.all([
-        execAsync("pactl get-default-sink").catch(() => ""),
-        execAsync("pactl -f json list sinks").catch(() => "[]"),
+        execAsync("pactl get-default-sink"),
+        execAsync("pactl -f json list sinks"),
     ])
     const sinks = JSON.parse(rawSinks || "[]") as PactlSink[]
 
@@ -129,6 +145,14 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     let outputs: Output[] = []
     let refreshing = false
     let settingVolume = false
+    let pendingVolumeChanges = 0
+    let volumeRevision = 0
+    let volumeWrites = Promise.resolve()
+    let queuedVolume: { name: string; value: number } | null = null
+    let volumeWriteTimer: ReturnType<typeof setTimeout> | null = null
+    let refreshTimer: ReturnType<typeof setInterval> | null = null
+    let deviceSignature = ""
+    let switching = false
 
     const deviceList = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -143,20 +167,44 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     addClass(currentOutputLabel, "current-output")
     const volumeIcon = new Gtk.Image({ iconName: "audio-volume-medium-symbolic", pixelSize: 16 })
     const volumeLabel = new Gtk.Label({ label: "--%", xalign: 1 })
+    addClass(volumeLabel, "volume-value")
+    const muteButton = new Gtk.Button({ sensitive: false, tooltipText: "Mute output (M)" })
+    addClass(muteButton, "mute-button")
+    const muteLabel = new Gtk.Label({ label: "Mute" })
+    const muteContent = new Gtk.Box({ spacing: 6 })
+    muteContent.add(volumeIcon)
+    muteContent.add(muteLabel)
+    muteButton.add(muteContent)
+    const statusLabel = new Gtk.Label({ label: "", xalign: 0, wrap: true, noShowAll: true })
+    addClass(statusLabel, "error")
+    const showError = (error: unknown) => {
+        print(error)
+        statusLabel.label = "Couldn’t update audio. Please try again."
+        statusLabel.show()
+    }
     const volumeScale = new Gtk.Scale({
         orientation: Gtk.Orientation.HORIZONTAL,
         drawValue: false,
         hexpand: true,
         sensitive: false,
     })
-    volumeScale.set_size_request(180, 24)
+    volumeScale.set_size_request(240, 36)
     volumeScale.set_range(0, 100)
     volumeScale.set_increments(1, 5)
+    volumeScale.tooltipText = "Output volume · Left/Right to adjust by 5%"
 
-    const activeOutput = () => outputs.find((output) => output.active) ?? outputs[0] ?? null
+    const volumeDownButton = new Gtk.Button({ label: "−", tooltipText: "Decrease volume by 5% (Left)", sensitive: false })
+    const volumeUpButton = new Gtk.Button({ label: "+", tooltipText: "Increase volume by 5% (Right)", sensitive: false })
+    addClass(volumeDownButton, "volume-step")
+    addClass(volumeUpButton, "volume-step")
+
+    const activeOutput = () => outputs.find((output) => output.active) ?? null
 
     const renderVolume = () => {
         const output = activeOutput()
+        muteButton.sensitive = !!output && !switching
+        volumeDownButton.sensitive = !!output && output.volume > 0
+        volumeUpButton.sensitive = !!output && output.volume < 100
         if (!output) {
             currentOutputLabel.label = "No output selected"
             volumeLabel.label = "--%"
@@ -170,7 +218,12 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
         volumeScale.set_value(output.volume)
         settingVolume = false
         volumeLabel.label = `${output.volume}%`
-        volumeIcon.iconName = output.muted ? "audio-volume-muted-symbolic" : "audio-volume-medium-symbolic"
+        volumeIcon.iconName = output.muted || output.volume === 0 ? "audio-volume-muted-symbolic"
+            : output.volume < 34 ? "audio-volume-low-symbolic"
+            : output.volume < 67 ? "audio-volume-medium-symbolic" : "audio-volume-high-symbolic"
+        muteLabel.label = output.muted ? "Unmute" : "Mute"
+        muteButton.tooltipText = output.muted ? "Unmute output (M)" : "Mute output (M)"
+        setClass(muteButton, "is-muted", output.muted)
         setClass(volumeScale, "muted", output.muted)
         setClass(volumeLabel, "muted", output.muted)
     }
@@ -214,7 +267,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
             addClass(label, "device-name")
             text.pack_start(label, false, false, 0)
 
-            const detailParts = [output.active ? "Current output" : "Use this output"]
+            const detailParts = [output.active ? "Selected" : "Switch output"]
             if (output.detail) detailParts.push(output.detail)
             const detail = new Gtk.Label({
                 label: detailParts.join(" · "),
@@ -229,7 +282,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
             row.pack_start(new Gtk.Image({ iconName: output.icon, pixelSize: 16 }), false, false, 0)
             row.pack_start(text, true, true, 0)
             const state = new Gtk.Label({
-                label: output.active ? "CURRENT" : "SELECT",
+                label: output.active ? "✓" : "",
                 xalign: 1,
             })
             addClass(state, "device-state")
@@ -238,11 +291,14 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
             button.add(row)
             button.connect("clicked", async () => {
-                if (output.active) return
+                if (outputs.find((item) => item.name === output.name)?.active || switching) return
 
-                button.sensitive = false
-                state.label = "SWITCHING…"
+                switching = true
+                deviceList.sensitive = false
+                state.label = "…"
+                flushVolume()
                 try {
+                    await volumeWrites
                     await execAsync(["pactl", "set-default-sink", output.name])
                     const rawInputs = await execAsync(["pactl", "list", "short", "sink-inputs"])
                     const inputIds = rawInputs
@@ -253,7 +309,11 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
                         await execAsync(["pactl", "move-sink-input", inputId, output.name]).catch(print)
                     }
                 } catch (error) {
-                    print(error)
+                    showError(error)
+                } finally {
+                    switching = false
+                    deviceList.sensitive = true
+                    deviceSignature = ""
                 }
                 await refresh()
             })
@@ -265,31 +325,98 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     }
 
     async function refresh() {
-        if (refreshing) return
+        if (refreshing || pendingVolumeChanges > 0 || queuedVolume || switching) return
         refreshing = true
+        const revision = volumeRevision
         try {
-            outputs = await loadOutputs()
-            print(`${POPUP_VERSION}: loaded ${outputs.length} output(s): ${outputs.map((output) => `${output.active ? "*" : ""}${output.label}:${output.volume}%`).join(", ")}`)
-            renderDevices()
+            const loadedOutputs = await loadOutputs()
+            // A read started before an adjustment must not reset the slider.
+            if (pendingVolumeChanges > 0 || queuedVolume || switching || revision !== volumeRevision) return
+            outputs = loadedOutputs
+            const signature = JSON.stringify(outputs.map(({ volume, muted, ...device }) => device))
+            if (signature !== deviceSignature) {
+                deviceSignature = signature
+                renderDevices()
+            } else {
+                renderVolume()
+            }
         } catch (error) {
-            print(error)
+            showError(error)
         } finally {
             refreshing = false
         }
     }
 
-    volumeScale.connect("value-changed", () => {
-        if (settingVolume) return
-        const output = activeOutput()
-        if (!output) return
+    function flushVolume() {
+        if (volumeWriteTimer !== null) clearTimeout(volumeWriteTimer)
+        volumeWriteTimer = null
+        const change = queuedVolume
+        if (!change) return
+        queuedVolume = null
+        pendingVolumeChanges++
+        volumeWrites = volumeWrites
+            .then(() => execAsync(["pactl", "set-sink-volume", change.name, `${change.value}%`]))
+            .then(() => {})
+            .catch(showError)
+            .finally(() => { pendingVolumeChanges-- })
+    }
 
-        const value = Math.round(volumeScale.get_value())
+    const setVolume = (requested: number) => {
+        const output = activeOutput()
+        if (!output || switching) return
+
+        const value = Math.max(0, Math.min(100, Math.round(requested)))
+        if (value === output.volume) return
         output.volume = value
-        volumeLabel.label = `${value}%`
-        execAsync(`pactl set-sink-volume @DEFAULT_SINK@ ${value}%`).catch(print)
+        renderVolume()
+        statusLabel.hide()
+        volumeRevision++
+        // Combine drag events into at most one write per 40 ms.
+        if (queuedVolume && queuedVolume.name !== output.name) flushVolume()
+        queuedVolume = { name: output.name, value }
+        if (volumeWriteTimer === null) volumeWriteTimer = setTimeout(flushVolume, 40)
+    }
+
+    const toggleMute = () => {
+        const output = activeOutput()
+        if (!output || switching) return
+        flushVolume()
+        output.muted = !output.muted
+        const muted = output.muted
+        renderVolume()
+        statusLabel.hide()
+        volumeRevision++
+        pendingVolumeChanges++
+        volumeWrites = volumeWrites
+            .then(() => execAsync(["pactl", "set-sink-mute", output.name, muted ? "1" : "0"]))
+            .then(() => {})
+            .catch(showError)
+            .finally(() => { pendingVolumeChanges-- })
+    }
+
+    const adjustVolume = (delta: number) => {
+        const output = activeOutput()
+        if (output) setVolume(output.volume + delta)
+    }
+
+    volumeDownButton.connect("clicked", () => adjustVolume(-5))
+    volumeUpButton.connect("clicked", () => adjustVolume(5))
+    muteButton.connect("clicked", toggleMute)
+    volumeScale.connect("value-changed", () => {
+        if (!settingVolume) setVolume(volumeScale.get_value())
     })
 
-    const refreshTimer = setInterval(refresh, 1000)
+    const watch = (visible: boolean) => {
+        if (refreshTimer !== null) clearInterval(refreshTimer)
+        refreshTimer = null
+        if (visible) {
+            refresh()
+            refreshTimer = setInterval(refresh, 1000)
+        } else {
+            flushVolume()
+        }
+    }
+    onVisibilityChanged = watch
 
     const mixerButton = new Gtk.Button({
         tooltipText: "Playback, recording, inputs, outputs, and device profiles",
@@ -301,7 +428,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     mixerButton.add(mixerContent)
     mixerButton.connect("clicked", async () => {
         await execAsync(["sh", "-lc", "pwvucontrol >/tmp/pwvucontrol.log 2>&1 &"]).catch(print)
-        App.quit()
+        setPopupVisible(false)
     })
 
     const win = <window
@@ -311,37 +438,61 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
         visible={true}
         className="AudioPopup"
         anchor={TOP | RIGHT}
-        keymode={Astal.Keymode.ON_DEMAND}
+        keymode={Astal.Keymode.EXCLUSIVE}
         exclusivity={Astal.Exclusivity.IGNORE}
-        onDestroy={() => clearInterval(refreshTimer)}
+        onDestroy={() => watch(false)}
         onKeyPressEvent={(_, event) => {
-            if (event.get_keyval()[1] === Gdk.KEY_Escape) {
-                App.quit()
+            const key = event.get_keyval()[1]
+            if (key === Gdk.KEY_Escape) {
+                setPopupVisible(false)
+                return true
             }
+            if (key === Gdk.KEY_Left || key === Gdk.KEY_Right) {
+                adjustVolume(key === Gdk.KEY_Left ? -5 : 5)
+                return true
+            }
+            if (key === Gdk.KEY_m || key === Gdk.KEY_M) {
+                toggleMute()
+                return true
+            }
+            return false
         }}>
-        <box className="panel" orientation={Gtk.Orientation.VERTICAL} spacing={10}>
-            <box className="heading" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-                <label className="title" label="Sound output" xalign={0} />
-                <label className="subtitle" label="Choose where your audio plays" xalign={0} />
+        <box className="panel" orientation={Gtk.Orientation.VERTICAL} spacing={16}>
+            <box className="heading" spacing={12}>
+                <label className="title" label="Sound" xalign={0} hexpand={true} />
+                <button className="close" label="×" tooltipText="Close (Esc)" onClicked={() => setPopupVisible(false)} />
             </box>
-            <box className="current" orientation={Gtk.Orientation.HORIZONTAL} spacing={8}>
-                <label className="current-label" label="PLAYING THROUGH" xalign={0} />
+            <box className="volume-card" orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+                <box spacing={12}>
+                    <label className="section-label" label="Volume" xalign={0} hexpand={true} />
+                    {volumeLabel}
+                </box>
                 {currentOutputLabel}
+                <box className="volume" spacing={10}>
+                    {volumeDownButton}
+                    {volumeScale}
+                    {volumeUpButton}
+                </box>
+                <box>
+                    {muteButton}
+                    <label className="hint" label="← / →  adjust · M  mute" xalign={1} hexpand={true} />
+                </box>
             </box>
-            <box className="volume" orientation={Gtk.Orientation.HORIZONTAL} spacing={10}>
-                {volumeIcon}
-                {volumeScale}
-                {volumeLabel}
+            <box orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+                <label className="section-label" label="Output device" xalign={0} />
+                {deviceList}
             </box>
-            {deviceList}
+            {statusLabel}
             <box className="footer" orientation={Gtk.Orientation.HORIZONTAL}>
-                <label label="CLICK A DEVICE TO SWITCH ALL PLAYING APPS" xalign={0} hexpand={true} />
+                <label label="Esc to close" xalign={0} hexpand={true} />
                 {mixerButton}
             </box>
         </box>
     </window>
 
-    refresh()
+    // Plain Gtk children do not inherit the JSX widgets' visible default.
+    win.show_all()
+    watch(true)
     return win
 }
 
@@ -355,29 +506,26 @@ function DismissLayer(gdkmonitor: Gdk.Monitor) {
         visible={true}
         className="AudioPopupDismiss"
         anchor={TOP | RIGHT | BOTTOM | LEFT}
-        keymode={Astal.Keymode.ON_DEMAND}
+        keymode={Astal.Keymode.NONE}
         exclusivity={Astal.Exclusivity.IGNORE}
-        onButtonPressEvent={() => App.quit()} />
+        onButtonPressEvent={() => setPopupVisible(false)} />
 }
 
 App.start({
     instanceName: WINDOW_NAME,
     css: style,
-    requestHandler(argv: string[], response: (message: string) => void) {
+    requestHandler(request: string, response: (message: string) => void) {
         const win = App.get_window(WINDOW_NAME)
-        if (argv[0] === "health") {
+        if (request === "health") {
             response(win ? "ready" : "missing-window")
             return
         }
-        if (argv[0] === "toggle") {
+        if (request === "toggle") {
             if (!win) {
                 response("missing-window")
                 return
             }
-            if (win.visible) win.hide()
-            else {
-                win.show()
-            }
+            setPopupVisible(!win.visible)
             response("ok")
             return
         }

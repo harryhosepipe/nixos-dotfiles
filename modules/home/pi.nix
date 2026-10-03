@@ -1,13 +1,13 @@
 { pkgs, ... }:
 let
-  piVersion = "0.84.3";
+  piVersion = "0.87.1";
 
   piPackage = pkgs.buildNpmPackage {
     pname = "pi-coding-agent";
     version = piVersion;
 
     src = ../../nix/pi-npm;
-    npmDepsHash = "sha256-JpLZLP1jg947wUiPjgDR+DGebB6kIQQIADD1OO8WVgA=";
+    npmDepsHash = "sha256-iG+2hlOqUNQGK2hURsRw6X0YMT3+pxRMs17MOU40xJo=";
     npmDepsFetcherVersion = 2;
 
     dontNpmBuild = true;
@@ -20,7 +20,7 @@ let
       cp -r node_modules package.json package-lock.json "$out/lib/pi-coding-agent/"
 
       makeWrapper ${pkgs.nodejs_24}/bin/node "$out/bin/pi" \
-        --add-flags "$out/lib/pi-coding-agent/node_modules/@earendil-works/pi-coding-agent/dist/cli.js" \
+        --add-flags "$out/lib/pi-coding-agent/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js" \
         --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.ripgrep pkgs.fd ]}
 
       runHook postInstall

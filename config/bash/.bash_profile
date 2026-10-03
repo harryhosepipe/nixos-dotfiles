@@ -9,3 +9,6 @@ fi
 if [[ $- == *i* ]] && [ -f "$HOME/.bashrc" ]; then
   . "$HOME/.bashrc"
 fi
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"

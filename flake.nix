@@ -3,14 +3,9 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    codex-cli-nix = {
-      url = "github:sadjow/codex-cli-nix/v0.149.1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     codex-desktop-linux = {
-      url = "path:./nix/codex-desktop-linux-patched";
+      url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.upstream.inputs.nixpkgs.follows = "nixpkgs";
     };
     mattpocock-skills = {
       url = "github:mattpocock/skills";
@@ -32,7 +27,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.8.19";
+      url = "github:NousResearch/hermes-agent/v2026.9.24";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";

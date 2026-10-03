@@ -82,6 +82,10 @@ in
 
   programs.zsh.enable = true;
   programs.fish.enable = true;
+
+  # Allow prebuilt Linux binaries, such as the Vite+ CLI, to run on NixOS.
+  programs.nix-ld.enable = true;
+
   programs.firefox = {
     enable = true;
     policies = {

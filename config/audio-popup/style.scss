@@ -1,163 +1,91 @@
 window.AudioPopup {
     background: transparent;
     color: #d8dee9;
-    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 12px;
+    font-family: "Inter", "Noto Sans", sans-serif;
+    font-size: 13px;
 }
 
-window.AudioPopupDismiss {
-    background: transparent;
-}
+window.AudioPopupDismiss { background: transparent; }
 
-.panel {
-    min-width: 380px;
-    margin: 8px 10px 0 0;
-    padding: 10px;
-    border: 1px solid rgba(216, 222, 233, 0.14);
-    border-radius: 8px;
-    background: rgba(18, 20, 24, 0.92);
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
-}
+.AudioPopup {
+    .panel {
+        min-width: 380px;
+        margin: 10px 12px 0 0;
+        padding: 18px;
+        border: 1px solid rgba(216, 222, 233, 0.16);
+        border-radius: 16px;
+        background: rgba(23, 26, 32, 0.98);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
 
-.heading {
-    padding: 2px 4px 0;
-}
+    .title { color: #eceff4; font-size: 20px; font-weight: 700; }
+    .section-label { color: #d8dee9; font-size: 12px; font-weight: 600; }
+    .current-output { color: #aeb8c7; font-size: 12px; }
+    .hint, .footer { color: #939dac; font-size: 11px; }
+    .volume-card {
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(143, 188, 187, 0.07);
+    }
+    .volume-value {
+        min-width: 72px;
+        color: #eceff4;
+        font-size: 28px;
+        font-weight: 700;
+        font-feature-settings: "tnum";
+    }
+    .muted { color: #939dac; }
 
-.title {
-    color: #eceff4;
-    font-size: 15px;
-    font-weight: 700;
-}
+    scale { min-width: 240px; padding: 10px 0; }
+    scale trough {
+        min-height: 8px;
+        border-radius: 99px;
+        background: rgba(216, 222, 233, 0.14);
+    }
+    scale highlight {
+        min-height: 8px;
+        border-radius: 99px;
+        background: #8fbcbb;
+    }
+    scale.muted highlight { background: #687580; }
+    scale slider {
+        min-width: 18px;
+        min-height: 18px;
+        margin: -6px;
+        border: 2px solid #b9d7d6;
+        border-radius: 99px;
+        background: #eceff4;
+    }
 
-.subtitle {
-    color: #7d8490;
-    font-size: 10px;
-}
-
-.current {
-    margin: 0 4px;
-    padding: 7px 9px;
-    border-radius: 5px;
-    background: rgba(143, 188, 187, 0.08);
-}
-
-.current-label {
-    color: #7d8490;
-    font-size: 9px;
-}
-
-.current-output {
-    color: #8fbcbb;
-    font-weight: 700;
-}
-
-.volume {
-    min-height: 30px;
-    padding: 4px 4px 6px;
-}
-
-.volume label {
-    min-width: 44px;
-}
-
-.volume scale {
-    min-width: 180px;
-}
-
-.muted {
-    color: #7d8490;
-}
-
-scale trough {
-    min-height: 4px;
-    border-radius: 999px;
-    background: rgba(216, 222, 233, 0.16);
-}
-
-scale highlight {
-    min-height: 4px;
-    border-radius: 999px;
-    background: #8fbcbb;
-}
-
-scale.muted highlight {
-    background: #5b626d;
-}
-
-scale slider {
-    min-width: 12px;
-    min-height: 12px;
-    margin: -5px;
-    border: 1px solid rgba(216, 222, 233, 0.38);
-    border-radius: 999px;
-    background: #d8dee9;
-}
-
-button {
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: inherit;
-    box-shadow: none;
-    text-shadow: none;
-}
-
-button.device {
-    min-height: 38px;
-    padding: 9px 10px;
-}
-
-.device-name {
-    color: #d8dee9;
-    font-weight: 600;
-}
-
-button.device:hover {
-    background: rgba(216, 222, 233, 0.08);
-}
-
-button.device.active {
-    color: #8fbcbb;
-    background: rgba(143, 188, 187, 0.10);
-}
-
-.detail {
-    color: #7d8490;
-    font-size: 10px;
-}
-
-.active-detail {
-    color: #8fbcbb;
-}
-
-.device-state {
-    color: #7d8490;
-    font-size: 9px;
-}
-
-.active-state {
-    color: #8fbcbb;
-    font-weight: 700;
-}
-
-.empty {
-    padding: 8px;
-    color: #7d8490;
-}
-
-.footer {
-    padding: 2px 2px 0;
-    color: #7d8490;
-    font-size: 10px;
-}
-
-button.mixer {
-    padding: 4px 6px;
-    color: #aeb6c2;
-    font-size: 10px;
-}
-
-button.mixer:hover {
-    color: #d8dee9;
-    background: rgba(216, 222, 233, 0.08);
+    button {
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: inherit;
+        box-shadow: none;
+        text-shadow: none;
+    }
+    button:hover { background: rgba(216, 222, 233, 0.08); }
+    button:focus { border-color: #8fbcbb; }
+    button:disabled { color: #65707e; }
+    button.volume-step, button.close {
+        min-width: 30px;
+        min-height: 30px;
+        padding: 0;
+        font-size: 20px;
+    }
+    button.volume-step { background: rgba(216, 222, 233, 0.08); }
+    button.volume-step:hover { background: rgba(143, 188, 187, 0.22); }
+    button.mute-button { padding: 5px 8px; background: rgba(216, 222, 233, 0.07); }
+    button.mute-button.is-muted { color: #ebcb8b; background: rgba(235, 203, 139, 0.12); }
+    button.device { min-height: 38px; padding: 9px 10px; }
+    button.device.active { background: rgba(143, 188, 187, 0.10); border-color: rgba(143, 188, 187, 0.24); }
+    .device-name { color: #d8dee9; font-weight: 600; }
+    .detail { color: #939dac; font-size: 11px; }
+    .active-detail, .active-state { color: #8fbcbb; }
+    .device-state { min-width: 18px; font-size: 18px; }
+    .empty { padding: 12px; color: #939dac; }
+    .error { color: #ebcb8b; font-size: 12px; }
+    .footer { padding-top: 4px; }
+    button.mixer { padding: 4px 6px; color: #aeb8c7; font-size: 11px; }
 }

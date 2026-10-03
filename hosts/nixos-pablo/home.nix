@@ -1,10 +1,10 @@
-{ config
-, inputs
-, pkgs
-, userSettings
-, ...
-}:
-let
+{
+  config,
+  inputs,
+  pkgs,
+  userSettings,
+  ...
+}: let
   draculaQbittorrentTheme = pkgs.fetchurl {
     url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
     hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
@@ -14,10 +14,9 @@ let
     hash = "sha256-DUfJEt2uUSgW8yeW57AL0h2mGVn5TPGznDqeDduhcRM=";
   };
   shellSettings = import ../../shells/settings.nix;
-  localPackages = import ../../packages { inherit pkgs; };
+  localPackages = import ../../packages {inherit pkgs;};
   fzfShare = "${pkgs.fzf}/share/fzf";
-in
-{
+in {
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/dotfiles.nix
@@ -82,7 +81,7 @@ in
         identitiesOnly = true;
       };
       "razer" = {
-        hostname = "192.168.3.9";
+        hostname = "192.168.88.247";
         identityFile = "~/.ssh/ansible_razer";
         identitiesOnly = true;
       };
@@ -94,19 +93,18 @@ in
 
   # Buzz replaces ~/.local/bin/buzz symlinks with its bundled, unpatched CLI.
   # Keep a regular-file shim there so it resolves to the Nix-wrapped package.
-  home.activation.installBuzzCliShim = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.installBuzzCliShim = config.lib.dag.entryAfter ["writeBoundary"] ''
     buzzCliShim="${config.home.homeDirectory}/.local/bin/buzz"
     $DRY_RUN_CMD rm -f "$buzzCliShim"
     $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm755 \
       ${pkgs.writeShellScript "buzz-cli-shim" ''
-        exec ${localPackages.buzz}/bin/buzz "$@"
-      ''} \
+      exec ${localPackages.buzz}/bin/buzz "$@"
+    ''} \
       "$buzzCliShim"
   '';
 
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
-  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
-    solarizedLightQbittorrentTheme;
+  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source = solarizedLightQbittorrentTheme;
   xdg.configFile."superfile/hotkeys.toml".source = ../../config/superfile/hotkeys.toml;
 
   programs.gh = {
@@ -166,10 +164,12 @@ in
     google-chrome
     qbittorrent
     obsidian
-    signal-desktop
+    localPackages.blender
+    localPackages.signal-desktop
     whatsapp-electron
     pavucontrol
     pwvucontrol
+    localPackages.cliamp
     localPackages.buzz
     localPackages.codex-acp
     localPackages.figma-desktop
@@ -183,6 +183,7 @@ in
     localPackages.dokploy-cli
     wtype
     mpv
+    ffmpeg
     yt-dlp
   ];
 }
