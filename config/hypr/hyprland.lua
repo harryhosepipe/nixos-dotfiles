@@ -1,7 +1,6 @@
 local terminal = "ghostty"
-local fileManager = "thunar"
 local browser = "firefox"
-local menu = "wofi --show drun"
+local menu = "oma-cast toggle"
 local layoutPreset = "scrolling"
 local configDir = debug.getinfo(1, "S").source:sub(2):match("(.*/)")
 
@@ -22,6 +21,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("swaync")
 	hl.exec_cmd("systemctl --user start handy.service")
+	hl.exec_cmd("oma-cast start")
 end)
 
 hl.env("XCURSOR_SIZE", "24")
@@ -56,7 +56,7 @@ hl.config({
 		rounding = 4,
 		rounding_power = 4,
 		active_opacity = 1.0,
-		inactive_opacity = 0.9,
+		inactive_opacity = 1.0,
 		shadow = {
 			enabled = false,
 			range = 4,
@@ -147,7 +147,11 @@ hl.device({
 
 -- Launchers and apps
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal), { description = "Open terminal" })
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("[float] " .. fileManager), { description = "Open file manager" })
+hl.bind(
+	mainMod .. " + E",
+	hl.dsp.exec_cmd('[float] sh "$HOME/.config/hypr/open-strata.sh"'),
+	{ description = "Open Strata in terminal directory" }
+)
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser), { description = "Open browser" })
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser), { description = "Open browser" })
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu), { description = "Open application launcher" })
@@ -158,10 +162,8 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + A",
-	hl.dsp.exec_cmd(
-		"sh -lc 'if pgrep -x pwvucontrol >/dev/null 2>&1; then pkill -x pwvucontrol; else pwvucontrol >/tmp/pwvucontrol.log 2>&1 & fi'"
-	),
-	{ description = "Open audio controls" }
+	hl.dsp.exec_cmd("$HOME/.config/hypr/audio-popup-toggle.sh"),
+	{ locked = true, description = "Audio output and volume" }
 )
 
 -- Window actions
@@ -180,6 +182,13 @@ hl.bind(
 )
 
 hl.bind("CTRL + M", hl.dsp.exec_cmd("~/.config/hypr/handy-toggle.sh"), { description = "Toggle Handy recording" })
+-- Apartment intercom: hold Super+F9 to talk with Mumble in the background.
+hl.bind(mainMod .. " + F9", hl.dsp.exec_cmd("mumble rpc starttalking"), { description = "Mumble push to talk" })
+hl.bind(
+	"F9",
+	hl.dsp.exec_cmd("mumble rpc stoptalking"),
+	{ release = true, ignore_mods = true, description = "Mumble stop talking" }
+)
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("sh -lc "), { description = "Reserved shortcut" })
 hl.bind(
 	mainMod .. " + SHIFT + B",
@@ -218,9 +227,17 @@ hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }), { description = "
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }), { description = "Focus down" })
 
 -- Window movement and resizing
-hl.bind(mainMod .. " + CTRL + H", hl.dsp.window.resize({ x = -40, y = 0 }), { description = "Shrink window horizontally" })
+hl.bind(
+	mainMod .. " + CTRL + H",
+	hl.dsp.window.resize({ x = -40, y = 0 }),
+	{ description = "Shrink window horizontally" }
+)
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.window.resize({ x = 40, y = 0 }), { description = "Grow window horizontally" })
-hl.bind(mainMod .. " + CTRL + K", hl.dsp.window.resize({ x = 0, y = -40 }), { description = "Shrink window vertically" })
+hl.bind(
+	mainMod .. " + CTRL + K",
+	hl.dsp.window.resize({ x = 0, y = -40 }),
+	{ description = "Shrink window vertically" }
+)
 hl.bind(mainMod .. " + CTRL + J", hl.dsp.window.resize({ x = 0, y = 40 }), { description = "Grow window vertically" })
 
 -- Workspaces
@@ -242,8 +259,16 @@ hl.bind(
 )
 
 -- Screenshots
-hl.bind("Print", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"), { description = "Copy area screenshot" })
-hl.bind("ALT + mouse:276", hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"), { description = "Copy area screenshot" })
+hl.bind(
+	"Print",
+	hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"),
+	{ description = "Copy area screenshot" }
+)
+hl.bind(
+	"ALT + mouse:276",
+	hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | wl-copy'"),
+	{ description = "Copy area screenshot" }
+)
 hl.bind(
 	"SHIFT + Print",
 	hl.dsp.exec_cmd("sh -lc 'grim -g \"$(slurp -d -w 0)\" - | swappy -f -'"),
@@ -268,6 +293,8 @@ hl.bind("ALT + Print", hl.dsp.exec_cmd("sh -lc 'grim - | wl-copy'"), { descripti
 -- Mouse controls
 hl.bind("mouse:276", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
 hl.bind("mouse:275", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
+hl.bind("SHIFT + mouse:276", hl.dsp.focus({ direction = "left" }), { description = "Focus left" })
+hl.bind("SHIFT + mouse:275", hl.dsp.focus({ direction = "right" }), { description = "Focus right" })
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Go to next workspace" })
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }), { description = "Go to previous workspace" })
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Drag active window" })
@@ -362,15 +389,6 @@ hl.window_rule({
 	match = { class = "thunar" },
 	float = true,
 	size = "1400 1100",
-})
-
-hl.window_rule({
-	name = "audio-control-popup",
-	match = { class = "com.saivert.pwvucontrol" },
-	float = true,
-	pin = true,
-	size = "520 620",
-	move = "monitor_w-540 42",
 })
 
 hl.window_rule({

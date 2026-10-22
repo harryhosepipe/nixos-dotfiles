@@ -1,5 +1,5 @@
-model = "gpt-5.6-sol"
-model_reasoning_effort = "low"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
 service_tier = "priority"
 notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
 personality = "pragmatic"
@@ -185,6 +185,108 @@ trust_level = "trusted"
 [projects."/home/pablo/Documents/Codex/2026-07-26/can"]
 trust_level = "trusted"
 
+[projects."/home/pablo/projects/tokenflow"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/Z"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-30/whe"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/vox"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/this"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/is"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-07-31/i-m-currently-building-a-plugin"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Dashboard"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/stacki"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/TokenFlow2"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-08-05/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/gotempl"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/gotempl"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-08-13/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-08-14/hello-hello-hello"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/base-astro"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/sm3"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-08-18/https-www-youtube-com-playlist-list"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/Brand Workflow"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/valletta"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/Manage My Computer"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/JJ"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/blender"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/Rock Productions"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/Gary website"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/Codex/2026-09-04/files-mentioned-by-the-user-codex"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/Espees"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/blacksheep"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/goodman"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/murphybed"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/ALLY TRAVEL"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/local ai"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/REA"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/tradingpal"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -212,56 +314,62 @@ enabled = true
 [plugins."chrome@openai-bundled"]
 enabled = true
 
-[plugins."computer-use@openai-bundled"]
-enabled = true
-
-[plugins."sites@openai-bundled"]
-enabled = false
-
 [plugins."visualize@openai-bundled"]
-enabled = false
+enabled = true
 
 [plugins."paper-desktop@paper"]
 enabled = true
 
-# [mcp_servers.gitnexus]
-# command = "npx"
-# args = ["-y", "gitnexus@1.6.3", "mcp"]
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."code-review@openai-bundled"]
+enabled = true
 
 [mcp_servers.context-mode]
 command = "context-mode"
 env_vars = ["CODEX_HOME"]
+enabled = false
 
 [mcp_servers.context-mode.env]
 CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/h3qd8wsjccm2vxlyq1m830qkqcfvnj4b-codex-desktop-computer-use-ui-remote-mobile-control-26.721.31836/opt/codex-desktop/resources/node_repl"
+command = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node_repl"
+env_vars = ["BROWSER_USE_ACCESS_EXECUTOR_ID", "BROWSER_USE_ACCESS_PIPE_PATH", "BROWSER_USE_ACCESS_VERIFYING_IDENTITY"]
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = ""
-NODE_REPL_NODE_PATH = "/nix/store/h3qd8wsjccm2vxlyq1m830qkqcfvnj4b-codex-desktop-computer-use-ui-remote-mobile-control-26.721.31836/opt/codex-desktop/resources/node-runtime/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/pablo/.config/codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "3fdfe9a7ad39456da69c5e8fa7bbf7229ec2fe9de5f4cf2e476166bf30a08a7e,6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,e2e631b79f15eaa8ddc13f9764240c49044bbbe32c06d42301f5f2c564339fa8,d34bb41149f8b35e06f4377ba85200443cdfb21c02d8d4ee2164b237e9c0c38a"
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.721.31836"
+BROWSER_USE_CODEX_APP_VERSION = "26.1016.51333"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/pablo/.config/codex/plugins/cache/openai-bundled/browser/26.1016.51333/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
+CODEX_CLI_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/codex"
+NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = ""
 
-[mcp_servers.node_repl.tools]
-
-[mcp_servers.node_repl.tools.js]
-approval_mode = "approve"
+[mcp_servers.blender]
+command = "/home/pablo/.local/share/codex/mcp/blender-mcp/bin/blender-mcp"
 
 [tui]
 notifications = false
 status_line = ["model-with-reasoning", "current-dir", "project-name", "run-state", "context-remaining", "five-hour-limit", "weekly-limit", "task-progress"]
 status_line_use_colors = true
+screen_reader_detection_done = true
 
 [tui.keymap.global]
 toggle_vim_mode = "|"
@@ -269,8 +377,11 @@ toggle_vim_mode = "|"
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 4
+gpt-6-astra = 2
+"gpt-6.1-sol" = 4
 
 [features]
+# context_management.experimental_mode = true
 terminal_resize_reflow = true
 goals = true
 hooks = true
@@ -316,23 +427,21 @@ trusted_hash = "sha256:e237486526f1cf8b394a7c9d48de70eed40d09aecf29704939444cdfe
 trusted_hash = "sha256:51ecfc4277a64a6684e1bae31f925f6d37fd4226a45c12cdb73500d192fde0ff"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-07-26T09:12:15Z"
 source_type = "local"
 source = "/home/pablo/.config/codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-07-24T10:27:32Z"
 source_type = "local"
 source = "/home/pablo/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [marketplaces.paper]
-last_updated = "2026-07-25T20:04:35Z"
-last_revision = "a30668a826916aa68fee8be0a00c85692ec9ffc4"
+last_updated = "2026-08-26T16:41:46Z"
+last_revision = "c3c2c3e1a7cee49c3a3e210b57ea6b44f9e3d022"
 source_type = "git"
 source = "https://github.com/paper-design/agent-plugins.git"
 
 [desktop]
-conversationDetailMode = "STEPS_COMMANDS"
+conversationDetailMode = "STEPS_PROSE"
 ambient-suggestions-enabled = false
 notifications-turn-mode = "always"
 followUpQueueMode = "queue"
@@ -350,8 +459,35 @@ name = "presentations:Presentations"
 enabled = false
 
 [[skills.config]]
-name = "mattpocock-skills:writing-great-skills"
+name = "mattpocock-skills:writing-for-agents"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:migrate-to-shoehorn"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:scaffold-exercises"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:setup-matt-pocock-skills"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:setup-pre-commit"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:git-guardrails-claude-code"
+enabled = false
+
+[[skills.config]]
+name = "mattpocock-skills:diagnosing-bugs"
 enabled = false
 
 [apps.connector_20205bf7d4e99a89d7154bb849718324]
 enabled = false
+
+[shell_environment_policy.set]
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "2158647076eed887c7591cca0957da78747ab9155819d64409d6b895e84ed99b"

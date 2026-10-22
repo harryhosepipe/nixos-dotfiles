@@ -6,7 +6,7 @@
     "auto": false,
     "notice": false
   },
-  "console_title_template": "{{ .Folder }}",
+  "console_title_template": "{{ .PWD }}",
   "transient_prompt": {
     "background": "transparent",
     "foreground": "#a89984",

@@ -1,0 +1,40 @@
+id: 1cae286d-88bf-4d61-8688-b2224ca5f5e7
+name: nix-package-updates
+description: Check selected package releases or prepare isolated updates without building or activating.
+tags:
+  purpose: nix-package-updates
+reports:
+  require:
+    - "@pablo/package-update-summary"
+inputs:
+  type: object
+  properties:
+    mode:
+      type: string
+      enum: [check, update]
+      default: check
+    packages:
+      type: string
+      default: all
+      description: all or comma-separated package IDs from docs/package-updates.md
+  additionalProperties: false
+jobs:
+  - name: main
+    description: Run the package allowlist and retain a structured report.
+    steps:
+      - name: package-updates
+        description: Fetch release metadata; update mode changes a separate Git worktree.
+        task:
+          type: behavior
+          behaviorType: "@pablo/nix-package-updates"
+          behaviorName: nix-package-updates
+          methodName: run
+          inputs:
+            mode: "${{ inputs.mode }}"
+            packages: "${{ inputs.packages }}"
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 1

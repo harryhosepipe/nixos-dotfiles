@@ -1,10 +1,10 @@
-{ config
-, inputs
-, pkgs
-, userSettings
-, ...
-}:
-let
+{
+  config,
+  inputs,
+  pkgs,
+  userSettings,
+  ...
+}: let
   draculaQbittorrentTheme = pkgs.fetchurl {
     url = "https://raw.githubusercontent.com/dracula/qbittorrent/9020f6eb457087270179beb86d45914d434adb6b/dracula.qbtheme";
     hash = "sha256-tEhfn07mE5t8d7v7ciBrYIvPp0jzTUkgXExLZeeXbTc=";
@@ -14,13 +14,13 @@ let
     hash = "sha256-DUfJEt2uUSgW8yeW57AL0h2mGVn5TPGznDqeDduhcRM=";
   };
   shellSettings = import ../../shells/settings.nix;
-  localPackages = import ../../packages { inherit pkgs; };
+  localPackages = import ../../packages {inherit pkgs;};
   fzfShare = "${pkgs.fzf}/share/fzf";
-in
-{
+in {
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/dotfiles.nix
+    ../../modules/home/oma-cast.nix
     ../../modules/home/firefox.nix
     ../../modules/home/language-toolchain.nix
     ../../modules/home/tmux.nix
@@ -82,7 +82,7 @@ in
         identitiesOnly = true;
       };
       "razer" = {
-        hostname = "192.168.3.9";
+        hostname = "192.168.88.247";
         identityFile = "~/.ssh/ansible_razer";
         identitiesOnly = true;
       };
@@ -92,9 +92,43 @@ in
   services.ssh-agent.enable = true;
   services.handy.enable = true;
 
+  # Buzz replaces ~/.local/bin/buzz symlinks with its bundled, unpatched CLI.
+  # Keep a regular-file shim there so it resolves to the Nix-wrapped package.
+  home.activation.installBuzzCliShim = config.lib.dag.entryAfter ["writeBoundary"] ''
+    buzzCliShim="${config.home.homeDirectory}/.local/bin/buzz"
+    $DRY_RUN_CMD rm -f "$buzzCliShim"
+    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm755 \
+      ${pkgs.writeShellScript "buzz-cli-shim" ''
+      exec ${localPackages.buzz}/bin/buzz "$@"
+    ''} \
+      "$buzzCliShim"
+  '';
+
   xdg.configFile."qBittorrent/themes/dracula.qbtheme".source = draculaQbittorrentTheme;
-  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source =
-    solarizedLightQbittorrentTheme;
+  xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source = solarizedLightQbittorrentTheme;
+  xdg.configFile."superfile/hotkeys.toml".source = ../../config/superfile/hotkeys.toml;
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications."inode/directory" = "io.github.lgse.Strata.desktop";
+    associations.added."inode/directory" = "io.github.lgse.Strata.desktop";
+  };
+
+  # Browsers use FileManager1 to reveal downloads, independently of folder MIME defaults.
+  xdg.dataFile."dbus-1/services/io.github.lgse.Strata.FileManager1.service" = {
+    source = "${localPackages.strata}/share/strata/io.github.lgse.Strata.FileManager1.service";
+    force = true;
+  };
+
+  xdg.desktopEntries."info.mumble.Mumble" = {
+    name = "Mumble";
+    genericName = "Voice Chat";
+    exec = "env QT_QPA_PLATFORM=wayland mumble %u";
+    icon = "mumble";
+    terminal = false;
+    categories = ["Network" "Chat" "Qt"];
+    mimeType = ["x-scheme-handler/mumble"];
+  };
 
   programs.gh = {
     enable = true;
@@ -147,17 +181,27 @@ in
     oh-my-posh
     fzf
     zoxide
+    superfile
     thunar
+    localPackages.strata
     chromium
     google-chrome
+    keepassxc
     qbittorrent
     obsidian
-    signal-desktop
+    tradingview
+    localPackages.blender
+    localPackages.signal-desktop
     whatsapp-electron
+    mumble
     pavucontrol
     pwvucontrol
+    localPackages.cliamp
+    localPackages.buzz
+    localPackages.codex-acp
     localPackages.figma-desktop
     localPackages.paper-desktop
+    localPackages.photocraft
     localPackages.t3code
     zed-editor
     telegram-desktop
@@ -165,8 +209,10 @@ in
     inputs.herdr.packages.${pkgs.system}.default
     localPackages.nextcloud-client_4_0_4
     localPackages.dokploy-cli
+    localPackages.sanity-cli
     wtype
     mpv
+    ffmpeg
     yt-dlp
   ];
 }

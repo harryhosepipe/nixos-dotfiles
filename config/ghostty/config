@@ -4,6 +4,8 @@ auto-update = off
 
 command = zsh -l
 working-directory = home
+# Oh My Posh keeps the full directory in the title for Super+E, even during commands.
+shell-integration-features = no-title
 
 font-family = TX-02
 # font-family = Inconsolata Nerd Font Mono

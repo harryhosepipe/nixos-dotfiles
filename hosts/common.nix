@@ -4,6 +4,7 @@
 }:
 let
   shellSettings = import ../shells/settings.nix;
+  michelangelus = import ../packages/michelangelus.nix { inherit pkgs; };
   tx-02 = pkgs.stdenvNoCC.mkDerivation {
     pname = "tx-02";
     version = "local";
@@ -82,6 +83,10 @@ in
 
   programs.zsh.enable = true;
   programs.fish.enable = true;
+
+  # Allow prebuilt Linux binaries, such as the Vite+ CLI, to run on NixOS.
+  programs.nix-ld.enable = true;
+
   programs.firefox = {
     enable = true;
     policies = {
@@ -96,6 +101,8 @@ in
     ghostty
     wezterm
     git
+    # Strata resolves bubblewrap from trusted system paths, not the user's PATH.
+    bubblewrap
     gvfs
     tumbler
     thunar-volman
@@ -120,6 +127,7 @@ in
   ];
 
   fonts.packages = with pkgs; [
+    michelangelus
     tx-02
     nerd-fonts.inconsolata
   ];

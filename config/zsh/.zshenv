@@ -13,3 +13,6 @@ if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
 fi
 
 export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"
