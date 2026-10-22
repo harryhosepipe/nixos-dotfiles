@@ -14,7 +14,10 @@
         "browser.compactmode.show" = true;
         "browser.uidensity" = 1;
         # "browser.tabs.tabMinWidth" = 80;
-        "browser.startup.page" = 1;
+        # Open blank pages instead of Firefox Home at startup and in new tabs.
+        "browser.startup.page" = 0;
+        "browser.startup.homepage" = "about:blank";
+        "browser.newtabpage.enabled" = false;
         "browser.sessionstore.resume_from_crash" = false;
         "browser.sessionstore.max_resumed_crashes" = 0;
         "browser.aboutwelcome.enabled" = false;
@@ -43,6 +46,9 @@
         "app.normandy.first_run" = false;
         "browser.discovery.enabled" = false;
         "extensions.htmlaboutaddons.recommendations.enabled" = false;
+        # Hide site shortcuts and recent activity on Firefox Home and new tabs.
+        "browser.newtabpage.activity-stream.feeds.topsites" = false;
+        "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
         "browser.newtabpage.activity-stream.feeds.asrouter" = false;
         "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons" = false;
         "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;

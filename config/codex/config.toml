@@ -272,6 +272,21 @@ trust_level = "trusted"
 [projects."/home/pablo/projects/goodman"]
 trust_level = "trusted"
 
+[projects."/home/pablo/Documents/ChatGPT/murphybed"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/ALLY TRAVEL"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/local ai"]
+trust_level = "trusted"
+
+[projects."/home/pablo/Documents/ChatGPT/REA"]
+trust_level = "trusted"
+
+[projects."/home/pablo/projects/tradingpal"]
+trust_level = "trusted"
+
 [plugins."github@openai-curated"]
 enabled = true
 
@@ -320,29 +335,31 @@ enabled = true
 [mcp_servers.context-mode]
 command = "context-mode"
 env_vars = ["CODEX_HOME"]
+enabled = false
 
 [mcp_servers.context-mode.env]
 CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/88f86dghdjyspbqyshqqdybii4nfgs6j-codex-desktop-computer-use-linux-26.928.21956/opt/codex-desktop/resources/cua_node/bin/node_repl"
+command = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node_repl"
+env_vars = ["BROWSER_USE_ACCESS_EXECUTOR_ID", "BROWSER_USE_ACCESS_PIPE_PATH", "BROWSER_USE_ACCESS_VERIFYING_IDENTITY"]
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/nix/store/88f86dghdjyspbqyshqqdybii4nfgs6j-codex-desktop-computer-use-linux-26.928.21956/opt/codex-desktop/resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/nix/store/88f86dghdjyspbqyshqqdybii4nfgs6j-codex-desktop-computer-use-linux-26.928.21956/opt/codex-desktop/resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/88f86dghdjyspbqyshqqdybii4nfgs6j-codex-desktop-computer-use-linux-26.928.21956/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/pablo/.config/codex"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
 BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.928.21956"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/pablo/.config/codex/plugins/cache/openai-bundled/browser/26.928.21956/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
-CODEX_CLI_PATH = "/nix/store/88f86dghdjyspbqyshqqdybii4nfgs6j-codex-desktop-computer-use-linux-26.928.21956/opt/codex-desktop/resources/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.1016.51333"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/pablo/.config/codex/plugins/cache/openai-bundled/browser/26.1016.51333/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
+CODEX_CLI_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/codex"
 NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = ""
 
 [mcp_servers.blender]
@@ -424,7 +441,7 @@ source_type = "git"
 source = "https://github.com/paper-design/agent-plugins.git"
 
 [desktop]
-conversationDetailMode = "STEPS_COMMANDS"
+conversationDetailMode = "STEPS_PROSE"
 ambient-suggestions-enabled = false
 notifications-turn-mode = "always"
 followUpQueueMode = "queue"
@@ -442,19 +459,11 @@ name = "presentations:Presentations"
 enabled = false
 
 [[skills.config]]
-name = "mattpocock-skills:writing-great-skills"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:edit-article"
+name = "mattpocock-skills:writing-for-agents"
 enabled = false
 
 [[skills.config]]
 name = "mattpocock-skills:migrate-to-shoehorn"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:obsidian-vault"
 enabled = false
 
 [[skills.config]]
@@ -475,10 +484,6 @@ enabled = false
 
 [[skills.config]]
 name = "mattpocock-skills:diagnosing-bugs"
-enabled = false
-
-[[skills.config]]
-name = "mattpocock-skills:code-review"
 enabled = false
 
 [apps.connector_20205bf7d4e99a89d7154bb849718324]

@@ -7,10 +7,14 @@
     builtins.elem (lib.getName pkg) [
       "figma-desktop"
       "google-chrome"
+      "michelangelus"
       "nvidia-settings"
       "nvidia-x11"
       "nvim-highlight-colors"
       "obsidian"
+      "oma-cast"
       "paper-desktop"
+      "strata"
+      "tradingview"
     ];
 }

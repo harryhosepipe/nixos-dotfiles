@@ -8,7 +8,7 @@
           "handy",
           "nixpkgs"
         ],
-        "systems": "systems_4",
+        "systems": "systems_2",
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
@@ -28,17 +28,17 @@
     },
     "codex-desktop-linux": {
       "inputs": {
-        "flake-utils": "flake-utils_3",
+        "flake-utils": "flake-utils",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1790761582,
-        "narHash": "sha256-cwvFWx8++B4XB03rMZ6ulEMxJjtIi2O3jVEip1QHIxc=",
+        "lastModified": 1792563141,
+        "narHash": "sha256-MxhrXRuWRNlc/1A7/iZvB0FZMcUEA25MFVIqh+Nsqc8=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "d947cd3ddbe9692f67400770845ef76c9dd6c106",
+        "rev": "cc4c4fd294b3a8d0581680b8cba0d3dabb8d21ec",
         "type": "github"
       },
       "original": {
@@ -86,9 +86,9 @@
         "type": "github"
       }
     },
-    "flake-utils_3": {
+    "flake-utils": {
       "inputs": {
-        "systems": "systems_3"
+        "systems": "systems"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -112,16 +112,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1786147388,
-        "narHash": "sha256-CYSvo03b7d8CeLtvSdO9cyGSdrlpDupKGHITr7E7LuI=",
+        "lastModified": 1790993485,
+        "narHash": "sha256-3j73ss9pwkcK4MfeNY/9PFp//Cbc0OSICDdlmHprSso=",
         "owner": "cjpais",
         "repo": "Handy",
-        "rev": "db003f38b1aef4eb967ac3419bebc851d680f71c",
+        "rev": "14f6f0d31cb22a4268acfbddba3052820fd0a06e",
         "type": "github"
       },
       "original": {
         "owner": "cjpais",
-        "ref": "v0.9.5",
+        "ref": "v0.9.8",
         "repo": "Handy",
         "type": "github"
       }
@@ -161,16 +161,16 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1790244527,
-        "narHash": "sha256-y6NaoG+HCeMPhxRsBXrRFef4hp3FF1svSPNKpI6Xz/E=",
+        "lastModified": 1792581269,
+        "narHash": "sha256-C6/rsm8KxzxgNWrHTej1mR+ccEL3vDTT1t0pGrqFB3w=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "f97608f178d1ffeca59860195ab7da295f7c8e5f",
+        "rev": "5b147ab036d6d19131bff8d20701b5001eab844a",
         "type": "github"
       },
       "original": {
         "owner": "NousResearch",
-        "ref": "v2026.9.24",
+        "ref": "v0.22.3",
         "repo": "hermes-agent",
         "type": "github"
       }
@@ -234,11 +234,11 @@
     "mattpocock-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1783516840,
-        "narHash": "sha256-XqF709Y9GMKINzZITlbCTyatG9AxRZh0qn2vcv1Z8yo=",
+        "lastModified": 1791199038,
+        "narHash": "sha256-oN3OQPouK6wrrGzmgNdvdOVLsOJVGaK7cy3BZoE10AA=",
         "owner": "mattpocock",
         "repo": "skills",
-        "rev": "d574778f94cf620fcc8ce741584093bc650a61d3",
+        "rev": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
         "type": "github"
       },
       "original": {
@@ -413,7 +413,7 @@
         "type": "github"
       }
     },
-    "systems_3": {
+    "systems": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
@@ -428,7 +428,7 @@
         "type": "github"
       }
     },
-    "systems_4": {
+    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",

@@ -3,7 +3,7 @@ import { execAsync } from "astal/process"
 import style from "./style.scss"
 
 const WINDOW_NAME = "audio-popup"
-const POPUP_VERSION = "audio-popup pactl-ui v5"
+const POPUP_VERSION = "audio-popup pactl-ui v6"
 
 let onVisibilityChanged = (_visible: boolean) => {}
 
@@ -153,6 +153,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     let refreshTimer: ReturnType<typeof setInterval> | null = null
     let deviceSignature = ""
     let switching = false
+    let restarting = false
 
     const deviceList = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -179,9 +180,15 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     addClass(statusLabel, "error")
     const showError = (error: unknown) => {
         print(error)
+        addClass(statusLabel, "error")
         statusLabel.label = "Couldn’t update audio. Please try again."
         statusLabel.show()
     }
+    const restartButton = new Gtk.Button({
+        label: "Restart audio",
+        tooltipText: "Recover missing sound. Briefly interrupts playback and recording.",
+    })
+    addClass(restartButton, "restart-audio")
     const volumeScale = new Gtk.Scale({
         orientation: Gtk.Orientation.HORIZONTAL,
         drawValue: false,
@@ -202,9 +209,10 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
     const renderVolume = () => {
         const output = activeOutput()
-        muteButton.sensitive = !!output && !switching
-        volumeDownButton.sensitive = !!output && output.volume > 0
-        volumeUpButton.sensitive = !!output && output.volume < 100
+        const available = !!output && !switching && !restarting
+        muteButton.sensitive = available
+        volumeDownButton.sensitive = available && !!output && output.volume > 0
+        volumeUpButton.sensitive = available && !!output && output.volume < 100
         if (!output) {
             currentOutputLabel.label = "No output selected"
             volumeLabel.label = "--%"
@@ -213,7 +221,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
         }
 
         currentOutputLabel.label = output.label
-        volumeScale.sensitive = true
+        volumeScale.sensitive = available
         settingVolume = true
         volumeScale.set_value(output.volume)
         settingVolume = false
@@ -291,9 +299,10 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
             button.add(row)
             button.connect("clicked", async () => {
-                if (outputs.find((item) => item.name === output.name)?.active || switching) return
+                if (outputs.find((item) => item.name === output.name)?.active || switching || restarting) return
 
                 switching = true
+                restartButton.sensitive = false
                 deviceList.sensitive = false
                 state.label = "…"
                 flushVolume()
@@ -312,6 +321,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
                     showError(error)
                 } finally {
                     switching = false
+                    restartButton.sensitive = true
                     deviceList.sensitive = true
                     deviceSignature = ""
                 }
@@ -325,13 +335,13 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
     }
 
     async function refresh() {
-        if (refreshing || pendingVolumeChanges > 0 || queuedVolume || switching) return
+        if (refreshing || pendingVolumeChanges > 0 || queuedVolume || switching || restarting) return
         refreshing = true
         const revision = volumeRevision
         try {
             const loadedOutputs = await loadOutputs()
             // A read started before an adjustment must not reset the slider.
-            if (pendingVolumeChanges > 0 || queuedVolume || switching || revision !== volumeRevision) return
+            if (pendingVolumeChanges > 0 || queuedVolume || switching || restarting || revision !== volumeRevision) return
             outputs = loadedOutputs
             const signature = JSON.stringify(outputs.map(({ volume, muted, ...device }) => device))
             if (signature !== deviceSignature) {
@@ -341,7 +351,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
                 renderVolume()
             }
         } catch (error) {
-            showError(error)
+            if (!restarting && revision === volumeRevision) showError(error)
         } finally {
             refreshing = false
         }
@@ -363,7 +373,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
     const setVolume = (requested: number) => {
         const output = activeOutput()
-        if (!output || switching) return
+        if (!output || switching || restarting) return
 
         const value = Math.max(0, Math.min(100, Math.round(requested)))
         if (value === output.volume) return
@@ -379,7 +389,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
 
     const toggleMute = () => {
         const output = activeOutput()
-        if (!output || switching) return
+        if (!output || switching || restarting) return
         flushVolume()
         output.muted = !output.muted
         const muted = output.muted
@@ -398,6 +408,40 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
         const output = activeOutput()
         if (output) setVolume(output.volume + delta)
     }
+
+    restartButton.connect("clicked", async () => {
+        if (restarting || switching) return
+        restarting = true
+        volumeRevision++
+        restartButton.sensitive = false
+        restartButton.label = "Restarting…"
+        deviceList.sensitive = false
+        statusLabel.hide()
+        renderVolume()
+        flushVolume()
+        try {
+            // Finish queued adjustments before their audio device disappears.
+            await volumeWrites
+            await execAsync([
+                "systemctl", "--user", "restart",
+                "pipewire.service", "pipewire-pulse.service", "wireplumber.service",
+            ])
+            setClass(statusLabel, "error", false)
+            statusLabel.label = "Audio restarted."
+            statusLabel.show()
+        } catch (error) {
+            showError(error)
+            statusLabel.label = "Couldn’t restart audio. Please try again."
+        } finally {
+            restarting = false
+            restartButton.sensitive = true
+            restartButton.label = "Restart audio"
+            deviceList.sensitive = true
+            deviceSignature = ""
+            renderVolume()
+        }
+        await refresh()
+    })
 
     volumeDownButton.connect("clicked", () => adjustVolume(-5))
     volumeUpButton.connect("clicked", () => adjustVolume(5))
@@ -482,6 +526,7 @@ function AudioPopup(gdkmonitor: Gdk.Monitor) {
                 <label className="section-label" label="Output device" xalign={0} />
                 {deviceList}
             </box>
+            {restartButton}
             {statusLabel}
             <box className="footer" orientation={Gtk.Orientation.HORIZONTAL}>
                 <label label="Esc to close" xalign={0} hexpand={true} />

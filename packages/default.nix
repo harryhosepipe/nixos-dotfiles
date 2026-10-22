@@ -126,15 +126,30 @@ let
           ': # Desktop integration is managed by the Nix package'
     '';
   };
-  paperDesktopVersion = "0.5.0";
+  paperDesktopVersion = "0.5.15";
   paperDesktopSrc = pkgs.fetchurl {
     url = "https://download.paper.design/linux/appImage";
-    hash = "sha256-1Ezg5+5AgotZCa7meMqYdPf6UP/hJxlm5AONbx1OZWE=";
+    hash = "sha256-TxqHdvjFgDt4dSoFES5TC42+5dbRSMQZKXxF0iqjlPs=";
   };
   paperDesktopContents = pkgs.appimageTools.extractType2 {
     pname = "paper-desktop";
     version = paperDesktopVersion;
     src = paperDesktopSrc;
+  };
+  photocraftVersion = "0.10.0";
+  photocraftSrc = pkgs.fetchurl {
+    url = "https://github.com/storytold/photocraft/releases/download/v${photocraftVersion}/photocraft-${photocraftVersion}-linux-x86_64.AppImage";
+    hash = "sha256-zRozyXnopdqU3tgddkjnecuAabd+Ssp0PI0XfKUnDXc=";
+  };
+  photocraftContents = pkgs.appimageTools.extractType2 {
+    pname = "photocraft";
+    version = photocraftVersion;
+    src = photocraftSrc;
+    # Nix installs the desktop entry and icons; skip AppImage self-registration.
+    postExtract = ''
+      substituteInPlace "$out/AppRun" \
+        --replace-fail 'set -u' 'export PHOTOCRAFT_NO_DESKTOP_INTEGRATION=1; set -u'
+    '';
   };
   signalDesktopVersion = "8.25.0";
   signalDesktopSrc = pkgs.fetchurl {
@@ -146,10 +161,10 @@ let
     version = signalDesktopVersion;
     src = signalDesktopSrc;
   };
-  t3codeVersion = "0.0.42";
+  t3codeVersion = "0.1.2-nightly.20261021.3473";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-jcH8zavC7TpZo5RMx3LvEZMbk1FAHAlj7TBdX5bjzfQ=";
+    hash = "sha256-rgc1ji1mT1MAho2pgOBBTLtIhX/VW/5QVFOautgvxZc=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
@@ -158,6 +173,10 @@ let
   };
 in
 {
+  strata = import ./strata.nix { inherit pkgs; };
+  swamp = import ./swamp.nix { inherit pkgs; };
+  vercel-cli = import ./vercel-cli.nix { inherit pkgs; };
+
   blender = pkgs.buildFHSEnv {
     pname = "blender";
     version = blenderVersion;
@@ -324,6 +343,45 @@ in
     };
   };
 
+  photocraft = pkgs.appimageTools.wrapAppImage {
+    pname = "photocraft";
+    version = photocraftVersion;
+    src = photocraftContents;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    # Prefer native Wayland; PHOTOCRAFT_NATIVE_WAYLAND=0 restores upstream's
+    # XWayland fallback for tablets that need it.
+    extraPkgs = pkgs: with pkgs; [ wayland libxkbcommon vulkan-loader ];
+
+    extraInstallCommands = ''
+      wrapProgram $out/bin/photocraft \
+        --set-default PHOTOCRAFT_NATIVE_WAYLAND 1
+
+      install -Dm444 ${photocraftContents}/ai.storyteller.photocraft.desktop \
+        $out/share/applications/ai.storyteller.photocraft.desktop
+      substituteInPlace $out/share/applications/ai.storyteller.photocraft.desktop \
+        --replace-fail 'Exec=photocraft %F' "Exec=$out/bin/photocraft %F" \
+        --replace-fail 'TryExec=photocraft' "TryExec=$out/bin/photocraft"
+
+      while IFS= read -r icon; do
+        install -Dm444 "$icon" "$out/share/''${icon#${photocraftContents}/usr/share/}"
+      done < <(find ${photocraftContents}/usr/share/icons -type f)
+
+      install -Dm444 ${photocraftContents}/usr/share/mime/packages/ai.storyteller.photocraft.xml \
+        $out/share/mime/packages/ai.storyteller.photocraft.xml
+      install -Dm444 ${photocraftContents}/usr/share/metainfo/ai.storyteller.photocraft.metainfo.xml \
+        $out/share/metainfo/ai.storyteller.photocraft.metainfo.xml
+    '';
+
+    meta = {
+      description = "Native image editor with layers, masks and PSD support";
+      homepage = "https://getartcraft.com/apps/photocraft";
+      license = with pkgs.lib.licenses; [ mit asl20 ];
+      mainProgram = "photocraft";
+      platforms = [ "x86_64-linux" ];
+      sourceProvenance = [ pkgs.lib.sourceTypes.binaryNativeCode ];
+    };
+  };
+
   signal-desktop = pkgs.appimageTools.wrapType2 {
     pname = "signal-desktop";
     version = signalDesktopVersion;
@@ -417,26 +475,59 @@ in
     };
   });
 
+  sanity-cli = pkgs.buildNpmPackage {
+    pname = "sanity-cli";
+    version = "8.13.1";
+    nodejs = pkgs.nodejs_24;
+
+    src = ../nix/sanity-cli-npm;
+    npmDeps = pkgs.importNpmLock {
+      npmRoot = ../nix/sanity-cli-npm;
+    };
+    npmConfigHook = pkgs.importNpmLock.npmConfigHook;
+    dontNpmBuild = true;
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/bin" "$out/lib/sanity-cli"
+      cp -r node_modules package.json package-lock.json "$out/lib/sanity-cli/"
+      makeWrapper ${pkgs.nodejs_24}/bin/node "$out/bin/sanity" \
+        --add-flags "$out/lib/sanity-cli/node_modules/@sanity/cli/bin/run.js" \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]}
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Command-line tools for Sanity projects, datasets, and Studio";
+      homepage = "https://www.sanity.io/docs/cli";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "sanity";
+    };
+  };
+
   dokploy-cli = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
     pname = "dokploy-cli";
-    version = "0.29.4";
+    version = "0.30.7";
 
     src = pkgs.fetchFromGitHub {
       owner = "Dokploy";
       repo = "cli";
       tag = "v${finalAttrs.version}";
-      hash = "sha256-WTNzjUP2pMmYnyAPkf5kbnu3CNH0Va1Mk7T7CDtdB/8=";
+      hash = "sha256-TyggMj0AFLqDV0feC2giNCXb8/wJxgPwIzppNW12Quc=";
     };
 
     pnpmDeps = pkgs.fetchPnpmDeps {
       inherit (finalAttrs) pname version src;
+      # Keep the dependency store format consistent with the version 3 fetcher.
+      pnpm = pkgs.pnpm_10;
       fetcherVersion = 3;
-      hash = "sha256-RKBF5rxC2mlEZB5p62LH11CZSDF1+DlNwRkh6HSVoWI=";
+      hash = "sha256-RSq0VCHLg+umP7SXgvgaBfxXf0Fr6aaUfJksTH50zM0=";
     };
 
     nativeBuildInputs = with pkgs; [
       nodejs
-      pnpm
+      pnpm_10
       pnpmConfigHook
     ];
 
@@ -454,8 +545,6 @@ in
     buildPhase = ''
       runHook preBuild
       pnpm run build
-      substituteInPlace dist/index.js \
-        --replace-fail 'version: "0.3.0"' 'version: "${finalAttrs.version}"'
       runHook postBuild
     '';
 

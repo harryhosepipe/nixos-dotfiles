@@ -47,27 +47,31 @@ let
   # Destination directory names are read from each SKILL.md rather than duplicated
   # here, because Codex requires the directory and manifest names to agree.
   mattPocockSkillPaths = [
+    "engineering/ask-matt"
     "engineering/code-review"
+    "engineering/codebase-design"
     "engineering/diagnosing-bugs"
     "engineering/domain-modeling"
     "engineering/grill-with-docs"
     "engineering/implement"
+    "engineering/implement-spec"
     "engineering/improve-codebase-architecture"
+    "engineering/pr"
     "engineering/prototype"
     "engineering/research"
+    "engineering/retro"
     "engineering/setup-matt-pocock-skills"
     "engineering/tdd"
     "engineering/to-spec"
     "engineering/to-tickets"
     "engineering/triage"
+    "engineering/wayfinder"
+    "engineering/wizard"
     "misc/git-guardrails-claude-code"
     "misc/migrate-to-shoehorn"
     "misc/scaffold-exercises"
     "misc/setup-pre-commit"
-    "personal/edit-article"
-    "personal/obsidian-vault"
-    "engineering/wayfinder"
-    "productivity/writing-great-skills"
+    "productivity/writing-for-agents"
   ];
 
   skillName = path:

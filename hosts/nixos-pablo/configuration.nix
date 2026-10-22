@@ -1,4 +1,4 @@
-{host, ...}: {
+{host, pkgs, ...}: {
   imports = [
     ../common.nix
     ./hardware-configuration.nix
@@ -16,6 +16,7 @@
   networking.hostName = host.hostName;
   networking.networkmanager.dns = "none";
   networking.nameservers = ["192.168.88.247"];
+  services.tailscale.package = pkgs.callPackage ../../packages/tailscale.nix {};
   services.tailscale.extraSetFlags = ["--accept-dns=false"];
   users.users.pablo.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5hBuvy7gqjDvkeyZLWUpk8FH9gTKJeC/2jOlmAdoeE pablo@renderbros.com"

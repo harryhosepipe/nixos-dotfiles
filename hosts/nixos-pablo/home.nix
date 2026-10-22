@@ -20,6 +20,7 @@ in {
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/dotfiles.nix
+    ../../modules/home/oma-cast.nix
     ../../modules/home/firefox.nix
     ../../modules/home/language-toolchain.nix
     ../../modules/home/tmux.nix
@@ -107,6 +108,28 @@ in {
   xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source = solarizedLightQbittorrentTheme;
   xdg.configFile."superfile/hotkeys.toml".source = ../../config/superfile/hotkeys.toml;
 
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications."inode/directory" = "io.github.lgse.Strata.desktop";
+    associations.added."inode/directory" = "io.github.lgse.Strata.desktop";
+  };
+
+  # Browsers use FileManager1 to reveal downloads, independently of folder MIME defaults.
+  xdg.dataFile."dbus-1/services/io.github.lgse.Strata.FileManager1.service" = {
+    source = "${localPackages.strata}/share/strata/io.github.lgse.Strata.FileManager1.service";
+    force = true;
+  };
+
+  xdg.desktopEntries."info.mumble.Mumble" = {
+    name = "Mumble";
+    genericName = "Voice Chat";
+    exec = "env QT_QPA_PLATFORM=wayland mumble %u";
+    icon = "mumble";
+    terminal = false;
+    categories = ["Network" "Chat" "Qt"];
+    mimeType = ["x-scheme-handler/mumble"];
+  };
+
   programs.gh = {
     enable = true;
     settings = {
@@ -160,13 +183,17 @@ in {
     zoxide
     superfile
     thunar
+    localPackages.strata
     chromium
     google-chrome
+    keepassxc
     qbittorrent
     obsidian
+    tradingview
     localPackages.blender
     localPackages.signal-desktop
     whatsapp-electron
+    mumble
     pavucontrol
     pwvucontrol
     localPackages.cliamp
@@ -174,6 +201,7 @@ in {
     localPackages.codex-acp
     localPackages.figma-desktop
     localPackages.paper-desktop
+    localPackages.photocraft
     localPackages.t3code
     zed-editor
     telegram-desktop
@@ -181,6 +209,7 @@ in {
     inputs.herdr.packages.${pkgs.system}.default
     localPackages.nextcloud-client_4_0_4
     localPackages.dokploy-cli
+    localPackages.sanity-cli
     wtype
     mpv
     ffmpeg

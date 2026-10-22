@@ -78,6 +78,8 @@ window.AudioPopupDismiss { background: transparent; }
     button.volume-step:hover { background: rgba(143, 188, 187, 0.22); }
     button.mute-button { padding: 5px 8px; background: rgba(216, 222, 233, 0.07); }
     button.mute-button.is-muted { color: #ebcb8b; background: rgba(235, 203, 139, 0.12); }
+    button.restart-audio { padding: 8px 10px; background: rgba(216, 222, 233, 0.07); }
+    button.restart-audio:hover { background: rgba(143, 188, 187, 0.16); }
     button.device { min-height: 38px; padding: 9px 10px; }
     button.device.active { background: rgba(143, 188, 187, 0.10); border-color: rgba(143, 188, 187, 0.24); }
     .device-name { color: #d8dee9; font-weight: 600; }

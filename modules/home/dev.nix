@@ -1,4 +1,6 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  localPackages = import ../../packages { inherit pkgs; };
+in {
   # This file is for everyday developer tools.
   # Keep project-specific versions in each project when possible.
 
@@ -11,6 +13,8 @@
     bun
     nodejs
     pnpm
+    localPackages.swamp
+    localPackages.vercel-cli
     jq
     just
     curl

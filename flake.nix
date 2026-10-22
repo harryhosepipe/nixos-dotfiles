@@ -19,7 +19,7 @@
       url = "github:gmodena/nix-flatpak/v0.7.0";
     };
     handy = {
-      url = "github:cjpais/Handy/v0.9.5";
+      url = "github:cjpais/Handy/v0.9.8";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     herdr = {
@@ -27,7 +27,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.9.24";
+      url = "github:NousResearch/hermes-agent/v0.22.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";
