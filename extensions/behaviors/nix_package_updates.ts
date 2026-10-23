@@ -26,14 +26,14 @@ const resultSchema = z.object({
   activated: z.literal(false),
 }).passthrough();
 
-/** Repository-specific release checks and isolated, unbuilt package updates. */
+/** Repository-specific release checks and updates in the current checkout. */
 export const behavior = {
   type: "@pablo/nix-package-updates",
-  version: "2026.10.22.1",
+  version: "2026.10.22.2",
   globalArguments: z.object({}),
   resources: {
     result: {
-      description: "Release checks, update branch, changed files, and validation results",
+      description: "Release checks, current checkout, changed files, and validation results",
       schema: resultSchema,
       lifetime: "30d",
       garbageCollection: 30,

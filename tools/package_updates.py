@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check selected Nix packages and prepare updates without building anything.
 
-Only update mode writes package files, in a separate Git worktree. Subprocesses
+Only update mode writes package files, directly in the current checkout. Subprocesses
 use argument arrays; package lifecycle scripts and Nix import-from-derivation
 are disabled. The Swamp behavior calls the same entry point as the local CLI.
 """
@@ -524,7 +524,7 @@ class Updater:
             for name in files:
                 if name.endswith(".nix"):
                     run(["nix-instantiate", "--parse", workspace / name], cwd=workspace)
-            run(["git", "diff", "--check"], cwd=workspace)
+            run(["git", "diff", "--check", "--", *files], cwd=workspace)
             item.changedFiles = [name for name in files if (workspace / name).read_bytes() != before[name]]
             if not item.changedFiles:
                 raise UpdateError("The selected update produced no file changes")
@@ -572,57 +572,14 @@ def validate_workspace(workspace):
 
 def prepare_updates(updater, items, report):
     repo = updater.repo
-    if git(repo, "status", "--porcelain"):
-        raise UpdateError("Update mode requires a clean working tree. Commit or save current changes first; check mode is available now.")
-    base = git(repo, "rev-parse", "HEAD")
     updates = [item for item in items if item.status == "available"]
-    if not updates:
-        return report
-    common = Path(git(repo, "rev-parse", "--git-common-dir"))
-    if not common.is_absolute():
-        common = repo / common
-    state_dir = common.resolve() / "nix-package-updates"
-    state_dir.mkdir(exist_ok=True)
-    identity = json.dumps({"base": base, "packages": [
-        [item.package, item.latest, item.details.get("candidateRevision")] for item in items
-    ]}, sort_keys=True)
-    key = hashlib.sha256(identity.encode()).hexdigest()[:12]
-    branch = "updates/nix-packages-" + key
-    workspace = repo.parent / (repo.name + "-updates") / key
-    state_path = state_dir / (key + ".json")
-    with (state_dir / "lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as exc:
-            raise UpdateError("Another package update is already running") from exc
-        if state_path.exists():
-            saved = read_json(state_path)
-            if (not workspace.exists() or git(workspace, "branch", "--show-current") != branch
-                    or git(workspace, "rev-parse", "HEAD") != base or fingerprint(workspace) != saved["fingerprint"]):
-                raise UpdateError(f"Existing update workspace was changed; review it at {workspace}")
-            previous = saved["report"]
-            previous["reused"] = True
-            if not previous["summary"].get("failed") and previous["validation"]["status"] != "failed":
-                return previous
-            # Retry only failed packages; successful edits remain in place.
-            succeeded = {item["package"]: item for item in previous["results"] if item["status"] == "updated"}
-            items = [Candidate(**succeeded[item.package]) if item.package in succeeded else item for item in items]
-            updates = [item for item in items if item.status == "available"]
-            report["reused"] = True
-        else:
-            if workspace.exists() or subprocess.run(["git", "show-ref", "--verify", "--quiet", "refs/heads/" + branch], cwd=repo).returncode == 0:
-                raise UpdateError(f"Unrecognized existing update branch or directory: {branch}")
-            if git(repo, "rev-parse", "HEAD") != base or git(repo, "status", "--porcelain"):
-                raise UpdateError("Working tree changed while checking releases; rerun the update")
-            workspace.parent.mkdir(exist_ok=True)
-            git(repo, "worktree", "add", "-b", branch, str(workspace), base)
-        for item in updates:
-            updater.apply(workspace, item)
-        report.update({"baseCommit": base, "branch": branch, "worktree": str(workspace),
-                       "results": [dataclasses.asdict(item) for item in items]})
-        report["validation"] = validate_workspace(workspace) if changed_files(workspace) else {"status": "not-run", "reason": "no successful updates"}
-        report["summary"] = summarize(report["results"])
-        write_json(state_path, {"report": report, "fingerprint": fingerprint(workspace)})
+    for item in updates:
+        updater.apply(repo, item)
+    report.update({"branch": git(repo, "branch", "--show-current"), "worktree": str(repo),
+                   "results": [dataclasses.asdict(item) for item in items]})
+    # Also validate repeat runs with no new releases, including after a failed evaluation.
+    report["validation"] = validate_workspace(repo)
+    report["summary"] = summarize(report["results"])
     return report
 
 
@@ -636,8 +593,21 @@ def execute(repo, mode="check", packages="all", http=None):
     updater = Updater(repo, http)
     if Path(git(updater.repo, "rev-parse", "--show-toplevel")).resolve() != updater.repo:
         raise UpdateError("Repository path must be its Git root")
-    if mode == "update" and git(updater.repo, "status", "--porcelain"):
-        raise UpdateError("Update mode requires a clean working tree. Commit or save current changes first.")
+    if mode == "update":
+        git_dir = Path(git(updater.repo, "rev-parse", "--absolute-git-dir"))
+        with (git_dir / "nix-package-updates.lock").open("a") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise UpdateError("Another package update is already running") from exc
+            base = git(updater.repo, "rev-parse", "HEAD")
+            before = fingerprint(updater.repo)
+            report = execute(updater.repo, "check", packages, http)
+            if git(updater.repo, "rev-parse", "HEAD") != base or fingerprint(updater.repo) != before:
+                raise UpdateError("Working tree changed while checking releases; rerun the update")
+            report["mode"] = "update"
+            items = [Candidate(**item) for item in report["results"]]
+            return prepare_updates(updater, items, report)
     items = updater.check(names)
     report = {"mode": mode, "repository": str(updater.repo),
               "checkedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -645,7 +615,7 @@ def execute(repo, mode="check", packages="all", http=None):
               "validation": {"status": "not-run", "reason": "check-only"},
               "built": False, "activated": False}
     report["summary"] = summarize(report["results"])
-    return prepare_updates(updater, items, report) if mode == "update" else report
+    return report
 
 
 def main():

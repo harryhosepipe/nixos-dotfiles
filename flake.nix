@@ -27,7 +27,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v0.22.3";
+      url = "github:NousResearch/hermes-agent/v0.22.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-npm-lockfile-fix.follows = "hermes-agent/npm-lockfile-fix";

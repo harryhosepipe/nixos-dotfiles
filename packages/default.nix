@@ -161,10 +161,10 @@ let
     version = signalDesktopVersion;
     src = signalDesktopSrc;
   };
-  t3codeVersion = "0.1.2-nightly.20261021.3473";
+  t3codeVersion = "0.1.3-nightly.20261023.3566";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-rgc1ji1mT1MAho2pgOBBTLtIhX/VW/5QVFOautgvxZc=";
+    hash = "sha256-lpUxjpIAi1YA8AiM5yPyAGddKZiOo15kuqBUH/Uj+cI=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
@@ -477,7 +477,7 @@ in
 
   sanity-cli = pkgs.buildNpmPackage {
     pname = "sanity-cli";
-    version = "8.13.1";
+    version = "8.22.1";
     nodejs = pkgs.nodejs_24;
 
     src = ../nix/sanity-cli-npm;

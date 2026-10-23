@@ -1,5 +1,5 @@
 model = "gpt-6.1-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 service_tier = "priority"
 notify = ["notify-send", "--app-name=Codex", "--urgency=normal", "--expire-time=5000", "Codex", "Task complete"]
 personality = "pragmatic"
@@ -342,24 +342,24 @@ CONTEXT_MODE_PLATFORM = "codex"
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node_repl"
+command = "/nix/store/jlzavszp6y1xcwrh7i0wqv3sk79mhqfv-codex-desktop-computer-use-linux-26.1016.61520/opt/codex-desktop/resources/cua_node/bin/node_repl"
 env_vars = ["BROWSER_USE_ACCESS_EXECUTOR_ID", "BROWSER_USE_ACCESS_PIPE_PATH", "BROWSER_USE_ACCESS_VERIFYING_IDENTITY"]
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/jlzavszp6y1xcwrh7i0wqv3sk79mhqfv-codex-desktop-computer-use-linux-26.1016.61520/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/jlzavszp6y1xcwrh7i0wqv3sk79mhqfv-codex-desktop-computer-use-linux-26.1016.61520/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/pablo/.config/codex:/nix/store/jlzavszp6y1xcwrh7i0wqv3sk79mhqfv-codex-desktop-computer-use-linux-26.1016.61520/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/pablo/.config/codex"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
 BROWSER_USE_TINYSKY_ENABLED = "1"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.1016.51333"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/pablo/.config/codex/plugins/cache/openai-bundled/browser/26.1016.51333/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
-CODEX_CLI_PATH = "/nix/store/4i5dv4gs8bxrdzbv2kfprcrhs03jx3ay-codex-desktop-computer-use-linux-26.1016.51333/opt/codex-desktop/resources/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.1016.61520"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/pablo/.config/codex/plugins/cache/openai-bundled/browser/26.1016.61520/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
+CODEX_CLI_PATH = "/nix/store/jlzavszp6y1xcwrh7i0wqv3sk79mhqfv-codex-desktop-computer-use-linux-26.1016.61520/opt/codex-desktop/resources/codex"
 NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = ""
 
 [mcp_servers.blender]
@@ -441,7 +441,7 @@ source_type = "git"
 source = "https://github.com/paper-design/agent-plugins.git"
 
 [desktop]
-conversationDetailMode = "STEPS_PROSE"
+conversationDetailMode = "STEPS_COMMANDS"
 ambient-suggestions-enabled = false
 notifications-turn-mode = "always"
 followUpQueueMode = "queue"

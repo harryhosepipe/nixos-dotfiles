@@ -37,7 +37,7 @@ const statuses: Record<string, string> = {
   available: "Update available",
   "up-to-date": "Up to date",
   "ahead-of-upstream": "Configured version is newer",
-  updated: "Update prepared",
+  updated: "Updated in checkout",
   failed: "Failed",
 };
 
@@ -89,10 +89,13 @@ export const report = {
       }
     }
     if (data.branch) lines.push("", `Branch: ${data.branch}`);
-    if (data.worktree) lines.push("", `Review directory: ${data.worktree}`);
+    if (data.worktree) lines.push("", `Updated checkout: ${data.worktree}`);
     if (data.mode === "update") {
       lines.push("", `Configuration evaluation: ${data.validation.status}.`);
       if (data.validation.error) lines.push("", cell(data.validation.error));
+      if (data.validation.status === "passed" && !data.summary.failed) {
+        lines.push("", "Package definitions are ready in this checkout. Run nrs to rebuild and activate.");
+      }
     }
     lines.push("", "No builds or system activation were run.", "");
     return { markdown: lines.join("\n"), json: data };

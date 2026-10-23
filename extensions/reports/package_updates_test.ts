@@ -42,7 +42,7 @@ Deno.test("check report displays versions and statuses from this run's artifact"
   ]), "The report must read this run's specific artifact version");
 });
 
-Deno.test("update report includes review location and validation failures", async () => {
+Deno.test("update report includes current checkout and validation failures", async () => {
   const { context } = contextFor({
     mode: "update",
     results: [
@@ -51,13 +51,22 @@ Deno.test("update report includes review location and validation failures", asyn
     ],
     summary: { updated: 1, failed: 1 },
     validation: { status: "failed", error: "Evaluation error" },
-    branch: "updates/nix-packages-test",
-    worktree: "/tmp/example-updates/test",
+    branch: "main",
+    worktree: "/tmp/example",
   });
   const output = await report.execute(context);
-  for (const expected of ["Update prepared", "download \\| failed try later", "modules/home/pi.nix", "updates/nix-packages-test", "/tmp/example-updates/test", "Configuration evaluation: failed", "Evaluation error"]) {
+  for (const expected of ["Updated in checkout", "download \\| failed try later", "modules/home/pi.nix", "Branch: main", "Updated checkout: /tmp/example", "Configuration evaluation: failed", "Evaluation error"]) {
     assert(output.markdown.includes(expected), `Missing ${expected}`);
   }
+});
+
+Deno.test("successful update report says the checkout is ready for nrs", async () => {
+  const { context } = contextFor({
+    mode: "update", results: [], summary: { updated: 1 },
+    validation: { status: "passed" }, branch: "main", worktree: "/tmp/example",
+  });
+  const output = await report.execute(context);
+  assert(output.markdown.includes("Run nrs to rebuild and activate"), "Missing next step");
 });
 
 Deno.test("missing current-run output does not read stale data", async () => {

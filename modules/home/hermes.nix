@@ -7,7 +7,7 @@ let
   system = pkgs.stdenv.hostPlatform.system;
   hermesAgentBase = inputs.hermes-agent.packages.${system}.default;
   hermesAgent = hermesAgentBase.override {
-    version = "0.22.3";
+    version = "0.22.5";
     extraDependencyGroups = [
       "anthropic"
       "azure-identity"

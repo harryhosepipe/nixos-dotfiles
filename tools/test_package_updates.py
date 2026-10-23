@@ -131,40 +131,52 @@ class WorkspaceTests(unittest.TestCase):
         path = workspace / "packages/vercel-cli.nix"
         path.write_text(path.read_text().replace("1.0.0", "1.1.0"))
 
-    def test_update_is_isolated_and_repeat_run_reuses_branch(self):
-        with patch.object(updates.Updater, "check", side_effect=lambda _: [self.candidate()]), \
+    def test_update_edits_current_checkout_and_repeat_run_checks_current_files(self):
+        def check(_):
+            item = self.candidate()
+            if "1.1.0" in self.path.read_text():
+                item.current, item.status = "1.1.0", "up-to-date"
+            return [item]
+        branch = updates.git(self.repo, "branch", "--show-current")
+        with patch.object(updates.Updater, "check", side_effect=check), \
              patch.object(updates.Updater, "update_download", autospec=True, side_effect=self.update_package), \
              patch.object(updates, "validate_workspace", return_value={"status": "passed"}):
             first = updates.execute(self.repo, "update", "vercel-cli")
             self.assertEqual(first["summary"], {"updated": 1})
-            self.assertEqual(self.path.read_text(), self.original)
-            self.assertEqual(updates.git(self.repo, "status", "--porcelain"), "")
-            workspace = Path(first["worktree"])
-            self.assertIn("1.1.0", (workspace / "packages/vercel-cli.nix").read_text())
+            self.assertIn("1.1.0", self.path.read_text())
+            self.assertEqual(Path(first["worktree"]), self.repo)
             second = updates.execute(self.repo, "update", "vercel-cli")
-            self.assertTrue(second["reused"])
-            self.assertEqual(first["branch"], second["branch"])
+            self.assertEqual(second["summary"], {"up-to-date": 1})
+            self.assertEqual(first["branch"], branch)
+            self.assertEqual(updates.git(self.repo, "branch", "--show-current"), branch)
+            self.assertEqual(len(updates.git(self.repo, "worktree", "list").splitlines()), 1)
 
-    def test_dirty_source_is_rejected_before_network_access(self):
-        self.path.write_text("user changes\n")
-        with patch.object(updates.Updater, "check") as check:
-            with self.assertRaisesRegex(updates.UpdateError, "clean working tree"):
-                updates.execute(self.repo, "update", "vercel-cli")
-            check.assert_not_called()
-        self.assertEqual(self.path.read_text(), "user changes\n")
-
-    def test_existing_update_workspace_is_never_overwritten(self):
-        with patch.object(updates.Updater, "check", side_effect=lambda _: [self.candidate()]), \
+    def test_existing_edits_are_preserved_in_update_mode(self):
+        self.path.write_text(self.original + "# custom wrapper settings\n")
+        other = self.repo / "notes.txt"
+        other.write_text("unrelated user changes\n")
+        with patch.object(updates.Updater, "check", return_value=[self.candidate()]), \
              patch.object(updates.Updater, "update_download", autospec=True, side_effect=self.update_package), \
              patch.object(updates, "validate_workspace", return_value={"status": "passed"}):
             result = updates.execute(self.repo, "update", "vercel-cli")
-            path = Path(result["worktree"]) / "packages/vercel-cli.nix"
-            path.write_text("human review changes\n")
-            with self.assertRaisesRegex(updates.UpdateError, "workspace was changed"):
+        self.assertEqual(result["summary"], {"updated": 1})
+        self.assertIn("# custom wrapper settings", self.path.read_text())
+        self.assertEqual(other.read_text(), "unrelated user changes\n")
+
+    def test_edits_during_release_check_are_not_overwritten(self):
+        def check(_):
+            self.path.write_text("human review changes\n")
+            return [self.candidate()]
+        with patch.object(updates.Updater, "check", side_effect=check), \
+             patch.object(updates.Updater, "apply") as apply:
+            with self.assertRaisesRegex(updates.UpdateError, "Working tree changed"):
                 updates.execute(self.repo, "update", "vercel-cli")
-            self.assertEqual(path.read_text(), "human review changes\n")
+            apply.assert_not_called()
+        self.assertEqual(self.path.read_text(), "human review changes\n")
 
     def test_failed_package_edit_is_rolled_back(self):
+        self.path.write_text(self.original + "# existing user edit\n")
+        before = self.path.read_text()
         item = self.candidate()
         def fail(workspace, candidate):
             (workspace / "packages/vercel-cli.nix").write_text("partially updated\n")
@@ -173,7 +185,16 @@ class WorkspaceTests(unittest.TestCase):
         with patch.object(updater, "update_download", side_effect=fail):
             updater.apply(self.repo, item)
         self.assertEqual(item.status, "failed")
-        self.assertEqual(self.path.read_text(), self.original)
+        self.assertEqual(self.path.read_text(), before)
+
+    def test_concurrent_update_is_rejected_before_checking_releases(self):
+        git_dir = Path(updates.git(self.repo, "rev-parse", "--absolute-git-dir"))
+        with (git_dir / "nix-package-updates.lock").open("a") as lock:
+            updates.fcntl.flock(lock, updates.fcntl.LOCK_EX | updates.fcntl.LOCK_NB)
+            with patch.object(updates.Updater, "check") as check:
+                with self.assertRaisesRegex(updates.UpdateError, "already running"):
+                    updates.execute(self.repo, "update", "vercel-cli")
+                check.assert_not_called()
 
     def test_unchanged_failed_workspace_can_retry(self):
         calls = []
@@ -190,10 +211,11 @@ class WorkspaceTests(unittest.TestCase):
             second = updates.execute(self.repo, "update", "vercel-cli")
             self.assertEqual(second["summary"], {"updated": 1})
             self.assertEqual(first["branch"], second["branch"])
-            self.assertTrue(second["reused"])
 
     def test_failed_evaluation_retries_without_reapplying_packages(self):
-        with patch.object(updates.Updater, "check", side_effect=lambda _: [self.candidate()]), \
+        current = self.candidate()
+        current.current, current.status = "1.1.0", "up-to-date"
+        with patch.object(updates.Updater, "check", side_effect=[[self.candidate()], [current]]), \
              patch.object(updates.Updater, "update_download", autospec=True, side_effect=self.update_package) as apply, \
              patch.object(updates, "validate_workspace", side_effect=[{"status": "failed"}, {"status": "passed"}]):
             first = updates.execute(self.repo, "update", "vercel-cli")

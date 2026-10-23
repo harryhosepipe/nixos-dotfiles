@@ -83,7 +83,13 @@ tooltip {
 }
 
 #network {
-  color: #083613;
+  color: #85ae94;
+  border-radius: 6px;
+}
+
+#network:hover {
+  color: #c1efd2;
+  background: rgba(68, 170, 136, 0.18);
 }
 
 #custom-volume {

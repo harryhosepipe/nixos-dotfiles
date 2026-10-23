@@ -1,0 +1,83 @@
+window.dns-window {
+  background: #141a20;
+  color: #edf3ef;
+  font-family: "Inter", "Adwaita Sans", sans-serif;
+  font-size: 13px;
+}
+.dns-window headerbar {
+  background: #141a20;
+  box-shadow: none;
+  border: none;
+  min-height: 38px;
+}
+.dns-window .content { padding: 8px 24px 22px; }
+.dns-window .eyebrow {
+  color: #97a8a2;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+.dns-window .heading { font-size: 26px; font-weight: 700; letter-spacing: -0.7px; }
+.dns-window .muted { color: #a0afa9; font-size: 12px; }
+.dns-window .status-card {
+  background: #1b2827;
+  border: 1px solid #2d4540;
+  border-radius: 15px;
+  padding: 17px;
+}
+.dns-window .provider { font-size: 22px; font-weight: 650; }
+.dns-window .addresses { color: #b3c8bf; font-family: monospace; font-size: 12px; }
+.dns-window .health { color: #96d6b9; font-size: 10px; }
+.dns-window button.resolver {
+  padding: 13px 14px;
+  background: #1a2128;
+  background-image: none;
+  border: 1px solid #2a343c;
+  border-radius: 12px;
+  box-shadow: none;
+  color: #edf3ef;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.dns-window button.resolver:hover { background: #232e34; border-color: #53685e; }
+.dns-window button.resolver.selected { background: #203831; border-color: #85bea3; }
+.dns-window .radio { color: #85bea3; font-size: 19px; }
+.dns-window .resolver-title { font-size: 14px; font-weight: 650; }
+.dns-window .resolver-description { font-size: 11px; color: #a4b5ae; }
+.dns-window .badge { font-size: 10px; color: #a2b7ad; }
+.dns-window entry {
+  background: #1a2128;
+  border: 1px solid #53685e;
+  border-radius: 9px;
+  color: #edf3ef;
+  padding: 10px;
+  box-shadow: none;
+}
+.dns-window button.apply {
+  background: #a8dfbe;
+  background-image: none;
+  border: none;
+  border-radius: 11px;
+  color: #14281f;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 13px;
+  box-shadow: none;
+}
+.dns-window button.apply:hover { background: #beefd1; }
+.dns-window button.apply:disabled { background: #2b3a34; color: #83998e; }
+.dns-window button.secondary {
+  background: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  color: #c1d3c9;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.dns-window button.secondary:hover { background: #24312c; }
+.dns-window button.secondary:disabled { color: #65766d; }
+.dns-window .message { color: #a8dfbe; font-size: 12px; }
+.dns-window .error { color: #efac98; }
+.dns-window .footnote { color: #899b92; font-size: 11px; }
+.dns-window button:focus-visible { outline: 2px solid #c8f4da; outline-offset: 2px; }
