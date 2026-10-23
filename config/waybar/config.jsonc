@@ -64,7 +64,8 @@
     "format-ethernet": "LAN",
     "format-linked": "NETWORK READY",
     "format-disconnected": "OFFLINE",
-    "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr}\nClick to change DNS",
+    "on-click": "sh \"$HOME/.config/waybar/dns-switcher.sh\"",
   },
 
   "custom/volume": {

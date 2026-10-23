@@ -1,7 +1,7 @@
 # Swamp package updates
 
 The `nix-package-updates` workflow checks the configuration in this checkout.
-It prepares updates in a separate Git worktree. It never builds packages,
+Update mode edits package files directly in this checkout. It never builds packages,
 activates a configuration, launches applications, pushes branches, or opens PRs.
 
 ## Packages and release sources
@@ -38,24 +38,26 @@ swamp workflow run nix-package-updates --input mode=check --input packages=pi,t3
 Check mode is the default and does not edit package definitions, lockfiles,
 or Git branches. Swamp saves its usual run history under the ignored `.swamp/`.
 
-After committing the workflow setup and saving any other working-tree changes:
+To check and update packages together:
 
 ```sh
 swamp workflow run nix-package-updates --input mode=update
 ```
 
 Optional `packages` uses the IDs above, separated by commas, or `all`.
-Update mode requires a clean checkout. It creates an
-`updates/nix-packages-<id>` branch under the sibling directory
-`/home/pablo/nix-dot-updates/<id>`. It does not switch the current checkout.
-The report includes the exact path and branch. Review there with `git diff`.
+Update mode writes versions, hashes, and lockfiles into your current checkout
+and leaves your current branch selected. After a successful run, your only
+follow-up command is `nrs` to rebuild and activate as usual. No branch switch,
+merge, or commit is required by the workflow.
 
-The same base commit and release selection reuse the same prepared branch.
-If someone edits that worktree, a repeat run stops instead of overwriting it.
-Per-package edits are sequential, and an unsuccessful package update restores
-that package's prior files while preserving earlier successful updates.
-Repeating an unchanged failed run retries its failed package updates and
-configuration checks, keeping successful package edits in place.
+Existing edits are allowed and preserved; adapters stop if the packaging no
+longer matches the expected structure. The updater takes a lock and stops if
+files change during the release check. Avoid editing package files while an
+update is running. Per-package edits are sequential, and an unsuccessful
+package update restores that package's prior files while preserving earlier
+successful updates and pre-existing edits. Repeating a run reads the versions
+currently in your checkout, skips packages already current, and retries the
+configuration check even when no new releases are available.
 
 ## Results
 
@@ -67,7 +69,7 @@ run fail after retaining the structured result.
 
 The workflow prints a package table after each run, including configured and
 available versions and a readable status. Update-mode reports also include the
-review branch, worktree directory, changed files, and evaluation results. The
+current branch, checkout directory, changed files, and evaluation results. The
 same summary remains available afterwards:
 
 ```sh

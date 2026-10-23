@@ -1,13 +1,13 @@
 { pkgs, ... }:
 let
-  piVersion = "1.3.0";
+  piVersion = "1.4.0";
 
   piPackage = pkgs.buildNpmPackage {
     pname = "pi-coding-agent";
     version = piVersion;
 
     src = ../../nix/pi-npm;
-    npmDepsHash = "sha256-TmWGu10NT7D9Di/mMcoJ18vSGyoRNEycbi6J40YpbDY=";
+    npmDepsHash = "sha256-Jzwr01lu8/qSQERcK/RmW0hqQVmrMW32SByQE1TLD8w=";
     npmDepsFetcherVersion = 2;
 
     dontNpmBuild = true;

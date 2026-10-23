@@ -34,11 +34,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792563141,
-        "narHash": "sha256-MxhrXRuWRNlc/1A7/iZvB0FZMcUEA25MFVIqh+Nsqc8=",
+        "lastModified": 1792644373,
+        "narHash": "sha256-zCoulY+C/OjRTevn+M+1tt8HV+q6xbWx1Pg2hkcvnQA=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "cc4c4fd294b3a8d0581680b8cba0d3dabb8d21ec",
+        "rev": "5308535835e9baf6d8baa312e97e58fb7cf87386",
         "type": "github"
       },
       "original": {
@@ -161,16 +161,16 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1792581269,
-        "narHash": "sha256-C6/rsm8KxzxgNWrHTej1mR+ccEL3vDTT1t0pGrqFB3w=",
+        "lastModified": 1792722267,
+        "narHash": "sha256-n6HfR4dydeITXx+ITkQr0l8LiKkUhZPVBvJu2ZwQxdk=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "5b147ab036d6d19131bff8d20701b5001eab844a",
+        "rev": "bf0203a794a07aac3ff764972ab9087baa4e4f4e",
         "type": "github"
       },
       "original": {
         "owner": "NousResearch",
-        "ref": "v0.22.3",
+        "ref": "v0.22.5",
         "repo": "hermes-agent",
         "type": "github"
       }
@@ -477,11 +477,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785277507,
-        "narHash": "sha256-9Tq3UDX2hD/aveW/HvkBlAmEwJTOlY5HQXJM+L5BGmE=",
+        "lastModified": 1792151315,
+        "narHash": "sha256-PMtgvHuGijoIAtPtrBm7kJOI6fxzX4LYPAIK+QVGY+Y=",
         "owner": "pyproject-nix",
         "repo": "uv2nix",
-        "rev": "5a836d395cbf5fc22670eb98dd4aa4fc4d406977",
+        "rev": "7aba73a3d85454f1118f8cf9de97979b4d26bcac",
         "type": "github"
       },
       "original": {

@@ -20,6 +20,7 @@ in {
   imports = [
     ../../modules/home/git.nix
     ../../modules/home/dotfiles.nix
+    ../../modules/home/dns-switcher.nix
     ../../modules/home/oma-cast.nix
     ../../modules/home/firefox.nix
     ../../modules/home/language-toolchain.nix

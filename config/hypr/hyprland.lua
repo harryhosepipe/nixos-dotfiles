@@ -392,6 +392,13 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	name = "dns-switcher-popup",
+	match = { class = "io.github.nixdot.DNSSwitcher" },
+	float = true,
+	move = "monitor_w-window_w-24 48",
+})
+
+hl.window_rule({
 	name = "move-signal-to-workspace-7",
 	match = { class = "signal" },
 	workspace = "7",
