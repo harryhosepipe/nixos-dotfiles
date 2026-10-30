@@ -76,6 +76,12 @@ in {
       "*" = {
         addKeysToAgent = "yes";
       };
+      "dokploy" = {
+        user = "pablo";
+        hostname = "72.61.207.36";
+        identityFile = "~/.ssh/hostinger_ed25519";
+        identitiesOnly = true;
+      };
       "github.com" = {
         user = "git";
         hostname = "github.com";

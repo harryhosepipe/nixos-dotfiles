@@ -9,11 +9,15 @@ activates a configuration, launches applications, pushes branches, or opens PRs.
 | Package ID | Release policy | Files changed by an update |
 | --- | --- | --- |
 | `codex-desktop` | Latest commit of the existing `ilysenko/codex-desktop-linux` input; app version comes from its Linux package pins | `flake.lock` |
+| `claude-code` | Official native `latest` channel, with a published Linux x64 checksum | Claude version and source hash in `packages/default.nix` |
 | `hermes-desktop` | Stable `NousResearch/hermes-agent` release; preserves the desktop wrapper | `flake.nix`, `flake.lock`, `modules/home/hermes.nix` |
 | `pi` | npm `@earendil-works/pi-coding-agent` `latest` | npm manifest and lock, Pi version and dependency hash |
 | `t3code` | Latest published nightly with an x86_64 AppImage | T3 version and source hash in `packages/default.nix` |
+| `photocraft` | Stable `storytold/photocraft` release with a Linux x86_64 AppImage | Photocraft version and source hash in `packages/default.nix` |
+| `handy` | Stable `cjpais/Handy` release | Handy input tag in `flake.nix` and pin in `flake.lock` |
 | `dokploy-cli` | Stable `Dokploy/cli` release | Version, source hash, and pnpm dependency hash in `packages/default.nix` |
 | `vercel-cli` | npm `@vercel/vc-native-linux-x64` `latest` | Version and source hash in `packages/vercel-cli.nix` |
+| `tailscale` | Official stable Linux amd64 tarball feed | Version and source hash in `packages/tailscale.nix` |
 | `sanity-cli` | npm `@sanity/cli` `latest` | npm manifest and lock, version in `packages/default.nix` |
 
 The Codex wrapper revision can change even when its bundled app version stays
@@ -33,6 +37,9 @@ cd /home/pablo/nix-dot
 swamp workflow validate nix-package-updates
 swamp workflow run nix-package-updates
 swamp workflow run nix-package-updates --input mode=check --input packages=pi,t3code
+swamp workflow run nix-package-updates --input mode=check --input packages=photocraft,handy
+swamp workflow run nix-package-updates --input mode=check --input packages=tailscale
+swamp workflow run nix-package-updates --input mode=check --input packages=claude-code
 ```
 
 Check mode is the default and does not edit package definitions, lockfiles,
@@ -105,6 +112,13 @@ lifecycle scripts disabled, then normalized and hashed to match the pinned
 to Dokploy's fetcher settings or pnpm hooks stops the adapter for review.
 Sanity uses its existing `importNpmLock` setup. Missing registry integrity
 entries are filled only after confirming the registry's tarball URL matches.
+Tailscale follows the stable tarball version reported by `pkgs.tailscale.com`
+and verifies the download against its published SHA-256 checksum. Its daemon
+wrapper and service installation remain intact.
+Claude Code uses Anthropic's native release manifest and verifies the downloaded
+binary against its Linux x64 SHA-256 checksum. The local pin overrides only the
+Nixpkgs package's version and source, preserving its launcher, sandbox tools,
+and disabled self-updater.
 
 Update-only helper tools are resolved from the existing locked Nixpkgs. If a
 tool is absent from the local store, the update is reported as failed; the

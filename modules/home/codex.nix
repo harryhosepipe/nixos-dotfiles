@@ -41,76 +41,10 @@ let
       --set BROWSER_USE_CODEX_APP_VERSION ${desktopPackage.version} \
       --set CODEX_CLI_PATH ${desktopResources}/codex
   '';
-
-  # These are the active Codex skills from github:mattpocock/skills.
-  # Deprecated skills are left out so they do not appear as normal choices.
-  # Destination directory names are read from each SKILL.md rather than duplicated
-  # here, because Codex requires the directory and manifest names to agree.
-  mattPocockSkillPaths = [
-    "engineering/ask-matt"
-    "engineering/code-review"
-    "engineering/codebase-design"
-    "engineering/diagnosing-bugs"
-    "engineering/domain-modeling"
-    "engineering/grill-with-docs"
-    "engineering/implement"
-    "engineering/implement-spec"
-    "engineering/improve-codebase-architecture"
-    "engineering/pr"
-    "engineering/prototype"
-    "engineering/research"
-    "engineering/retro"
-    "engineering/setup-matt-pocock-skills"
-    "engineering/tdd"
-    "engineering/to-spec"
-    "engineering/to-tickets"
-    "engineering/triage"
-    "engineering/wayfinder"
-    "engineering/wizard"
-    "misc/git-guardrails-claude-code"
-    "misc/migrate-to-shoehorn"
-    "misc/scaffold-exercises"
-    "misc/setup-pre-commit"
-    "productivity/writing-for-agents"
-  ];
-
-  skillName = path:
-    let
-      manifest = "${inputs.mattpocock-skills}/skills/${path}/SKILL.md";
-      nameLines = builtins.filter
-        (line: builtins.match "name:[[:space:]]*.*" line != null)
-        (pkgs.lib.splitString "\n" (builtins.readFile manifest));
-    in
-    if builtins.length nameLines != 1 then
-      throw "Expected exactly one top-level name in ${manifest}"
-    else
-      builtins.elemAt (builtins.match "name:[[:space:]]*(.*)" (builtins.head nameLines)) 0;
-
-  mattPocockSkillFiles = builtins.listToAttrs (
-    map
-      (path:
-        let name = skillName path;
-        in {
-          name = "codex/skills/${name}";
-          value.source = "${inputs.mattpocock-skills}/skills/${path}";
-        })
-      mattPocockSkillPaths
-  );
-
-  skillNamesAreUnique =
-    builtins.length (builtins.attrNames mattPocockSkillFiles)
-    == builtins.length mattPocockSkillPaths;
 in
 {
   imports = [
     inputs.codex-desktop-linux.homeManagerModules.default
-  ];
-
-  assertions = [
-    {
-      assertion = skillNamesAreUnique;
-      message = "Matt Pocock's selected skills must have unique names in their SKILL.md files";
-    }
   ];
 
   home.packages = [
@@ -129,8 +63,6 @@ in
     "codex/hooks.json" = "codex/hooks.json";
     "codex/hooks" = "codex/hooks";
   };
-
-  xdg.configFile = mattPocockSkillFiles;
 
   programs.codexDesktopLinux = {
     enable = true;

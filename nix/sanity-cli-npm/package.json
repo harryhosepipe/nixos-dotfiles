@@ -1,8 +1,8 @@
 {
   "name": "sanity-cli-nix-wrapper",
-  "version": "8.22.1",
+  "version": "8.26.0",
   "private": true,
   "dependencies": {
-    "@sanity/cli": "8.22.1"
+    "@sanity/cli": "8.26.0"
   }
 }

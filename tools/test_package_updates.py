@@ -26,6 +26,9 @@ class FakeHttp:
     def github(self, repo, suffix):
         return self.json(f"{repo}/{suffix}")
 
+    def text(self, url):
+        return self.json(url)
+
 
 class ReleaseTests(unittest.TestCase):
     def test_nightly_selection_ignores_stable_and_other_prereleases(self):
@@ -104,6 +107,299 @@ class ReleaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, patch.object(client, "get", return_value=io.BytesIO(b"wrong")):
             with self.assertRaisesRegex(updates.UpdateError, "checksum mismatch"):
                 client.download("https://example.invalid/download", Path(folder) / "download", checksum)
+
+
+class ClaudeCodeAdapterTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.repo = Path(self.temporary.name)
+        (self.repo / "packages").mkdir()
+        self.path = self.repo / "packages/default.nix"
+        self.original = '''  claude-code = pkgs.claude-code.overrideAttrs (finalAttrs: previousAttrs: {
+    version = "2.1.177";
+    src = pkgs.fetchurl {
+      url = "https://downloads.claude.ai/claude-code-releases/${finalAttrs.version}/linux-x64/claude";
+      hash = "old-claude-hash";
+    };
+    meta = previousAttrs.meta // { platforms = [ "x86_64-linux" ]; };
+  });
+  another-package = { version = "2.1.177"; hash = "unrelated-hash"; };
+'''
+        self.path.write_text(self.original)
+        self.manifest_url = updates.CLAUDE_RELEASES + "/2.1.180/manifest.json"
+        self.manifest = {"version": "2.1.180", "platforms": {
+            "linux-x64": {"binary": "claude", "checksum": "ab" * 32}}}
+        self.client = FakeHttp({updates.CLAUDE_RELEASES + "/latest": "2.1.180\n",
+                                self.manifest_url: self.manifest})
+        self.updater = updates.Updater(self.repo, self.client)
+
+    def test_check_reads_native_release_and_matching_platform_without_writing(self):
+        item = self.updater.discover("claude-code")
+        self.assertEqual((item.current, item.latest, item.status), ("2.1.177", "2.1.180", "available"))
+        self.assertEqual(item.channel, "latest")
+        self.assertEqual(item.source, self.manifest_url)
+        self.assertEqual(item.details["checksum"], "ab" * 32)
+        self.assertEqual(self.path.read_text(), self.original)
+
+    def test_current_and_newer_pins_are_not_downgraded(self):
+        for current, status in [("2.1.180", "up-to-date"), ("2.1.181", "ahead-of-upstream")]:
+            with self.subTest(current=current):
+                self.path.write_text(self.original.replace('version = "2.1.177"', f'version = "{current}"'))
+                self.assertEqual(self.updater.discover("claude-code").status, status)
+
+    def test_prerelease_or_malformed_feed_is_rejected_before_fetching_manifest(self):
+        for version in ["2.1.180-beta.1", "../other", "", "3.0"]:
+            with self.subTest(version=version):
+                self.client.values[updates.CLAUDE_RELEASES + "/latest"] = version
+                self.assertIn("unsupported version", self.updater.discover("claude-code").error)
+
+    def test_manifest_requires_matching_version_platform_binary_and_checksum(self):
+        for manifest in [
+            {**self.manifest, "version": "2.1.179"},
+            {"version": "2.1.180", "platforms": {"linux-arm64": self.manifest["platforms"]["linux-x64"]}},
+            {"version": "2.1.180", "platforms": {"linux-x64": {"binary": "other", "checksum": "ab" * 32}}},
+            {"version": "2.1.180", "platforms": {"linux-x64": {"binary": "claude", "checksum": "invalid"}}},
+        ]:
+            with self.subTest(manifest=manifest):
+                self.client.values[self.manifest_url] = manifest
+                item = self.updater.discover("claude-code")
+                self.assertEqual(item.status, "failed")
+                self.assertIn("manifest must match", item.error)
+
+    def test_network_failure_is_reported_as_failed(self):
+        self.client.values[self.manifest_url] = updates.UpdateError("release feed unavailable")
+        item = self.updater.discover("claude-code")
+        self.assertEqual(item.status, "failed")
+        self.assertIn("release feed unavailable", item.error)
+
+    def test_update_verifies_binary_and_preserves_wrapper_and_other_packages(self):
+        item = self.updater.discover("claude-code")
+        with patch.object(self.client, "download", create=True, return_value="new-claude-hash") as download:
+            self.updater.update_download(self.repo, item)
+        expected = self.original.replace('version = "2.1.177"', 'version = "2.1.180"', 1)
+        self.assertEqual(self.path.read_text(), expected.replace("old-claude-hash", "new-claude-hash"))
+        self.assertEqual(download.call_args.args[0], updates.CLAUDE_RELEASES + "/2.1.180/linux-x64/claude")
+        self.assertEqual(download.call_args.args[2], "sha256-" + base64.b64encode(bytes.fromhex("ab" * 32)).decode())
+
+    def test_changed_native_packaging_requires_review_before_downloading(self):
+        item = self.updater.discover("claude-code")
+        for before in [self.original.replace("/linux-x64/", "/linux-arm64/"),
+                       self.original.replace("pkgs.claude-code.overrideAttrs", "pkgs.stdenvNoCC.mkDerivation")]:
+            with self.subTest(before=before):
+                self.path.write_text(before)
+                with patch.object(self.client, "download", create=True) as download:
+                    with self.assertRaisesRegex(updates.UpdateError, "native packaging changed"):
+                        self.updater.update_download(self.repo, item)
+                    download.assert_not_called()
+                self.assertEqual(self.path.read_text(), before)
+
+    def test_failed_checksum_verification_does_not_change_package(self):
+        item = self.updater.discover("claude-code")
+        with patch.object(self.client, "download", create=True, side_effect=updates.UpdateError("checksum mismatch")):
+            with self.assertRaisesRegex(updates.UpdateError, "checksum mismatch"):
+                self.updater.update_download(self.repo, item)
+        self.assertEqual(self.path.read_text(), self.original)
+
+
+class TailscaleAdapterTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.repo = Path(self.temporary.name)
+        (self.repo / "packages").mkdir()
+        self.path = self.repo / "packages/tailscale.nix"
+        self.original = '''{ stdenvNoCC, fetchurl, makeWrapper }:
+stdenvNoCC.mkDerivation (finalAttrs: {
+  pname = "tailscale";
+  version = "1.104.1";
+  src = fetchurl {
+    url = "https://pkgs.tailscale.com/stable/tailscale_${finalAttrs.version}_amd64.tgz";
+    hash = "old-hash";
+  };
+  installPhase = ''
+    wrapProgram "$out/bin/tailscaled" --prefix PATH : /existing/tools
+    install -Dm644 systemd/tailscaled.service "$out/lib/systemd/system/tailscaled.service"
+  '';
+})
+'''
+        self.path.write_text(self.original)
+        self.feed = "https://pkgs.tailscale.com/stable/?mode=json"
+        self.url = "https://pkgs.tailscale.com/stable/tailscale_1.104.4_amd64.tgz"
+        self.metadata = {"Version": "9.9.9", "TarballsVersion": "1.104.4",
+                         "Tarballs": {"amd64": "tailscale_1.104.4_amd64.tgz"}}
+        self.client = FakeHttp({self.feed: self.metadata, self.url + ".sha256": "ab" * 32 + "\n"})
+        self.updater = updates.Updater(self.repo, self.client)
+
+    def test_stable_linux_feed_drives_discovery_without_downloading(self):
+        item = self.updater.discover("tailscale")
+        self.assertEqual((item.current, item.latest, item.status), ("1.104.1", "1.104.4", "available"))
+        self.assertEqual(item.channel, "stable")
+        self.assertEqual(item.details["tarball"], self.url)
+        self.assertEqual(self.path.read_text(), self.original)
+
+    def test_stable_feed_rejects_prereleases_and_wrong_or_missing_architecture(self):
+        for version, tarballs in [
+            ("1.105.0-beta.1", {"amd64": "tailscale_1.105.0-beta.1_amd64.tgz"}),
+            ("1.104.4", {"arm64": "tailscale_1.104.4_arm64.tgz"}),
+            ("1.104.4", {"amd64": "../unstable/tailscale_1.104.4_amd64.tgz"}),
+        ]:
+            with self.subTest(version=version, tarballs=tarballs):
+                self.client.values[self.feed] = {"TarballsVersion": version, "Tarballs": tarballs}
+                self.assertEqual(self.updater.discover("tailscale").status, "failed")
+
+    def test_current_and_newer_pins_are_not_downgraded(self):
+        for current, status in [("1.104.4", "up-to-date"), ("1.104.10", "ahead-of-upstream")]:
+            with self.subTest(current=current):
+                self.path.write_text(self.original.replace('version = "1.104.1"', f'version = "{current}"'))
+                self.assertEqual(self.updater.discover("tailscale").status, status)
+
+    def test_update_verifies_checksum_and_preserves_wrapper_and_service(self):
+        item = self.updater.discover("tailscale")
+        with patch.object(self.client, "download", create=True, return_value="new-hash") as download:
+            self.updater.update_download(self.repo, item)
+        self.assertEqual(self.path.read_text(), self.original.replace('version = "1.104.1"',
+                         'version = "1.104.4"').replace("old-hash", "new-hash"))
+        self.assertEqual(download.call_args.args[0], self.url)
+        self.assertEqual(download.call_args.args[2], "sha256-" + base64.b64encode(bytes.fromhex("ab" * 32)).decode())
+
+    def test_changed_source_requires_review_before_downloading(self):
+        item = self.updater.discover("tailscale")
+        before = self.original.replace("/stable/", "/unstable/")
+        self.path.write_text(before)
+        with patch.object(self.client, "download", create=True) as download:
+            with self.assertRaisesRegex(updates.UpdateError, "source template changed"):
+                self.updater.update_download(self.repo, item)
+            download.assert_not_called()
+        self.assertEqual(self.path.read_text(), before)
+
+    def test_invalid_checksum_or_download_failure_keeps_package_unchanged(self):
+        item = self.updater.discover("tailscale")
+        with patch.object(self.client, "download", create=True,
+                          side_effect=updates.UpdateError("published checksum mismatch")) as download:
+            for checksum in ["not-a-checksum", "ab" * 32]:
+                with self.subTest(checksum=checksum):
+                    self.client.values[self.url + ".sha256"] = checksum
+                    with self.assertRaises(updates.UpdateError):
+                        self.updater.update_download(self.repo, item)
+                    self.assertEqual(self.path.read_text(), self.original)
+            self.assertEqual(download.call_count, 1)
+
+
+class DesktopAdapterTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.repo = Path(self.temporary.name)
+        (self.repo / "packages").mkdir()
+        self.packages = self.repo / "packages/default.nix"
+        self.original = '''  t3codeVersion = "0.1.2-nightly.20261021.9";
+  t3codeSrc = pkgs.fetchurl {
+    url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
+    hash = "old-t3-hash";
+  };
+  photocraftVersion = "0.10.0";
+  photocraftSrc = pkgs.fetchurl {
+    url = "https://github.com/storytold/photocraft/releases/download/v${photocraftVersion}/photocraft-${photocraftVersion}-linux-x86_64.AppImage";
+    hash = "old-photocraft-hash";
+  };
+  photocraft = pkgs.appimageTools.wrapAppImage {
+    version = photocraftVersion;
+    extraInstallCommands = 'wrapProgram $out/bin/photocraft --set-default PHOTOCRAFT_NATIVE_WAYLAND 1';
+  };
+'''
+        self.packages.write_text(self.original)
+        self.flake = self.repo / "flake.nix"
+        self.flake.write_text('  handy.url = "github:cjpais/Handy/v0.9.8";\n# existing configuration\n')
+        self.lock = self.repo / "flake.lock"
+        updates.write_json(self.lock, {"root": "root", "nodes": {
+            "root": {"inputs": {"handy": "handy", "nixpkgs": "nixpkgs"}},
+            "handy": {"locked": {"type": "github", "owner": "cjpais", "repo": "Handy", "rev": "old"},
+                      "original": {"type": "github", "owner": "cjpais", "repo": "Handy", "ref": "v0.9.8"}},
+            "nixpkgs": {"locked": {"rev": "unrelated"}},
+        }})
+
+    def release(self, name, version):
+        repo = "storytold/photocraft" if name == "photocraft" else "cjpais/Handy"
+        return {"draft": False, "prerelease": False, "tag_name": "v" + version,
+                "html_url": f"https://github.com/{repo}/releases/tag/v{version}",
+                "assets": [{"name": f"photocraft-{version}-linux-x86_64.AppImage",
+                            "browser_download_url": f"https://github.com/{repo}/releases/download/v{version}/photocraft-{version}-linux-x86_64.AppImage",
+                            "digest": "sha256:" + "ab" * 32}]}
+
+    def test_photocraft_stable_release_and_exact_linux_asset_are_required(self):
+        release = self.release("photocraft", "0.11.0")
+        client = FakeHttp({"storytold/photocraft/releases/latest": release})
+        updater = updates.Updater(self.repo, client)
+        result = updater.discover("photocraft")
+        self.assertEqual((result.current, result.latest, result.status), ("0.10.0", "0.11.0", "available"))
+        for field in ("draft", "prerelease"):
+            with self.subTest(field=field):
+                release[field] = True
+                self.assertEqual(updater.discover("photocraft").status, "failed")
+                release[field] = False
+        release["assets"][0]["name"] = "photocraft-0.11.0-linux-aarch64.AppImage"
+        self.assertEqual(updater.discover("photocraft").status, "failed")
+
+    def test_photocraft_updates_only_its_version_and_hash_and_checks_published_digest(self):
+        release = self.release("photocraft", "0.11.0")
+        client = FakeHttp({"storytold/photocraft/releases/latest": release})
+        updater = updates.Updater(self.repo, client)
+        item = updater.discover("photocraft")
+        with patch.object(client, "download", create=True, return_value="new-hash") as download:
+            updater.update_download(self.repo, item)
+        expected = self.original.replace('photocraftVersion = "0.10.0"', 'photocraftVersion = "0.11.0"')
+        self.assertEqual(self.packages.read_text(), expected.replace("old-photocraft-hash", "new-hash"))
+        self.assertEqual(download.call_args.args[2], "sha256-" + base64.b64encode(bytes.fromhex("ab" * 32)).decode())
+
+    def test_photocraft_changed_source_requires_review_before_download(self):
+        client = FakeHttp({"storytold/photocraft/releases/latest": self.release("photocraft", "0.11.0")})
+        updater = updates.Updater(self.repo, client)
+        item = updater.discover("photocraft")
+        before = self.original.replace("github.com/storytold/photocraft", "example.invalid/photocraft")
+        self.packages.write_text(before)
+        with patch.object(client, "download", create=True) as download:
+            with self.assertRaisesRegex(updates.UpdateError, "source template changed"):
+                updater.update_download(self.repo, item)
+            download.assert_not_called()
+        self.assertEqual(self.packages.read_text(), before)
+
+    def test_t3_download_still_updates_only_t3(self):
+        version = "0.1.2-nightly.20261022.1"
+        client = FakeHttp({})
+        item = updates.Candidate(package="t3code", current="0.1.2-nightly.20261021.9", latest=version,
+                                 details={"asset": {"browser_download_url": f"https://github.com/pingdotgg/t3code/releases/download/v{version}/T3-Code-{version}-x86_64.AppImage"}})
+        with patch.object(client, "download", create=True, return_value="new-hash"):
+            updates.Updater(self.repo, client).update_download(self.repo, item)
+        expected = self.original.replace(item.current, version).replace("old-t3-hash", "new-hash")
+        self.assertEqual(self.packages.read_text(), expected)
+
+    def test_handy_updates_its_flake_pin_and_keeps_unrelated_inputs(self):
+        client = FakeHttp({"cjpais/Handy/releases/latest": self.release("handy", "0.9.9")})
+        updater = updates.Updater(self.repo, client)
+        item = updater.discover("handy")
+        self.assertEqual((item.current, item.latest, item.status), ("0.9.8", "0.9.9", "available"))
+        before = self.flake.read_text()
+        def lock_input(command, **kwargs):
+            self.assertEqual(command, ["nix", "flake", "update", *updates.SAFE_NIX, "handy"])
+            lock = updates.read_json(self.lock)
+            lock["nodes"]["handy"]["original"]["ref"] = "v0.9.9"
+            lock["nodes"]["handy"]["locked"]["rev"] = "new"
+            updates.write_json(self.lock, lock)
+        with patch.object(updates, "run", side_effect=lock_input):
+            updater.update_flake(self.repo, item)
+        self.assertEqual(self.flake.read_text(), before.replace("v0.9.8", "v0.9.9"))
+        self.assertEqual(updates.read_json(self.lock)["nodes"]["nixpkgs"]["locked"]["rev"], "unrelated")
+
+    def test_handy_mismatched_or_nonstable_pin_requires_review(self):
+        client = FakeHttp({"cjpais/Handy/releases/latest": self.release("handy", "0.9.9")})
+        updater = updates.Updater(self.repo, client)
+        self.flake.write_text(self.flake.read_text().replace("v0.9.8", "v0.9.7"))
+        self.assertIn("flake URL and lock pin disagree", updater.discover("handy").error)
+        lock = updates.read_json(self.lock)
+        lock["nodes"]["handy"]["original"]["ref"] = "main"
+        updates.write_json(self.lock, lock)
+        self.assertIn("stable release tag", updater.discover("handy").error)
 
 
 class WorkspaceTests(unittest.TestCase):
