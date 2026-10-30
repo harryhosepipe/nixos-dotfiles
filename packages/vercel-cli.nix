@@ -1,11 +1,11 @@
 { pkgs }:
 pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "vercel-cli";
-  version = "65.2.0";
+  version = "65.8.0";
 
   src = pkgs.fetchurl {
     url = "https://registry.npmjs.org/@vercel/vc-native-linux-x64/-/vc-native-linux-x64-${finalAttrs.version}.tgz";
-    hash = "sha256-+UCaiEpFrnBbzhAatBX+6AxUAPsZp8lxhXegC+h7q2w=";
+    hash = "sha256-xFgbjxbibx+eMWLQ6aBlleW6o7xV28nYqGRV5V+6O/M=";
   };
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];

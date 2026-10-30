@@ -136,10 +136,10 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
-  photocraftVersion = "0.10.0";
+  photocraftVersion = "0.17.0";
   photocraftSrc = pkgs.fetchurl {
     url = "https://github.com/storytold/photocraft/releases/download/v${photocraftVersion}/photocraft-${photocraftVersion}-linux-x86_64.AppImage";
-    hash = "sha256-zRozyXnopdqU3tgddkjnecuAabd+Ssp0PI0XfKUnDXc=";
+    hash = "sha256-zncpnyQ1NKwdJIqoHJqf0niuQHwCTLkx4Dkx63C+VK8=";
   };
   photocraftContents = pkgs.appimageTools.extractType2 {
     pname = "photocraft";
@@ -176,6 +176,16 @@ in
   strata = import ./strata.nix { inherit pkgs; };
   swamp = import ./swamp.nix { inherit pkgs; };
   vercel-cli = import ./vercel-cli.nix { inherit pkgs; };
+
+  # Pin the native binary independently while retaining Nixpkgs' wrapper and sandbox tools.
+  claude-code = pkgs.claude-code.overrideAttrs (finalAttrs: previousAttrs: {
+    version = "2.1.314";
+    src = pkgs.fetchurl {
+      url = "https://downloads.claude.ai/claude-code-releases/${finalAttrs.version}/linux-x64/claude";
+      hash = "sha256-RIcEK0xPXYjUVo9orpiq4LH/rliGTPV/uGhkG8X4RZQ=";
+    };
+    meta = previousAttrs.meta // { platforms = [ "x86_64-linux" ]; };
+  });
 
   blender = pkgs.buildFHSEnv {
     pname = "blender";
@@ -477,7 +487,7 @@ in
 
   sanity-cli = pkgs.buildNpmPackage {
     pname = "sanity-cli";
-    version = "8.22.1";
+    version = "8.26.0";
     nodejs = pkgs.nodejs_24;
 
     src = ../nix/sanity-cli-npm;

@@ -14,11 +14,11 @@
 # independently of this configuration's pinned nixpkgs and Go compiler.
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "tailscale";
-  version = "1.104.1";
+  version = "1.104.4";
 
   src = fetchurl {
     url = "https://pkgs.tailscale.com/stable/tailscale_${finalAttrs.version}_amd64.tgz";
-    hash = "sha256-EI0dluz0ENMFVx4XNRbycDj4cJGam4nJFKFnxtM6RSg=";
+    hash = "sha256-Yk6gk9R9Ys9W8XuDMtdLjezaSh+qYQ68YKHeM0srPck=";
   };
 
   nativeBuildInputs = [ makeWrapper installShellFiles ];

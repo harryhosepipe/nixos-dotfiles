@@ -35,6 +35,10 @@ TARGETS = {
         "channel": "upstream Linux packaging branch", "input": "codex-desktop-linux",
         "files": ["flake.lock"],
     },
+    "claude-code": {
+        "kind": "claude-native", "channel": "latest",
+        "files": ["packages/default.nix"],
+    },
     "hermes-desktop": {
         "kind": "hermes", "repo": "NousResearch/hermes-agent", "channel": "stable",
         "input": "hermes-agent",
@@ -47,7 +51,19 @@ TARGETS = {
     },
     "t3code": {
         "kind": "appimage", "repo": "pingdotgg/t3code", "channel": "nightly",
+        "variable": "t3codeVersion", "source": "t3codeSrc",
+        "asset": "T3-Code-{version}-x86_64.AppImage",
         "files": ["packages/default.nix"],
+    },
+    "photocraft": {
+        "kind": "appimage", "repo": "storytold/photocraft", "channel": "stable",
+        "variable": "photocraftVersion", "source": "photocraftSrc",
+        "asset": "photocraft-{version}-linux-x86_64.AppImage",
+        "files": ["packages/default.nix"],
+    },
+    "handy": {
+        "kind": "stable-flake", "repo": "cjpais/Handy", "channel": "stable",
+        "input": "handy", "files": ["flake.nix", "flake.lock"],
     },
     "dokploy-cli": {
         "kind": "pnpm", "repo": "Dokploy/cli", "channel": "stable",
@@ -57,6 +73,10 @@ TARGETS = {
         "kind": "native-npm", "npm": "@vercel/vc-native-linux-x64", "channel": "latest",
         "files": ["packages/vercel-cli.nix"],
     },
+    "tailscale": {
+        "kind": "tailscale", "channel": "stable",
+        "files": ["packages/tailscale.nix"],
+    },
     "sanity-cli": {
         "kind": "npm", "npm": "@sanity/cli", "channel": "latest",
         "manifest": "nix/sanity-cli-npm", "nix": "packages/default.nix",
@@ -64,6 +84,7 @@ TARGETS = {
     },
 }
 SAFE_NIX = ["--option", "allow-import-from-derivation", "false"]
+CLAUDE_RELEASES = "https://downloads.claude.ai/claude-code-releases"
 VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-nightly\.(\d{8})\.(\d+))?$")
 
 
@@ -146,6 +167,10 @@ class Http:
         with self.get(url) as response:
             return json.load(response)
 
+    def text(self, url):
+        with self.get(url) as response:
+            return response.read().decode()
+
     def github(self, repo, suffix):
         return self.json(f"https://api.github.com/repos/{repo}/{suffix}")
 
@@ -216,7 +241,7 @@ class Updater:
     def current(self, name):
         target = TARGETS[name]
         kind = target["kind"]
-        if kind in ("codex", "hermes"):
+        if kind in ("codex", "hermes", "stable-flake"):
             lock = read_json(self.repo / "flake.lock")
             node = lock["nodes"][lock["nodes"][lock["root"]]["inputs"][target["input"]]]
             expected_owner, expected_repo = target["repo"].split("/")
@@ -230,9 +255,11 @@ class Updater:
                 return pins["version"], {"revision": revision}
             ref = node["original"].get("ref", "")
             if not re.fullmatch(r"v\d+\.\d+\.\d+", ref):
-                raise UpdateError("Hermes is not pinned to a supported stable release tag")
+                raise UpdateError(f"{name} is not pinned to a supported stable release tag")
             version = ref.removeprefix("v")
-            if assignment((self.repo / "modules/home/hermes.nix").read_text(), "version") != version:
+            if kind == "stable-flake" and (self.repo / "flake.nix").read_text().count(f'github:{target["repo"]}/{ref}"') != 1:
+                raise UpdateError(f"{name}: flake URL and lock pin disagree")
+            if kind == "hermes" and assignment((self.repo / "modules/home/hermes.nix").read_text(), "version") != version:
                 raise UpdateError("Hermes flake pin and module version disagree")
             return version, {"revision": node["locked"]["rev"]}
         if kind == "npm":
@@ -250,8 +277,8 @@ class Updater:
             return version, {}
         text = (self.repo / target["files"][0]).read_text()
         if kind == "appimage":
-            return assignment(text, "t3codeVersion"), {}
-        if kind == "pnpm":
+            return assignment(text, target["variable"]), {}
+        if kind in ("pnpm", "claude-native"):
             start, end = package_block(text, name)
             text = text[start:end]
         return assignment(text, "version"), {}
@@ -273,13 +300,33 @@ class Updater:
                 if version_key(item.latest) < version_key(item.current):
                     raise UpdateError("Upstream packaging would downgrade Codex Desktop")
                 return item
-            if "npm" in target:
+            if kind == "claude-native":
+                item.latest = self.http.text(CLAUDE_RELEASES + "/latest").strip()
+                if not re.fullmatch(r"\d+\.\d+\.\d+", item.latest):
+                    raise UpdateError("Claude Code's latest channel returned an unsupported version")
+                item.source = f"{CLAUDE_RELEASES}/{item.latest}/manifest.json"
+                manifest = self.http.json(item.source)
+                platform = manifest.get("platforms", {}).get("linux-x64", {})
+                checksum = platform.get("checksum", "")
+                if (manifest.get("version") != item.latest or platform.get("binary") != "claude"
+                        or not re.fullmatch(r"[A-Fa-f0-9]{64}", checksum)):
+                    raise UpdateError("Claude Code's manifest must match the release and provide a Linux x64 SHA-256 checksum")
+                item.details["checksum"] = checksum
+            elif kind == "tailscale":
+                item.source = "https://pkgs.tailscale.com/stable/"
+                metadata = self.http.json(item.source + "?mode=json")
+                item.latest = metadata["TarballsVersion"]
+                filename = f"tailscale_{item.latest}_amd64.tgz"
+                if metadata.get("Tarballs", {}).get("amd64") != filename:
+                    raise UpdateError("Tailscale stable metadata does not contain the expected Linux amd64 tarball")
+                item.details["tarball"] = item.source + filename
+            elif "npm" in target:
                 metadata = self.http.json(f"https://registry.npmjs.org/{target['npm']}/latest")
                 item.latest = metadata["version"]
                 item.source = f"https://www.npmjs.com/package/{target['npm']}/v/{item.latest}"
                 item.details["dist"] = {key: value for key, value in metadata.get("dist", {}).items()
                                         if key in ("tarball", "integrity", "shasum")}
-            elif kind == "appimage":
+            elif kind == "appimage" and target["channel"] == "nightly":
                 if "-nightly." not in item.current:
                     raise UpdateError("T3 no longer tracks a nightly; review its release policy")
                 releases = []
@@ -293,13 +340,7 @@ class Updater:
                     raise UpdateError("No nightly T3 release found in the latest 300 releases")
                 release = max(releases, key=lambda r: version_key(r["tag_name"][1:]))
                 item.latest = release["tag_name"][1:]
-                asset_name = f"T3-Code-{item.latest}-x86_64.AppImage"
-                assets = [a for a in release["assets"] if a["name"] == asset_name]
-                if len(assets) != 1:
-                    raise UpdateError(f"Nightly release does not contain {asset_name}")
                 item.source = release["html_url"]
-                item.details["asset"] = {key: value for key, value in assets[0].items()
-                                         if key in ("name", "browser_download_url", "digest", "size")}
             else:
                 release = self.http.github(target["repo"], "releases/latest")
                 if release["draft"] or release["prerelease"]:
@@ -309,6 +350,13 @@ class Updater:
                 item.details["tag"] = release["tag_name"]
             if target["channel"] != "nightly" and not re.fullmatch(r"\d+\.\d+\.\d+", item.latest):
                 raise UpdateError("The stable release source returned a prerelease or unsupported version")
+            if kind == "appimage":
+                asset_name = target["asset"].format(version=item.latest)
+                assets = [a for a in release["assets"] if a["name"] == asset_name]
+                if len(assets) != 1:
+                    raise UpdateError(f"Release must contain exactly one {asset_name}")
+                item.details["asset"] = {key: value for key, value in assets[0].items()
+                                         if key in ("name", "browser_download_url", "digest", "size")}
             comparison = (version_key(item.latest) > version_key(item.current)) - (version_key(item.latest) < version_key(item.current))
             item.status = "available" if comparison > 0 else "up-to-date" if comparison == 0 else "ahead-of-upstream"
         except Exception as exc:
@@ -322,10 +370,11 @@ class Updater:
     def update_flake(self, workspace, item):
         target = TARGETS[item.package]
         before = read_json(workspace / "flake.lock")
-        if target["kind"] == "hermes":
+        if target["kind"] in ("hermes", "stable-flake"):
             path = workspace / "flake.nix"
             old = f"github:{target['repo']}/v{item.current}"
             path.write_text(replace_once(path.read_text(), old, f"github:{target['repo']}/{item.details['tag']}"))
+        if target["kind"] == "hermes":
             path = workspace / "modules/home/hermes.nix"
             path.write_text(replace_once(path.read_text(), f'version = "{item.current}";', f'version = "{item.latest}";'))
         run(["nix", "flake", "update", *SAFE_NIX, target["input"]], cwd=workspace)
@@ -340,8 +389,8 @@ class Updater:
         node = after["nodes"][after["nodes"][after["root"]]["inputs"][target["input"]]]
         if target["kind"] == "codex" and node["locked"]["rev"] != item.details["candidateRevision"]:
             raise UpdateError("Upstream advanced during the check; rerun to check the new revision")
-        if target["kind"] == "hermes" and node["original"].get("ref") != item.details["tag"]:
-            raise UpdateError("The Hermes lock does not match the selected release")
+        if target["kind"] in ("hermes", "stable-flake") and node["original"].get("ref") != item.details["tag"]:
+            raise UpdateError(f"The {item.package} lock does not match the selected release")
 
     def fill_integrities(self, lock):
         for location, package in lock["packages"].items():
@@ -457,6 +506,23 @@ class Updater:
         path = workspace / target["files"][0]
         text = path.read_text()
         kind = target["kind"]
+        if kind == "claude-native":
+            start, end = package_block(text, item.package)
+            block = text[start:end]
+            source_url = CLAUDE_RELEASES + "/${finalAttrs.version}/linux-x64/claude"
+            if assignment(block, "url") != source_url or "pkgs.claude-code.overrideAttrs" not in block:
+                raise UpdateError("Claude Code's native packaging changed; review the adapter")
+            checksum = item.details["checksum"]
+            if not re.fullmatch(r"[A-Fa-f0-9]{64}", checksum):
+                raise UpdateError("Claude Code did not publish a valid SHA-256 checksum")
+            integrity = "sha256-" + base64.b64encode(bytes.fromhex(checksum)).decode()
+            url = source_url.replace("${finalAttrs.version}", item.latest)
+            with tempfile.TemporaryDirectory(prefix="nix-package-claude-") as temporary:
+                digest = self.http.download(url, Path(temporary) / "claude", integrity)
+            block = replace_once(block, f'version = "{item.current}";', f'version = "{item.latest}";')
+            block = replace_once(block, assignment(block, "hash"), digest)
+            path.write_text(text[:start] + block + text[end:])
+            return
         if kind == "pnpm":
             start, end = package_block(text, item.package)
             block = text[start:end]
@@ -475,7 +541,21 @@ class Updater:
             path.write_text(text[:start] + block + text[end:])
             return
         with tempfile.TemporaryDirectory(prefix="nix-package-download-") as temporary:
-            if kind == "native-npm":
+            if kind == "tailscale":
+                source_url = "https://pkgs.tailscale.com/stable/tailscale_${finalAttrs.version}_amd64.tgz"
+                if assignment(text, "url") != source_url:
+                    raise UpdateError("Tailscale's source template changed; review the adapter")
+                url = source_url.replace("${finalAttrs.version}", item.latest)
+                if item.details["tarball"] != url:
+                    raise UpdateError("Unexpected Tailscale stable tarball URL")
+                checksum = self.http.text(url + ".sha256").strip()
+                if not re.fullmatch(r"[A-Fa-f0-9]{64}", checksum):
+                    raise UpdateError("Tailscale did not publish a valid SHA-256 checksum")
+                integrity = "sha256-" + base64.b64encode(bytes.fromhex(checksum)).decode()
+                digest = self.http.download(url, Path(temporary) / "package.tgz", integrity)
+                text = replace_once(text, f'version = "{item.current}";', f'version = "{item.latest}";')
+                text = replace_once(text, assignment(text, "hash"), digest)
+            elif kind == "native-npm":
                 if "https://registry.npmjs.org/@vercel/vc-native-linux-x64/-/vc-native-linux-x64-${finalAttrs.version}.tgz" not in text:
                     raise UpdateError("Vercel's source template changed; review the adapter")
                 distribution = item.details["dist"]
@@ -489,21 +569,30 @@ class Updater:
                 text = replace_once(text, f'version = "{item.current}";', f'version = "{item.latest}";')
                 text = replace_once(text, assignment(text, "hash"), digest)
             else:
+                variable = target["variable"]
+                source = re.escape(target["source"])
+                match = re.search(rf"(?s)(  {source} = pkgs.fetchurl \{{)(.*?)(\n  \}};)", text)
+                if not match:
+                    raise UpdateError(f"Cannot find the {item.package} source definition")
+                version_template = "${" + variable + "}"
+                source_url = (f"https://github.com/{target['repo']}/releases/download/v{version_template}/"
+                              + target["asset"].format(version=version_template))
+                if assignment(match[2], "url") != source_url:
+                    raise UpdateError(f"{item.package}'s source template changed; review the adapter")
                 asset = item.details["asset"]
+                expected_url = (f"https://github.com/{target['repo']}/releases/download/v{item.latest}/"
+                                + target["asset"].format(version=item.latest))
+                if asset["browser_download_url"] != expected_url:
+                    raise UpdateError(f"Unexpected {item.package} release asset URL")
                 checksum = asset.get("digest")
                 integrity = None
                 if checksum:
                     algorithm, hexadecimal = checksum.split(":", 1)
                     integrity = algorithm + "-" + base64.b64encode(bytes.fromhex(hexadecimal)).decode()
-                digest = self.http.download(asset["browser_download_url"], Path(temporary) / "T3.AppImage", integrity)
-                text = replace_once(text, f't3codeVersion = "{item.current}";', f't3codeVersion = "{item.latest}";')
-                match = re.search(r"(?s)(  t3codeSrc = pkgs.fetchurl \{)(.*?)(\n  \};)", text)
-                if not match:
-                    raise UpdateError("Cannot find the T3 source definition")
-                if "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage" not in match[2]:
-                    raise UpdateError("T3's source template changed; review the adapter")
+                digest = self.http.download(asset["browser_download_url"], Path(temporary) / "app.AppImage", integrity)
                 body = replace_once(match[2], assignment(match[2], "hash"), digest)
                 text = text[:match.start(2)] + body + text[match.end(2):]
+                text = replace_once(text, f'{variable} = "{item.current}";', f'{variable} = "{item.latest}";')
         path.write_text(text)
 
     def apply(self, workspace, item):
@@ -512,7 +601,7 @@ class Updater:
         status_before = set(changed_files(workspace))
         try:
             kind = TARGETS[item.package]["kind"]
-            if kind in ("codex", "hermes"):
+            if kind in ("codex", "hermes", "stable-flake"):
                 self.update_flake(workspace, item)
             elif kind == "npm":
                 self.update_npm(workspace, item)

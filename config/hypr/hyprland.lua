@@ -16,6 +16,7 @@ hl.monitor({
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("waybar")
+	hl.exec_cmd("tailscale systray")
 	hl.exec_cmd("hyprpaper")
 	hl.exec_cmd("sh -lc '$HOME/.config/hypr/random-wallpaper.sh'")
 	hl.exec_cmd("hypridle")

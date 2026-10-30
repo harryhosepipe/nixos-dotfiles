@@ -11,6 +11,7 @@ in {
 
   home.packages = with pkgs; [
     bun
+    localPackages.claude-code
     nodejs
     pnpm
     localPackages.swamp

@@ -44,6 +44,11 @@
     };
   };
 
+  # Provide Secret Service storage for T3 Code and other desktop apps.
+  # greetd passes the login password to unlock the user's Login keyring.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.greetd.enableGnomeKeyring = true;
+
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
@@ -62,6 +67,8 @@
     hyprpaper
     grim
     jq
+    # Manage the Login keyring; its password should match the login password.
+    seahorse
     slurp
     swaynotificationcenter
     swappy

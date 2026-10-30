@@ -5,6 +5,7 @@
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
+      "claude-code"
       "figma-desktop"
       "google-chrome"
       "michelangelus"
