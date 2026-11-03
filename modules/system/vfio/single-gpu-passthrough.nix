@@ -316,9 +316,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    services.journald.extraConfig = ''
-      Storage=persistent
-    '';
+    services.journald.storage = "persistent";
 
     boot.kernelParams = [
       (if cfg.cpuVendor == "amd" then "amd_iommu=on" else "intel_iommu=on")

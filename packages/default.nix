@@ -136,10 +136,10 @@ let
     version = paperDesktopVersion;
     src = paperDesktopSrc;
   };
-  photocraftVersion = "0.17.0";
+  photocraftVersion = "0.19.0";
   photocraftSrc = pkgs.fetchurl {
     url = "https://github.com/storytold/photocraft/releases/download/v${photocraftVersion}/photocraft-${photocraftVersion}-linux-x86_64.AppImage";
-    hash = "sha256-zncpnyQ1NKwdJIqoHJqf0niuQHwCTLkx4Dkx63C+VK8=";
+    hash = "sha256-DNMLNm1ACQq6AbCh/gIb3PwCsR/5FRx6rO1bZj25uFY=";
   };
   photocraftContents = pkgs.appimageTools.extractType2 {
     pname = "photocraft";
@@ -151,20 +151,22 @@ let
         --replace-fail 'set -u' 'export PHOTOCRAFT_NO_DESKTOP_INTEGRATION=1; set -u'
     '';
   };
-  signalDesktopVersion = "8.25.0";
+  signalDesktopVersion = "8.33.0";
+  # Use the versioned file; the unversioned signal-desktop.AppImage changes on every release.
+  # Hash comes from https://updates.signal.org/desktop/latest-linux.yml.
   signalDesktopSrc = pkgs.fetchurl {
-    url = "https://updates.signal.org/desktop/signal-desktop.AppImage";
-    hash = "sha256-tUw4JT2Qc+ZQ/NitY6kejtJ+MJMPPqYhnebyy3WY7KM=";
+    url = "https://updates.signal.org/desktop/signal-desktop_${signalDesktopVersion}_x86_64.AppImage";
+    hash = "sha512-Y9gyG4isUyIzqvj3L2T1v/pcSssw5f8M6a5LbK+0dySmcf4E8qPIuGC+AGvnFeYvDRRe4FvqQWPNyl3K6DZLNQ==";
   };
   signalDesktopContents = pkgs.appimageTools.extractType2 {
     pname = "signal-desktop";
     version = signalDesktopVersion;
     src = signalDesktopSrc;
   };
-  t3codeVersion = "0.1.3-nightly.20261023.3566";
+  t3codeVersion = "0.1.7-nightly.20261101.4035";
   t3codeSrc = pkgs.fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${t3codeVersion}/T3-Code-${t3codeVersion}-x86_64.AppImage";
-    hash = "sha256-lpUxjpIAi1YA8AiM5yPyAGddKZiOo15kuqBUH/Uj+cI=";
+    hash = "sha256-ReFaCEUrm02Rf9+bwcJvtoAD7tkQG8x542pD44TdBg8=";
   };
   t3codeContents = pkgs.appimageTools.extractType2 {
     pname = "t3code";
@@ -176,13 +178,14 @@ in
   strata = import ./strata.nix { inherit pkgs; };
   swamp = import ./swamp.nix { inherit pkgs; };
   vercel-cli = import ./vercel-cli.nix { inherit pkgs; };
+  helium = import ./helium.nix { inherit pkgs; };
 
   # Pin the native binary independently while retaining Nixpkgs' wrapper and sandbox tools.
   claude-code = pkgs.claude-code.overrideAttrs (finalAttrs: previousAttrs: {
-    version = "2.1.314";
+    version = "2.1.316";
     src = pkgs.fetchurl {
       url = "https://downloads.claude.ai/claude-code-releases/${finalAttrs.version}/linux-x64/claude";
-      hash = "sha256-RIcEK0xPXYjUVo9orpiq4LH/rliGTPV/uGhkG8X4RZQ=";
+      hash = "sha256-/RPHAAD+w/IRbfvLthISELSikyi/DkYhClndWUpn2CQ=";
     };
     meta = previousAttrs.meta // { platforms = [ "x86_64-linux" ]; };
   });
@@ -487,7 +490,7 @@ in
 
   sanity-cli = pkgs.buildNpmPackage {
     pname = "sanity-cli";
-    version = "8.26.0";
+    version = "8.27.0";
     nodejs = pkgs.nodejs_24;
 
     src = ../nix/sanity-cli-npm;

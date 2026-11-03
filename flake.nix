@@ -3,6 +3,11 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    # Keep the newer kernel independent of the desktop's package-set pin.
+    kernel-nixpkgs = {
+      url = "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1105037.1c89083e451e/nixexprs.tar.zst";
+      flake = false;
+    };
     codex-desktop-linux = {
       url = "github:ilysenko/codex-desktop-linux";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -68,9 +73,13 @@
         (mainHost.path + "/configuration.nix")
         inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.handy.nixosModules.default
-        {
+        ({ config, ... }: {
+          boot.kernelPackages = (import inputs.kernel-nixpkgs {
+            system = mainHost.system;
+            config = config.nixpkgs.config;
+          }).linuxPackages_6_18;
           programs.handy.enable = true;
-        }
+        })
         home-manager.nixosModules.home-manager
         {
           home-manager = {
