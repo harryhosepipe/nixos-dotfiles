@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ipc() {
-  "$OMA_CAST_QUICKSHELL" ipc -p "$OMA_CAST_SHELL" call oma-cast "$@"
+  # "--" stops Quickshell from parsing method names such as "show" as its own subcommands.
+  "$OMA_CAST_QUICKSHELL" ipc -p "$OMA_CAST_SHELL" call -- oma-cast "$@"
 }
 
 start() {

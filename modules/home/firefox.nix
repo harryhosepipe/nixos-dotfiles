@@ -56,18 +56,4 @@
       };
     };
   };
-
-  # Desktop applications may rewrite this file at runtime. Replace those changes
-  # during activation instead of creating a backup that can later collide.
-  xdg.configFile."mimeapps.list".force = true;
-
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = {
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "text/html" = "firefox.desktop";
-      "application/xhtml+xml" = "firefox.desktop";
-    };
-  };
 }

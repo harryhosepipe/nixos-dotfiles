@@ -16,7 +16,6 @@
     # Serious errors can still show up, but warnings like noisy USB messages stay
     # in the journal instead of being printed over the login screen.
     consoleLogLevel = 3;
-    initrd.verbose = false;
     kernelParams = [
       "quiet"
       "systemd.show_status=auto"

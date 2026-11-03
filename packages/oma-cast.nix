@@ -16,13 +16,13 @@ let
 in
 pkgs.stdenvNoCC.mkDerivation {
   pname = "oma-cast";
-  version = "0.0.1-unstable-2026-10-21";
+  version = "0.0.1-unstable-2026-10-29";
 
   src = pkgs.fetchFromGitHub {
     owner = "typecraft-dev";
     repo = "oma-cast";
-    rev = "c6013b8d91a5fbb9f8b375c0cb48125d232571ec";
-    hash = "sha256-XzlwA2K6btLRtG2SrskmbfTyCMWtKlzSYv8mHPIFBvQ=";
+    rev = "582bc73466ca25903630d2ebe76c4d63f7b86a68";
+    hash = "sha256-96NXKVFx2fDTUhao2sU063VkKLSlU12MR4bC3FCfPZ8=";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
@@ -91,7 +91,7 @@ pkgs.stdenvNoCC.mkDerivation {
       --set OMARCHY_PATH "$shellDir" \
       --set OMARCHY_MENU_FONT "Inconsolata Nerd Font" \
       --set QT_QPA_PLATFORM wayland \
-      --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [ bash coreutils fontconfig hyprland systemd wl-clipboard xdg-utils ])}
+      --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [ bash coreutils fontconfig gnugrep hyprland jq systemd wl-clipboard xdg-utils ])}
     runHook postInstall
   '';
 

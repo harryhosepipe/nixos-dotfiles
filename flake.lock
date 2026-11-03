@@ -34,11 +34,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793314629,
-        "narHash": "sha256-PDa/ueQmljhD+BiLNqmdppQ5xVNjMnxd37wGuqMEB9s=",
+        "lastModified": 1793539660,
+        "narHash": "sha256-bT/AX6kb5IdslB4p3DynqC1CqQmWBDG88LSFd1Hq0s8=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "f9b973bc03ea60fc971bd227948541fe84bce635",
+        "rev": "e81573f490b034832cd76ca181477d99af1b268e",
         "type": "github"
       },
       "original": {
@@ -231,6 +231,20 @@
         "type": "github"
       }
     },
+    "kernel-nixpkgs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793341285,
+        "narHash": "sha256-LOv16TsMYV2/8BUYnhSxHkOASe7es2ORbqMeLlZJ8Hc=",
+        "rev": "1c89083e451e891152365b799595cf7790a43325",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1105037.1c89083e451e/nixexprs.tar.zst"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1105037.1c89083e451e/nixexprs.tar.zst"
+      }
+    },
     "mattpocock-skills": {
       "flake": false,
       "locked": {
@@ -387,6 +401,7 @@
           "uv2nix"
         ],
         "home-manager": "home-manager_2",
+        "kernel-nixpkgs": "kernel-nixpkgs",
         "mattpocock-skills": "mattpocock-skills",
         "nix-flatpak": "nix-flatpak",
         "nixpkgs": "nixpkgs"

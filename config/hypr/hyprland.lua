@@ -1,5 +1,5 @@
 local terminal = "ghostty"
-local browser = "firefox"
+local browser = "helium"
 local menu = "oma-cast toggle"
 local layoutPreset = "scrolling"
 local configDir = debug.getinfo(1, "S").source:sub(2):match("(.*/)")
@@ -155,6 +155,7 @@ hl.bind(
 )
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser), { description = "Open browser" })
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser), { description = "Open browser" })
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(browser), { description = "Open Helium" })
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu), { description = "Open application launcher" })
 hl.bind(
 	mainMod .. " + T",
@@ -222,7 +223,7 @@ if layoutPreset == "scrolling" then
 end
 
 -- Focus navigation
-hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }), { description = "Focus left" })
+hl.bind(mainMod .. " + LEFT", hl.dsp.focus({ direction = "left" }), { description = "Focus left" })
 hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }), { description = "Focus right" })
 hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }), { description = "Focus up" })
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }), { description = "Focus down" })

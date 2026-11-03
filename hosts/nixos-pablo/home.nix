@@ -115,9 +115,18 @@ in {
   xdg.configFile."qBittorrent/themes/solarized-light.qbtheme".source = solarizedLightQbittorrentTheme;
   xdg.configFile."superfile/hotkeys.toml".source = ../../config/superfile/hotkeys.toml;
 
+  # Desktop applications may rewrite this file; restore our defaults at activation.
+  xdg.configFile."mimeapps.list".force = true;
+
   xdg.mimeApps = {
     enable = true;
-    defaultApplications."inode/directory" = "io.github.lgse.Strata.desktop";
+    defaultApplications = {
+      "inode/directory" = "io.github.lgse.Strata.desktop";
+      "x-scheme-handler/http" = "helium.desktop";
+      "x-scheme-handler/https" = "helium.desktop";
+      "text/html" = "helium.desktop";
+      "application/xhtml+xml" = "helium.desktop";
+    };
     associations.added."inode/directory" = "io.github.lgse.Strata.desktop";
   };
 
@@ -176,6 +185,7 @@ in {
       zed = "zed";
       ghostty = "ghostty";
       wezterm = "wezterm";
+      wireplumber = "wireplumber";
     };
   };
 
@@ -193,6 +203,7 @@ in {
     localPackages.strata
     chromium
     google-chrome
+    localPackages.helium
     keepassxc
     qbittorrent
     obsidian
